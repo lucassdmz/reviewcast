@@ -269,10 +269,14 @@ model Theme {
 }
 
 /// Synthèse mensuelle précalculée pour la home et la page Tendances.
+/// `locationId` null = vue globale de tous les établissements.
 model MonthlySummary {
   id          String   @id @default(cuid())
-  locationId  String   @map("location_id")
+  locationId  String?  @map("location_id")
   mois        DateTime @db.Date
+  /// Phrase météo de la home (une ligne, générée par l'IA).
+  phrase      String?
+  /// Synthèse mensuelle de la page Tendances (5 lignes maximum).
   texte       String?
   meteo       Meteo
   noteMoyenne Decimal  @map("note_moyenne") @db.Decimal(3, 2)
@@ -280,7 +284,7 @@ model MonthlySummary {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  location Location? @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@unique([locationId, mois])
   @@map("monthly_summaries")
