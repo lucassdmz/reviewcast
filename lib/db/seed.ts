@@ -18,9 +18,13 @@ const fixtureSchema = z.array(
     auteur: z.string(),
     note: z.number().int().min(1).max(5),
     texte: z.string().nullable(),
-    date_creation: z.string(),
+    jours_avant: z.number().int().min(0),
   }),
 );
+
+function dateIlYA(jours: number): Date {
+  return new Date(Date.now() - jours * 24 * 60 * 60 * 1000);
+}
 
 async function main() {
   const brut = await readFile(path.join(process.cwd(), "tests", "fixtures", "reviews.json"), "utf8");
@@ -64,15 +68,15 @@ async function main() {
   for (const a of avis) {
     const review = await prisma.review.upsert({
       where: { googleReviewId: a.google_review_id },
-      update: {},
+      update: { dateCreation: dateIlYA(a.jours_avant), dateMaj: dateIlYA(a.jours_avant) },
       create: {
         googleReviewId: a.google_review_id,
         locationId: etablissement.id,
         auteur: a.auteur,
         note: a.note,
         texte: a.texte,
-        dateCreation: new Date(a.date_creation),
-        dateMaj: new Date(a.date_creation),
+        dateCreation: dateIlYA(a.jours_avant),
+        dateMaj: dateIlYA(a.jours_avant),
       },
     });
     await analyserAvis(review.id, ia);

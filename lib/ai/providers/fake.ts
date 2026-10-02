@@ -103,7 +103,8 @@ export class FakeProvider implements AiProvider {
 
   async weatherSentence(input: WeatherSentenceInput): Promise<AiResult<{ phrase: string }>> {
     const themes = input.themesPositifs.slice(0, 2).join(" et ") || "l'expérience générale";
-    const phrase = `${input.volume} avis ce mois-ci, ${input.nbEnthousiastes} enthousiastes. Les clients citent surtout ${themes}.`;
+    const enthousiastes = `${input.nbEnthousiastes} enthousiaste${input.nbEnthousiastes > 1 ? "s" : ""}`;
+    const phrase = `${input.volume} avis ce mois-ci, ${enthousiastes}. Les clients citent surtout ${themes}.`;
     return { data: weatherSentenceSchema.parse({ phrase }), usage: usage("fake") };
   }
 

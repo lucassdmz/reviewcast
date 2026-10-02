@@ -9,14 +9,18 @@ interface Fixture {
   auteur: string;
   note: number;
   texte: string | null;
-  date_creation: string;
+  jours_avant: number;
+}
+
+function dateIlYA(jours: number): Date {
+  return new Date(Date.now() - jours * 24 * 60 * 60 * 1000);
 }
 
 const fixtures = JSON.parse(readFileSync(new URL("../fixtures/reviews.json", import.meta.url), "utf8")) as Fixture[];
 const ligne = { texte: "Vouvoiement.", exemples: [] };
 
 function versIa(f: Fixture): ReviewForAi {
-  return { auteur: f.auteur, note: f.note, texte: f.texte, dateCreation: new Date(f.date_creation), etablissement: "Démo" };
+  return { auteur: f.auteur, note: f.note, texte: f.texte, dateCreation: dateIlYA(f.jours_avant), etablissement: "Démo" };
 }
 
 describe("jeu de 20 avis fictifs", () => {

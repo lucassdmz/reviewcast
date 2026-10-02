@@ -16,10 +16,14 @@ interface Fixture {
   auteur: string;
   note: number;
   texte: string | null;
-  date_creation: string;
+  jours_avant: number;
 }
 
 const cle = process.env.ANTHROPIC_API_KEY;
+function dateIlYA(jours: number): Date {
+  return new Date(Date.now() - jours * 24 * 60 * 60 * 1000);
+}
+
 const fixtures = JSON.parse(readFileSync(new URL("../fixtures/reviews.json", import.meta.url), "utf8")) as Fixture[];
 
 describe.skipIf(!cle)("fournisseur Anthropic sur les 20 avis fictifs", () => {
@@ -31,7 +35,7 @@ describe.skipIf(!cle)("fournisseur Anthropic sur les 20 avis fictifs", () => {
       new URL("../fixtures/ligne-de-conduite-test.md", import.meta.url).pathname,
     );
     for (const f of fixtures) {
-      const review: ReviewForAi = { auteur: f.auteur, note: f.note, texte: f.texte, dateCreation: new Date(f.date_creation), etablissement: "Établissement de démonstration" };
+      const review: ReviewForAi = { auteur: f.auteur, note: f.note, texte: f.texte, dateCreation: dateIlYA(f.jours_avant), etablissement: "Établissement de démonstration" };
       const { data: analyse, usage } = await ia.analyzeReview({ review, themesConnus });
       expect(usage.tokensOut).toBeGreaterThan(0);
       if (f.google_review_id === "fx-014") expect(analyse.hors_sujet).toBe(true);
