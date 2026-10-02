@@ -99,6 +99,7 @@ model GoogleConnection {
 
 /// Statut interne d'un avis dans la file « À traiter ».
 enum ReviewStatus {
+  HORS_FILE
   A_TRAITER
   BROUILLON_PRET
   PUBLIE
@@ -187,7 +188,7 @@ model Review {
   dateMaj            DateTime     @map("date_maj")
   reponseGoogleTexte String?      @map("reponse_google_texte")
   reponseGoogleDate  DateTime?    @map("reponse_google_date")
-  statut             ReviewStatus @default(A_TRAITER)
+  statut             ReviewStatus @default(HORS_FILE)
   retireAt           DateTime?    @map("retire_at")
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime     @updatedAt @map("updated_at")
@@ -210,6 +211,10 @@ model ReviewAnalysis {
   gravite       Gravite?
   resume        String
   passagesCles  String[]  @map("passages_cles")
+  /// Vrai si l'IA détecte un problème concret (sert à inclure un avis 4 étoiles dans la file).
+  problemeDetecte Boolean @default(false) @map("probleme_detecte")
+  /// Avis manifestement faux ou hors sujet (section 4.2 du cdc).
+  horsSujet     Boolean   @default(false) @map("hors_sujet")
   modele        String
   createdAt     DateTime  @default(now()) @map("created_at")
 
@@ -316,6 +321,23 @@ model Note {
 
   @@index([reviewId])
   @@map("notes")
+}
+
+/// Consommation IA par appel, pour le compteur de tokens des Réglages (section 4.3).
+model AiUsage {
+  id          String   @id @default(cuid())
+  tache       String
+  modele      String
+  tokensIn    Int      @map("tokens_in")
+  tokensOut   Int      @map("tokens_out")
+  cacheRead   Int      @default(0) @map("cache_read")
+  cacheWrite  Int      @default(0) @map("cache_write")
+  batch       Boolean  @default(false)
+  coutEstime  Decimal  @map("cout_estime") @db.Decimal(10, 6)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("ai_usage")
 }
 
 /// Journal des actions sensibles (section 7) : publication, ligne de conduite, clé API.
