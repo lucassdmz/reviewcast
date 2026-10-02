@@ -50,3 +50,19 @@ body {
   background: var(--fond);
   color: var(--encre);
 }
+
+/* Export PDF de la synthèse : seule la synthèse et son titre sont imprimés. */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  nav,
+  .no-print,
+  [aria-label="Navigation principale"] {
+    display: none !important;
+  }
+  main > div > *:not(:has(#synthese-titre)) {
+    display: none;
+  }
+}

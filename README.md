@@ -51,6 +51,10 @@ Les parcours Playwright protégés ouvrent une session directement en base (`tes
 
 La publication passe par `lib/google/publication.ts` : le publieur réel appelle `reviews.updateReply` avec le jeton OAuth du lot 1, le publieur simulé (`PUBLICATION_GOOGLE=simulee`) enregistre la réponse en base. Dans les deux cas, rien ne part sans le clic « Confirmer la publication », et chaque publication est journalisée.
 
+## Tendances
+
+Les statistiques de la page Tendances sont précalculées dans `daily_stats` et `theme_stats` par `lib/analytics/recalcul.ts`, appelé après chaque analyse IA, chaque publication et le seed ; la page ne lit jamais les avis bruts. `lib/analytics/agregation.ts` classe les thèmes, trace la courbe mensuelle, répartit les étoiles et calcule taux et délai de réponse ; `periodes.ts` gère 30 jours, 90 jours, 12 mois et la période personnalisée. La synthèse IA en 5 lignes vit dans `synthese.ts`, exportable en texte (presse-papiers) et en PDF (impression du navigateur, feuille de style dédiée).
+
 ## Arborescence
 
 - `app/` : routes Next.js (écrans et API). Les écrans sous `app/(app)/` exigent une session.
