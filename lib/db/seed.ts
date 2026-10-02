@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { analyserAvis, genererBrouillon, initialiserTaxonomie } from "@/lib/ai/service";
+import { recalculerStatistiques } from "@/lib/analytics/recalcul";
 import { FakeProvider } from "@/lib/ai/providers/fake";
 import { prisma } from "@/lib/db/client";
 
@@ -86,7 +87,21 @@ async function main() {
       brouillons++;
     }
   }
-  console.log(`Démo prête : ${avis.length} avis analysés, ${brouillons} brouillons générés.`);
+  // Les avis négatifs de plus de 90 jours sont considérés déjà répondus (historique de démonstration).
+  const anciens = await prisma.review.findMany({
+    where: { locationId: etablissement.id, note: { lte: 3 }, statut: { in: ["A_TRAITER", "BROUILLON_PRET"] }, dateCreation: { lt: dateIlYA(90) } },
+    include: { drafts: { orderBy: { version: "desc" }, take: 1 } },
+  });
+  for (const a of anciens) {
+    const texte = a.drafts[0]?.texte ?? "Merci pour votre retour, nous restons à votre disposition. L'équipe";
+    const delai = (a.googleReviewId.charCodeAt(a.googleReviewId.length - 1) % 36) + 2;
+    await prisma.review.update({
+      where: { id: a.id },
+      data: { statut: "PUBLIE", reponseGoogleTexte: texte, reponseGoogleDate: new Date(a.dateCreation.getTime() + delai * 3_600_000) },
+    });
+  }
+  const jours = await recalculerStatistiques(etablissement.id);
+  console.log(`Démo prête : ${avis.length} avis analysés, ${brouillons} brouillons générés, ${anciens.length} réponses historiques, ${jours} jours de statistiques.`);
 }
 
 main()
