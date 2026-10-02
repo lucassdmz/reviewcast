@@ -5,6 +5,7 @@ export type AuditAction =
   | "connexion"
   | "deconnexion"
   | "publication_reponse"
+  | "avis_ignore"
   | "modification_ligne_de_conduite"
   | "changement_cle_api"
   | "export_donnees"
