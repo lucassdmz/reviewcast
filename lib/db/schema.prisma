@@ -1,0 +1,334 @@
+// Schéma de données — section 5.2 du cahier des charges.
+// Les tables d'authentification (users, accounts, sessions, verification_tokens)
+// sont celles attendues par l'adaptateur Prisma d'Auth.js.
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Authentification (Auth.js)
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts          Account[]
+  sessions          Session[]
+  googleConnections GoogleConnection[]
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Connexion Google Business Profile (lot 1)
+// ---------------------------------------------------------------------------
+
+/// Compte Google autorisé pour la Business Profile API. Le refresh token est
+/// chiffré en AES-256-GCM avec la clé ENCRYPTION_KEY (voir lib/crypto).
+model GoogleConnection {
+  id                    String   @id @default(cuid())
+  userId                String   @map("user_id")
+  googleAccountId       String   @unique @map("google_account_id")
+  googleAccountName     String?  @map("google_account_name")
+  refreshTokenEncrypted String   @map("refresh_token_encrypted")
+  scope                 String
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locations Location[]
+
+  @@map("google_connections")
+}
+
+// ---------------------------------------------------------------------------
+// Données métier
+// ---------------------------------------------------------------------------
+
+/// Statut interne d'un avis dans la file « À traiter ».
+enum ReviewStatus {
+  A_TRAITER
+  BROUILLON_PRET
+  PUBLIE
+  IGNORE
+
+  @@map("review_status")
+}
+
+enum Sentiment {
+  POSITIF
+  NEUTRE
+  MIXTE
+  NEGATIF
+
+  @@map("sentiment")
+}
+
+enum Gravite {
+  FAIBLE
+  MOYENNE
+  FORTE
+
+  @@map("gravite")
+}
+
+enum Polarite {
+  POSITIF
+  NEGATIF
+  MIXTE
+
+  @@map("polarite")
+}
+
+enum OrigineTheme {
+  TAXONOMIE
+  IA
+
+  @@map("origine_theme")
+}
+
+enum Meteo {
+  GRAND_SOLEIL
+  SOLEIL_VOILE
+  NUAGEUX
+  PLUIE_LEGERE
+
+  @@map("meteo")
+}
+
+enum FournisseurIa {
+  ANTHROPIC
+  OPENAI
+  OLLAMA
+
+  @@map("fournisseur_ia")
+}
+
+/// Fiche Google (établissement).
+model Location {
+  id                 String   @id @default(cuid())
+  googleLocationId   String   @unique @map("google_location_id")
+  googleConnectionId String   @map("google_connection_id")
+  nom                String
+  adresse            String?
+  lastSyncAt         DateTime? @map("last_sync_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  googleConnection GoogleConnection @relation(fields: [googleConnectionId], references: [id], onDelete: Cascade)
+  reviews          Review[]
+  monthlySummaries MonthlySummary[]
+  settings         Settings?
+
+  @@map("locations")
+}
+
+/// Avis Google. Jamais effacé : un avis retiré côté Google est marqué `retireAt`.
+model Review {
+  id                 String       @id @default(cuid())
+  googleReviewId     String       @unique @map("google_review_id")
+  locationId         String       @map("location_id")
+  auteur             String
+  note               Int
+  texte              String?
+  dateCreation       DateTime     @map("date_creation")
+  dateMaj            DateTime     @map("date_maj")
+  reponseGoogleTexte String?      @map("reponse_google_texte")
+  reponseGoogleDate  DateTime?    @map("reponse_google_date")
+  statut             ReviewStatus @default(A_TRAITER)
+  retireAt           DateTime?    @map("retire_at")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  location Location        @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  analysis ReviewAnalysis?
+  drafts   Draft[]
+  notes    Note[]
+
+  @@index([locationId, dateCreation])
+  @@index([locationId, statut])
+  @@map("reviews")
+}
+
+/// Résultat de l'analyse IA d'un avis (sortie JSON validée par zod).
+model ReviewAnalysis {
+  id            String    @id @default(cuid())
+  reviewId      String    @unique @map("review_id")
+  sentiment     Sentiment
+  gravite       Gravite?
+  resume        String
+  passagesCles  String[]  @map("passages_cles")
+  modele        String
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  review Review                @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  themes ReviewAnalysisTheme[]
+
+  @@map("review_analyses")
+}
+
+/// Thèmes détectés sur une analyse (liste ordonnée, avec le passage surligné).
+model ReviewAnalysisTheme {
+  analysisId String  @map("analysis_id")
+  themeId    String  @map("theme_id")
+  passage    String?
+
+  analysis ReviewAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  theme    Theme          @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@id([analysisId, themeId])
+  @@map("review_analysis_themes")
+}
+
+/// Brouillon de réponse généré par l'IA. Chaque régénération crée une version.
+model Draft {
+  id         String   @id @default(cuid())
+  reviewId   String   @map("review_id")
+  texte      String
+  version    Int
+  consigne   String?
+  modele     String
+  tokensIn   Int      @default(0) @map("tokens_in")
+  tokensOut  Int      @default(0) @map("tokens_out")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, version])
+  @@map("drafts")
+}
+
+/// Taxonomie des thèmes (accueil, délais, qualité…), extensible par l'IA.
+model Theme {
+  id        String       @id @default(cuid())
+  libelle   String       @unique
+  polarite  Polarite
+  origine   OrigineTheme @default(TAXONOMIE)
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  analyses ReviewAnalysisTheme[]
+
+  @@map("themes")
+}
+
+/// Synthèse mensuelle précalculée pour la home et la page Tendances.
+model MonthlySummary {
+  id          String   @id @default(cuid())
+  locationId  String   @map("location_id")
+  mois        DateTime @db.Date
+  texte       String?
+  meteo       Meteo
+  noteMoyenne Decimal  @map("note_moyenne") @db.Decimal(3, 2)
+  volume      Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, mois])
+  @@map("monthly_summaries")
+}
+
+/// Réglages par établissement. Les clés IA sont chiffrées (lib/crypto).
+model Settings {
+  id                     String        @id @default(cuid())
+  locationId             String        @unique @map("location_id")
+  ligneDeConduite        String?       @map("ligne_de_conduite")
+  exemplesReference      String[]      @map("exemples_reference")
+  seuilGrandSoleilNote   Decimal       @default(4.7) @map("seuil_grand_soleil_note") @db.Decimal(3, 2)
+  seuilGrandSoleilPart   Int           @default(90) @map("seuil_grand_soleil_part")
+  seuilSoleilVoileNote   Decimal       @default(4.3) @map("seuil_soleil_voile_note") @db.Decimal(3, 2)
+  seuilNuageuxNote       Decimal       @default(3.8) @map("seuil_nuageux_note") @db.Decimal(3, 2)
+  inclureQuatreEtoiles   Boolean       @default(true) @map("inclure_quatre_etoiles")
+  fournisseurIa          FournisseurIa @default(ANTHROPIC) @map("fournisseur_ia")
+  modeleAnalyse          String?       @map("modele_analyse")
+  modeleRedaction        String?       @map("modele_redaction")
+  cleIaChiffree          String?       @map("cle_ia_chiffree")
+  notificationsActives   Boolean       @default(false) @map("notifications_actives")
+  createdAt              DateTime      @default(now()) @map("created_at")
+  updatedAt              DateTime      @updatedAt @map("updated_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@map("settings")
+}
+
+/// Note interne privée sur un avis (donnée personnelle, exportable et supprimable).
+model Note {
+  id        String   @id @default(cuid())
+  reviewId  String   @map("review_id")
+  texte     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@map("notes")
+}
+
+/// Journal des actions sensibles (section 7) : publication, ligne de conduite, clé API.
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  action    String
+  cible     String?
+  details   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
