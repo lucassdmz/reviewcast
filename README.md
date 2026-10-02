@@ -39,6 +39,12 @@ Tout passe par `lib/ai/` : un contrat `AiProvider` (`analyzeReview`, `draftReply
 - Chaque appel enregistre ses tokens et un coût estimé, affichés dans Réglages.
 - `AI_PROVIDER=fake` dans `.env` permet de travailler sans clé API.
 
+## Home météo
+
+`lib/meteo/` calcule tout ce que l'écran d'accueil affiche : météo du mois depuis les seuils des réglages (`calcul.ts`), agrégations pures sur les avis (`agregation.ts`), compliment du moment (`compliment.ts`), phrase de synthèse IA stockée dans `monthly_summaries` et régénérée quand le volume du mois change (`phrase.ts`), et l'assemblage côté base (`stats.ts`). Les composants de `components/meteo/` reçoivent ces données déjà calculées.
+
+Les parcours Playwright protégés ouvrent une session directement en base (`tests/e2e/helpers/session.ts`) : ils supposent une base migrée et le seed de démonstration chargé.
+
 ## Arborescence
 
 - `app/` : routes Next.js (écrans et API). Les écrans sous `app/(app)/` exigent une session.

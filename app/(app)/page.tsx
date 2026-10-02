@@ -1,20 +1,39 @@
-import { Ecran } from "@/components/Ecran";
-import { auth } from "@/lib/auth/config";
+import { CarteATraiter } from "@/components/meteo/CarteATraiter";
+import { CarteMeteo } from "@/components/meteo/CarteMeteo";
+import { Compliment } from "@/components/meteo/Compliment";
+import { MiniCourbe } from "@/components/meteo/MiniCourbe";
+import { SelecteurEtablissement } from "@/components/meteo/SelecteurEtablissement";
+import { obtenirMeteoHome } from "@/lib/meteo/stats";
 
-export default async function HomePage() {
-  const session = await auth();
-  const prenom = session?.user?.name?.split(" ")[0] ?? "";
+export const dynamic = "force-dynamic";
+
+export default async function HomePage({ searchParams }: PageProps<"/">) {
+  const params = await searchParams;
+  const locationId = typeof params.etablissement === "string" ? params.etablissement : null;
+  const home = await obtenirMeteoHome(locationId);
+
   return (
-    <Ecran titre={prenom ? `Bonjour ${prenom}` : "Bonjour"}>
-      <section className="rounded-2xl bg-ciel p-6">
-        <p className="text-5xl" aria-hidden="true">
-          🌤️
-        </p>
-        <p className="mt-3 text-lg font-semibold">Votre météo arrive bientôt</p>
-        <p className="mt-1 text-sm text-encre-douce">
+    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-2 px-4 pb-16 pt-2">
+      <h1 className="sr-only">Météo de vos avis</h1>
+      <SelecteurEtablissement etablissements={home.etablissements} actif={home.etablissementActif} />
+      <CarteMeteo
+        meteo={home.meteo}
+        noteMoyenneMois={home.noteMoyenneMois}
+        noteMoyenne12Mois={home.noteMoyenne12Mois}
+        volumeMois={home.volumeMois}
+        nbEnthousiastes={home.nbEnthousiastes}
+        evolutionNote={home.evolutionNote}
+        evolutionVolume={home.evolutionVolume}
+        phrase={home.phrase}
+      />
+      <Compliment compliment={home.compliment} />
+      <MiniCourbe points={home.courbe} />
+      <CarteATraiter nombre={home.aTraiter} />
+      {home.volumeMois === 0 && home.noteMoyenne12Mois === null && (
+        <p className="rounded-2xl bg-surface p-4 text-sm text-encre-douce">
           Connectez votre fiche Google dans Réglages pour voir le climat de vos avis.
         </p>
-      </section>
-    </Ecran>
+      )}
+    </main>
   );
 }

@@ -34,6 +34,8 @@ export default defineConfig({
       ALLOWED_EMAILS: process.env.ALLOWED_EMAILS ?? "test@exemple.fr",
       ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ?? "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
       DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/eclaircie",
+      // Fournisseur IA simulé : aucun appel réseau pendant les parcours.
+      AI_PROVIDER: "fake",
     },
   },
 });
