@@ -1,8 +1,10 @@
 import { CarteATraiter } from "@/components/meteo/CarteATraiter";
 import { CarteMeteo } from "@/components/meteo/CarteMeteo";
+import { CarteRemerciement } from "@/components/meteo/CarteRemerciement";
 import { Compliment } from "@/components/meteo/Compliment";
 import { MiniCourbe } from "@/components/meteo/MiniCourbe";
 import { SelecteurEtablissement } from "@/components/meteo/SelecteurEtablissement";
+import { remerciementDuMoment } from "@/lib/file/service";
 import { obtenirMeteoHome } from "@/lib/meteo/stats";
 
 export const dynamic = "force-dynamic";
@@ -10,12 +12,18 @@ export const dynamic = "force-dynamic";
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const params = await searchParams;
   const locationId = typeof params.etablissement === "string" ? params.etablissement : null;
-  const home = await obtenirMeteoHome(locationId);
+  const [home, remerciement] = await Promise.all([obtenirMeteoHome(locationId), remerciementDuMoment()]);
+  const message = params.remercie ? "Remerciement publié. Merci pour eux !" : typeof params.erreur === "string" ? params.erreur : null;
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-2 px-4 pb-16 pt-2">
       <h1 className="sr-only">Météo de vos avis</h1>
       <SelecteurEtablissement etablissements={home.etablissements} actif={home.etablissementActif} />
+      {message && (
+        <p role="status" className="rounded-xl bg-soleil-doux px-4 py-2 text-sm">
+          {message}
+        </p>
+      )}
       <CarteMeteo
         meteo={home.meteo}
         noteMoyenneMois={home.noteMoyenneMois}
@@ -29,6 +37,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       <Compliment compliment={home.compliment} />
       <MiniCourbe points={home.courbe} />
       <CarteATraiter nombre={home.aTraiter} />
+      <CarteRemerciement remerciement={remerciement} />
       {home.volumeMois === 0 && home.noteMoyenne12Mois === null && (
         <p className="rounded-2xl bg-surface p-4 text-sm text-encre-douce">
           Connectez votre fiche Google dans Réglages pour voir le climat de vos avis.

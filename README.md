@@ -45,6 +45,12 @@ Tout passe par `lib/ai/` : un contrat `AiProvider` (`analyzeReview`, `draftReply
 
 Les parcours Playwright protégés ouvrent une session directement en base (`tests/e2e/helpers/session.ts`) : ils supposent une base migrée et le seed de démonstration chargé.
 
+## File « À traiter »
+
+`lib/file/` porte la file des avis à traiter : transitions de statut autorisées (`statuts.ts`), bandeau de contexte rassurant (`contexte.ts`), validation zod des entrées (`validation.ts`) et le service (`service.ts`) qui liste, édite, régénère, ignore, annote et publie. Les actions serveur de `app/(app)/a-traiter/actions.ts` vérifient la session, valident puis délèguent.
+
+La publication passe par `lib/google/publication.ts` : le publieur réel appelle `reviews.updateReply` avec le jeton OAuth du lot 1, le publieur simulé (`PUBLICATION_GOOGLE=simulee`) enregistre la réponse en base. Dans les deux cas, rien ne part sans le clic « Confirmer la publication », et chaque publication est journalisée.
+
 ## Arborescence
 
 - `app/` : routes Next.js (écrans et API). Les écrans sous `app/(app)/` exigent une session.

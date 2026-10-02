@@ -36,6 +36,7 @@ export default defineConfig({
       DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/eclaircie",
       // Fournisseur IA simulé : aucun appel réseau pendant les parcours.
       AI_PROVIDER: "fake",
+      PUBLICATION_GOOGLE: "simulee",
     },
   },
 });
