@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Palette douce inspirée de la météo (section 2 du cdc). Pas de rouge vif. */
+:root {
+  --ciel: #eaf4fb;
+  --ciel-fonce: #cfe4f3;
+  --soleil: #f6c453;
+  --soleil-doux: #fbe8b8;
+  --nuage: #e9edf1;
+  --encre: #1f2a37;
+  --encre-douce: #5b6b7c;
+  --surface: #ffffff;
+  --fond: #f4f8fb;
+  --accent: #3b82c4;
+  --attention: #c98a3a;
+}
+
+@theme inline {
+  --color-ciel: var(--ciel);
+  --color-ciel-fonce: var(--ciel-fonce);
+  --color-soleil: var(--soleil);
+  --color-soleil-doux: var(--soleil-doux);
+  --color-nuage: var(--nuage);
+  --color-encre: var(--encre);
+  --color-encre-douce: var(--encre-douce);
+  --color-surface: var(--surface);
+  --color-fond: var(--fond);
+  --color-accent: var(--accent);
+  --color-attention: var(--attention);
+  --font-sans: var(--font-sans-app);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ciel: #1b2a3a;
+    --ciel-fonce: #24384d;
+    --soleil: #e6b64a;
+    --soleil-doux: #4a3f22;
+    --nuage: #2a3340;
+    --encre: #eef3f8;
+    --encre-douce: #a3b1c0;
+    --surface: #182230;
+    --fond: #0f161f;
+    --accent: #7cb4e6;
+    --attention: #d9a45b;
+  }
+}
+
+body {
+  background: var(--fond);
+  color: var(--encre);
+}
