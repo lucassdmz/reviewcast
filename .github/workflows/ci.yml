@@ -50,6 +50,8 @@ jobs:
         run: npm run db:deploy
       - name: Le schéma est à jour
         run: npx prisma migrate diff --from-config-datasource --to-schema lib/db/schema.prisma --exit-code
+      - name: Données de démonstration (fournisseur simulé)
+        run: npm run db:seed
       - name: Build
         run: npm run build
       - name: Navigateurs Playwright

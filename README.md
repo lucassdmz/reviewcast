@@ -26,12 +26,24 @@ Pour la connexion Google : créez des identifiants OAuth « application web » d
 | `npm run db:migrate` | crée une migration depuis le schéma et l'applique (dev) |
 | `npm run db:deploy` | applique les migrations existantes (prod, CI) |
 | `npm run db:studio` | explorateur de données Prisma |
+| `npm run db:seed` | charge un établissement de démonstration et 20 avis fictifs analysés, sans appel réseau |
+| `npm run test:integration` | passe les 20 avis fictifs dans le vrai modèle (nécessite `ANTHROPIC_API_KEY`, environ 0,50 $) |
+
+## Couche IA
+
+Tout passe par `lib/ai/` : un contrat `AiProvider` (`analyzeReview`, `draftReply`, `thankYouNote`, `weatherSentence`, `summarize`), une implémentation Anthropic avec sorties structurées validées par zod et prompt système mis en cache, un fournisseur simulé pour les tests et la démo. OpenAI et Ollama sont déclarés mais pas encore disponibles.
+
+- Les sorties sont demandées en JSON strict et validées par un schéma ; en cas d'échec, un nouvel essai, puis une erreur visible.
+- Le texte d'un avis est isolé dans une balise `<avis>`, ses chevrons sont neutralisés et le modèle est averti d'ignorer toute consigne qu'il contiendrait.
+- La ligne de conduite vient des réglages de l'établissement, sinon de `docs/ligne-de-conduite.md` (section « Exemples de réponses » séparée par `---`).
+- Chaque appel enregistre ses tokens et un coût estimé, affichés dans Réglages.
+- `AI_PROVIDER=fake` dans `.env` permet de travailler sans clé API.
 
 ## Arborescence
 
 - `app/` : routes Next.js (écrans et API). Les écrans sous `app/(app)/` exigent une session.
 - `components/` : composants d'interface, sans logique métier.
-- `lib/` : logique métier. `db/` (schéma Prisma, migrations), `auth/`, `crypto/`, `audit/` ; `ai/`, `google/`, `meteo/`, `analytics/` arrivent dans les lots suivants.
+- `lib/` : logique métier. `db/` (schéma Prisma, migrations, seed), `auth/`, `crypto/`, `audit/`, `ai/` ; `google/`, `meteo/`, `analytics/` arrivent dans les lots suivants.
 - `jobs/` : tâches planifiées.
 - `tests/` : `unit/` (Vitest), `e2e/` (Playwright), `fixtures/`.
 - `docs/` : cahier des charges et ligne de conduite.
