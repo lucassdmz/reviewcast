@@ -4,9 +4,9 @@ import { compterThemes } from "@/lib/meteo/agregation";
 describe("thèmes du mois", () => {
   it("classe les thèmes par polarité détectée et par fréquence", () => {
     const avis = [
-      { analysis: { themes: [{ theme: { libelle: "accueil", polarite: "POSITIF" } }, { theme: { libelle: "délais", polarite: "NEGATIF" } }] } },
-      { analysis: { themes: [{ theme: { libelle: "accueil", polarite: "POSITIF" } }, { theme: { libelle: "prix", polarite: "MIXTE" } }] } },
-      { analysis: { themes: [{ theme: { libelle: "rapidité", polarite: "POSITIF" } }] } },
+      { analysis: { themes: [{ polarite: "POSITIF", theme: { libelle: "accueil" } }, { polarite: "NEGATIF", theme: { libelle: "délais" } }] } },
+      { analysis: { themes: [{ polarite: "POSITIF", theme: { libelle: "accueil" } }, { polarite: "MIXTE", theme: { libelle: "prix" } }] } },
+      { analysis: { themes: [{ polarite: "POSITIF", theme: { libelle: "rapidité" } }] } },
       { analysis: null },
     ];
     expect(compterThemes(avis)).toEqual({ positifs: ["accueil", "rapidité"], negatifs: ["délais"] });

@@ -97,14 +97,14 @@ export function evolution(actuel: number | null, precedent: number | null): numb
 
 /** Thèmes les plus cités du mois, séparés par polarité telle que détectée sur l'avis. */
 export function compterThemes(
-  avis: { analysis: { themes: { theme: { libelle: string; polarite: string } }[] } | null }[],
+  avis: { analysis: { themes: { polarite: string; theme: { libelle: string } }[] } | null }[],
   max = 3,
 ): { positifs: string[]; negatifs: string[] } {
   const positifs = new Map<string, number>();
   const negatifs = new Map<string, number>();
   for (const a of avis) {
-    for (const { theme } of a.analysis?.themes ?? []) {
-      const cible = theme.polarite === "NEGATIF" ? negatifs : theme.polarite === "POSITIF" ? positifs : null;
+    for (const { polarite, theme } of a.analysis?.themes ?? []) {
+      const cible = polarite === "NEGATIF" ? negatifs : polarite === "POSITIF" ? positifs : null;
       if (cible) cible.set(theme.libelle, (cible.get(theme.libelle) ?? 0) + 1);
     }
   }

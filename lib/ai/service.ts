@@ -1,3 +1,4 @@
+import { recalculerPourAvis } from "@/lib/analytics/recalcul";
 import { prisma } from "@/lib/db/client";
 import { resolveAiConfig, resolveLigneDeConduite } from "./config";
 import { createProvider } from "./factory";
@@ -61,6 +62,7 @@ export async function analyserAvis(reviewId: string, provider?: AiProvider): Pro
     inclureQuatreEtoiles: review.location.settings?.inclureQuatreEtoiles ?? true,
   });
   await prisma.review.update({ where: { id: reviewId }, data: { statut } });
+  await recalculerPourAvis(reviewId);
   return data;
 }
 
@@ -91,7 +93,7 @@ export async function enregistrerAnalyse(reviewId: string, data: ReviewAnalysisO
         update: {},
         create: { libelle, polarite: t.polarite, origine: "IA" },
       });
-      await tx.reviewAnalysisTheme.create({ data: { analysisId: created.id, themeId: theme.id, passage: t.passage } });
+      await tx.reviewAnalysisTheme.create({ data: { analysisId: created.id, themeId: theme.id, polarite: t.polarite, passage: t.passage } });
     }
   });
 }
@@ -108,7 +110,7 @@ export async function genererBrouillon(reviewId: string, consigne?: string, prov
         sentiment: review.analysis.sentiment,
         gravite: review.analysis.gravite,
         resume: review.analysis.resume,
-        themes: review.analysis.themes.map((t) => ({ libelle: t.theme.libelle, polarite: t.theme.polarite, passage: t.passage })),
+        themes: review.analysis.themes.map((t) => ({ libelle: t.theme.libelle, polarite: t.polarite, passage: t.passage })),
         passages_cles: review.analysis.passagesCles,
         probleme_detecte: review.analysis.problemeDetecte,
         hors_sujet: review.analysis.horsSujet,

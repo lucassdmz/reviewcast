@@ -1,4 +1,5 @@
 import { genererBrouillon, genererRemerciement } from "@/lib/ai/service";
+import { recalculerPourAvis } from "@/lib/analytics/recalcul";
 import { logAudit } from "@/lib/audit/log";
 import { prisma } from "@/lib/db/client";
 import type { Gravite, ReviewStatus } from "@/lib/db/generated/enums";
@@ -103,7 +104,7 @@ export async function ficheAvis(reviewId: string): Promise<FicheAvis | null> {
           gravite: a.analysis.gravite,
           resume: a.analysis.resume,
           horsSujet: a.analysis.horsSujet,
-          themes: a.analysis.themes.map((t) => ({ libelle: t.theme.libelle, polarite: t.theme.polarite })),
+          themes: a.analysis.themes.map((t) => ({ libelle: t.theme.libelle, polarite: t.polarite })),
         }
       : null,
     contexte,
@@ -213,6 +214,7 @@ export async function publierReponse(
       data: { statut: "PUBLIE", reponseGoogleTexte: texte, reponseGoogleDate: dateReponse },
     });
   });
+  await recalculerPourAvis(reviewId);
   await logAudit({
     userId,
     action: "publication_reponse",

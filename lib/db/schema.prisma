@@ -172,6 +172,8 @@ model Location {
   reviews          Review[]
   monthlySummaries MonthlySummary[]
   settings         Settings?
+  dailyStats       DailyStat[]
+  themeStats       ThemeStat[]
 
   @@map("locations")
 }
@@ -225,9 +227,11 @@ model ReviewAnalysis {
 }
 
 /// Thèmes détectés sur une analyse (liste ordonnée, avec le passage surligné).
+/// `polarite` est celle de l'avis sur ce thème, pas celle du thème en général.
 model ReviewAnalysisTheme {
-  analysisId String  @map("analysis_id")
-  themeId    String  @map("theme_id")
+  analysisId String   @map("analysis_id")
+  themeId    String   @map("theme_id")
+  polarite   Polarite @default(MIXTE)
   passage    String?
 
   analysis ReviewAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
@@ -263,9 +267,57 @@ model Theme {
   origine   OrigineTheme @default(TAXONOMIE)
   createdAt DateTime     @default(now()) @map("created_at")
 
-  analyses ReviewAnalysisTheme[]
+  analyses   ReviewAnalysisTheme[]
+  themeStats ThemeStat[]
 
   @@map("themes")
+}
+
+// ---------------------------------------------------------------------------
+// Statistiques précalculées (section 7 : jamais calculées à l'affichage)
+// ---------------------------------------------------------------------------
+
+/// Agrégat quotidien par établissement, reconstruit à chaque analyse ou publication.
+model DailyStat {
+  id                  String   @id @default(cuid())
+  locationId          String   @map("location_id")
+  jour                DateTime @db.Date
+  volume              Int
+  sommeNotes          Int      @map("somme_notes")
+  nb1                 Int      @default(0)
+  nb2                 Int      @default(0)
+  nb3                 Int      @default(0)
+  nb4                 Int      @default(0)
+  nb5                 Int      @default(0)
+  /// Avis 1 à 3 étoiles reçus ce jour-là.
+  nbNegatifs          Int      @default(0) @map("nb_negatifs")
+  /// Parmi eux, ceux qui ont une réponse publiée.
+  nbNegatifsRepondus  Int      @default(0) @map("nb_negatifs_repondus")
+  /// Somme des délais de réponse (heures) des avis négatifs répondus.
+  sommeDelaiHeures    Decimal  @default(0) @map("somme_delai_heures") @db.Decimal(12, 2)
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, jour])
+  @@map("daily_stats")
+}
+
+/// Nombre d'avis par jour, thème et polarité détectée.
+model ThemeStat {
+  id         String   @id @default(cuid())
+  locationId String   @map("location_id")
+  jour       DateTime @db.Date
+  themeId    String   @map("theme_id")
+  polarite   Polarite
+  nombre     Int
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  theme    Theme    @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([locationId, jour, themeId, polarite])
+  @@index([locationId, jour])
+  @@map("theme_stats")
 }
 
 /// Synthèse mensuelle précalculée pour la home et la page Tendances.

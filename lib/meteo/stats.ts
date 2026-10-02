@@ -75,7 +75,7 @@ export async function obtenirMeteoHome(
       note: true,
       texte: true,
       dateCreation: true,
-      analysis: { select: { passagesCles: true, themes: { select: { theme: { select: { libelle: true, polarite: true } } } } } },
+      analysis: { select: { passagesCles: true, themes: { select: { polarite: true, theme: { select: { libelle: true } } } } } },
     },
   });
   const aTraiter = await prisma.review.count({ where: { ...filtreLocation, retireAt: null, statut: { in: ["A_TRAITER", "BROUILLON_PRET"] } } });
