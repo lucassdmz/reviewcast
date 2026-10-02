@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eclaircie
+  AUTH_SECRET: secret-de-ci-suffisamment-long
+  AUTH_URL: http://localhost:3000
+  AUTH_TRUST_HOST: "true"
+  AUTH_GOOGLE_ID: id-google-factice
+  AUTH_GOOGLE_SECRET: secret-google-factice
+  ALLOWED_EMAILS: test@exemple.fr
+  ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+
+jobs:
+  verifier:
+    name: Lint, types, tests et migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eclaircie
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Types
+        run: npm run typecheck
+      - name: Tests unitaires
+        run: npm run test
+      - name: Migrations sur une base vide
+        run: npm run db:deploy
+      - name: Le schéma est à jour
+        run: npx prisma migrate diff --from-config-datasource --to-schema lib/db/schema.prisma --exit-code
+      - name: Build
+        run: npm run build
+      - name: Navigateurs Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Parcours Playwright
+        run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
