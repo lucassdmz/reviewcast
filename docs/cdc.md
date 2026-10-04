@@ -1,6 +1,8 @@
 # Cahier des charges — PWA météo des avis Google
 
-Version du 1er octobre 2026 · Lucas Dominguez
+Version 1.1 du 4 octobre 2026 · Lucas Dominguez
+
+La version 1.0 du 1er octobre décrivait le MVP. Cette version intègre les décisions prises pendant sa construction (section 11) et ajoute le lot 7, « la voix de l'établissement » (section 12).
 
 ## 1. Contexte et objectifs
 
@@ -27,14 +29,17 @@ L'outil remet les avis Google en perspective : il montre d'abord le climat globa
 
 **Règles d'interface**
 
-- La home s'ouvre sur la météo du mois, jamais sur la liste des avis négatifs.
+- La home s'ouvre sur la météo des 40 derniers jours, jamais sur la liste des avis négatifs.
+- Aucun compteur ne repart de zéro le 1er du mois : la météo, la note et la file se lisent sur une fenêtre glissante de 40 jours. Deux avis sévères en début de mois ne doivent pas assombrir tout l'écran.
+- Pas de dette affichée : les avis anciens restés sans réponse sont rangés dans un « rattrapage » replié, sans compteur.
 - Pas de rouge vif, pas de badge de notification agressif. Les avis négatifs à traiter apparaissent comme une file de tâches, en ton neutre.
-- Chaque avis négatif est affiché avec son contexte : part des avis positifs sur la même période, note moyenne du mois.
+- Le contexte rassurant est dit une fois par écran, en une phrase lisible sans calcul : « 12 clients contents sur 17 avis reçus ces 40 derniers jours ».
 - Les formulations sont positives et factuelles : « 2 avis à traiter » plutôt que « 2 avis négatifs ! ».
 - Les succès sont célébrés : nouvel avis 5 étoiles, meilleure semaine du trimestre, 10 réponses publiées.
-- Lecture rapide : chaque écran livre son information principale sans scroll sur un écran de téléphone.
+- Lecture rapide : chaque écran livre son information principale sans scroll sur un écran de téléphone. Le reste se découvre en défilant.
+- Une information ne ressemble jamais à un bouton, et une invitation dit ce qui se passe quand on appuie (« Voir le brouillon »).
 
-**Direction visuelle** : palette douce inspirée de la météo (ciel, soleil, nuage léger), typographie lisible, mode clair et sombre. Pas de dashboard dense type BI.
+**Direction visuelle** : une application mobile sobre, dans l'esprit d'un café japonais. Fond gris brume, cartes blanches aux grands arrondis, encre noire. Une seule couleur forte, le jaune du soleil, et une touche de vert matcha pour ce qui plaît. Le ciel du moment est illustré par un grand disque solaire plus ou moins couvert. Mouvements discrets (entrée des cartes, courbes qui se tracent), coupés si l'utilisateur réduit les animations. Mode clair et sombre. Pas de dashboard dense type BI.
 
 ## 3. Périmètre fonctionnel V1
 
@@ -42,17 +47,19 @@ Quatre écrans : Home (météo), À traiter, Tendances, Réglages. Navigation pa
 
 ### 3.1 Home — météo des avis
 
-- Indicateur météo du mois en cours : icône (grand soleil, soleil voilé, nuageux, pluie légère) calculée depuis la note moyenne et la part d'avis 4-5 étoiles. Seuils par défaut : grand soleil ≥ 4,7 et ≥ 90 % de 4-5 ★ ; soleil voilé ≥ 4,3 ; nuageux ≥ 3,8 ; pluie légère en dessous. Seuils modifiables dans Réglages.
-- Note moyenne du mois et sur 12 mois glissants, nombre d'avis reçus, évolution par rapport au mois précédent.
-- Phrase de synthèse générée par l'IA, une ligne, ton positif et factuel : « 23 avis ce mois-ci, 21 enthousiastes. Les clients citent surtout l'accueil et la rapidité. »
+- Indicateur météo des 40 derniers jours : illustration (grand soleil, soleil voilé, nuageux, pluie légère) calculée depuis la note moyenne et la part d'avis 4-5 étoiles. Seuils par défaut : grand soleil ≥ 4,7 et ≥ 90 % de 4-5 ★ ; soleil voilé ≥ 4,3 ; nuageux ≥ 3,8 ; pluie légère en dessous. Seuils modifiables dans Réglages.
+- Note moyenne sur 40 jours et sur 12 mois glissants, nombre d'avis reçus, évolution par rapport aux 40 jours précédents.
+- Phrase de synthèse générée par l'IA, une ligne, ton positif et factuel, qui commence par les clients contents : « 21 clients contents sur 23 avis. Ils citent surtout l'accueil et la rapidité. »
 - Le compliment du moment : extrait d'un avis positif récent mis en avant, rotation à chaque ouverture.
-- Carte discrète « N avis à traiter » qui mène à l'écran À traiter. Absente s'il n'y a rien à traiter.
+- Carte discrète « N avis à traiter » qui mène à l'écran À traiter. Elle ne compte que les avis des 40 derniers jours. Absente s'il n'y a rien à traiter.
 - Mini-courbe de la note moyenne sur les 8 dernières semaines. Sélecteur d'établissement en haut de l'écran : météo globale de tous les établissements par défaut, météo d'un établissement en un tap.
 
 ### 3.2 À traiter — gestion des avis négatifs
 
-- Liste des avis 1 à 3 étoiles sans réponse publiée, du plus récent au plus ancien. Un avis 4 étoiles avec texte critique peut être ajouté à la file si l'IA détecte un problème (réglable).
-- Fiche avis : auteur, note, date, texte complet, thèmes détectés, gravité estimée par l'IA (faible, moyenne, forte), bandeau de contexte (« 19 avis positifs sur la même période »).
+- Liste des avis 1 à 3 étoiles sans réponse publiée reçus dans les 40 derniers jours, du plus récent au plus ancien. Les avis plus anciens sans réponse sont accessibles dans un bloc « Rattrapage » replié en bas d'écran, sans compteur.
+- En tête de liste, une seule phrase de contexte sur le climat récent. Chaque carte montre l'auteur, la note, la date, un extrait, la gravité en jauge discrète et l'invitation « Voir le brouillon ».
+- Un avis 4 étoiles avec texte critique peut être ajouté à la file si l'IA détecte un problème (réglable).
+- Fiche avis : auteur, note, date, texte complet, thèmes détectés, gravité estimée par l'IA (faible, moyenne, forte), bandeau de contexte (« Cet avis fait partie de 17 avis reçus en 40 jours, dont 12 de clients contents »).
 - Brouillon de réponse pré-rédigé selon la ligne de conduite (section 4). Boutons : modifier, régénérer avec une consigne (« plus court », « propose un geste commercial »), marquer comme traité sans répondre.
 - Publication de la réponse directement sur Google via l'API, après validation explicite. Confirmation visuelle, puis l'avis sort de la file.
 - Statuts : à traiter, brouillon prêt, publié, ignoré. Historique des réponses publiées consultable.
@@ -70,7 +77,7 @@ Quatre écrans : Home (météo), À traiter, Tendances, Réglages. Navigation pa
 ### 3.4 Réglages
 
 - Connexion du compte Google et choix de la fiche.
-- Ligne de conduite éditable (texte libre + exemples de réponses de référence).
+- La voix de l'établissement (lot 7, section 12) : signature, personne qui parle, ton, coordonnées de contact, règles par sujet. La ligne de conduite complète reste éditable en texte libre pour qui veut aller plus loin.
 - Seuils météo, seuil d'inclusion des avis 4 étoiles dans la file.
 - Fréquence de synchronisation et activation des notifications push (résumé hebdomadaire et nouvel avis à traiter).
 - Clé API du fournisseur IA et choix du modèle.
@@ -92,12 +99,13 @@ Les sorties structurées sont demandées en JSON strict et validées par un sch�
 
 ### 4.2 Ligne de conduite
 
-Texte éditable dans Réglages, injecté comme prompt système à chaque génération, avec mise en cache (prompt caching). Contenu de départ à rédiger par Lucas, structuré ainsi :
+Texte injecté comme prompt système à chaque génération, avec mise en cache (prompt caching). La version de départ est rédigée dans `docs/ligne-de-conduite.md` et sert à tout établissement qui n'a pas la sienne. Elle part d'un constat : dans un petit commerce, la personne qui répond est la gérante ou le gérant. Une réponse ne renvoie donc jamais à « la direction ». Elle est structurée ainsi :
 
 - Ton : vouvoiement, chaleureux, jamais défensif, pas de jargon.
 - Structure imposée : remercier, reconnaître le point précis soulevé, expliquer sans se justifier, proposer une suite concrète (contact direct, geste), signer.
 - Interdits : contester publiquement les faits, nommer un employé, promettre un remboursement, répondre à une insulte par une insulte.
-- Cas particuliers : avis manifestement faux ou hors sujet → brouillon court et neutre + suggestion de signalement à Google.
+- Cas particuliers, une règle par sujet qui revient : le prix (reconnaître le ressenti, dire ce qu'il y a dans la tasse, ne jamais dire que les prix sont affichés ni parler des charges), l'accueil, le manque de places et la limite de temps avec un ordinateur, la commande sur tablette et le pourboire, une boisson ratée, une suggestion, un avis faux ou hors sujet (brouillon court et neutre + suggestion de signalement à Google).
+- Signature : celle des réglages de l'établissement, ajoutée par l'application et non par le modèle (section 12).
 - 3 à 5 réponses de référence rédigées à la main, données en exemples (few-shot).
 
 ### 4.3 Coûts et garde-fous
@@ -214,7 +222,7 @@ La V1 sert les établissements d'un seul franchisé, un utilisateur, Google uniq
 
 ## 9. Découpage en lots pour Claude Code
 
-Six lots, chacun livrable et testable seul. Une session Claude Code par lot, avec ce document et le `CLAUDE.md` en contexte. Les lots 3 et 4 peuvent démarrer sur des avis fictifs si l'accès Google n'est pas encore validé.
+Sept lots, chacun livrable et testable seul. Une session Claude Code par lot, avec ce document et le `CLAUDE.md` en contexte. Les lots 3 et 4 peuvent démarrer sur des avis fictifs si l'accès Google n'est pas encore validé.
 
 | Lot | Contenu | Critère d'acceptation |
 | --- | --- | --- |
@@ -225,15 +233,18 @@ Six lots, chacun livrable et testable seul. Une session Claude Code par lot, ave
 | 4. À traiter | File des avis négatifs, fiche avis, brouillon, modification, régénération avec consigne, publication via Google, statuts, notes internes | Une réponse validée dans l'app apparaît sur Google en moins d'une minute |
 | 5. Tendances | Agrégation par thème précalculée, listes « ce qui plaît / ce qui revient », courbe mensuelle, taux de réponse, synthèse IA exportable | Pour 12 mois d'avis, la page se charge en moins de 1 s et les thèmes correspondent à une lecture manuelle d'un échantillon |
 | 6. PWA et finitions | Manifest, service worker, hors ligne, notifications push, mode sombre, Lighthouse, tests Playwright des trois parcours | Installable sur iOS et Android, score PWA ≥ 90, trois parcours verts |
+| 7. La voix de l'établissement | Réglages de la signature, de la personne qui parle, du ton, des coordonnées et des règles par sujet, avec aperçu sur un vrai avis (section 12) | Changer la signature ou le ton dans Réglages modifie le brouillon suivant sans toucher au code ni au fichier de ligne de conduite |
 
-**Ordre conseillé** : 0, 2, 3 (avec données fictives), 1, 4, 5, 6. L'IA et la home avant Google permet de voir le produit très tôt et d'affiner le ton pendant que la validation Google avance.
+**État au 4 octobre 2026** : les lots 0, 2, 3, 4 et 5 sont livrés (PR 1). Restent le lot 1 (en attente de l'accès à la Business Profile API), le lot 6 et le lot 7. Le critère du lot 3 est devenu : l'information principale de la home (météo et accès à la file) tient dans le premier écran d'un iPhone 13.
+
+**Ordre conseillé** : 0, 2, 3 (avec données fictives), 1, 4, 5, 6. Le lot 7 peut se faire avant le lot 1 : il ne dépend pas de Google. L'IA et la home avant Google permet de voir le produit très tôt et d'affiner le ton pendant que la validation Google avance.
 
 **Décisions à prendre avant le lot 0**
 
-- [ ] Nom du produit.
-- [ ] Supabase ou Postgres + Prisma.
+- [x] Nom du produit : Éclaircie (nom de travail).
+- [x] Supabase ou Postgres + Prisma : Postgres avec Prisma, authentification Auth.js.
 - [ ] Hébergement : Vercel + Supabase, ou serveur existant.
-- [ ] Première version de la ligne de conduite et 3 réponses de référence.
+- [x] Première version de la ligne de conduite et réponses de référence : `docs/ligne-de-conduite.md`.
 - [ ] Demande d'accès à la Business Profile API déposée (à faire dès maintenant, le délai est long).
 
 ## 10. Structure du dépôt et CLAUDE.md
@@ -296,3 +307,54 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 **Premier prompt à donner à Claude Code**
 
 > Lis CLAUDE.md et docs/cdc.md. Réalise le lot 0 (socle) : initialise le projet, la base, le schéma de la section 5.2, l'authentification et la CI. Propose-moi d'abord ton plan en 5 lignes.
+
+## 11. Décisions prises pendant la construction du MVP
+
+| Sujet | Version 1.0 | Décision | Raison |
+| --- | --- | --- | --- |
+| Période de la météo | Mois calendaire | 40 jours glissants | Le 3 du mois, deux avis durs donnaient « pluie légère » alors que la période récente était bonne |
+| File « À traiter » | Tous les avis sans réponse | Les 40 derniers jours, le reste en « rattrapage » sans compteur | Un historique d'un an sans réponse s'affichait comme une dette de 29 tâches |
+| Contexte rassurant | Sur chaque avis, avec la note du mois | Une phrase par écran, sans calcul à faire | Répété sur chaque carte, il n'était plus lu, et sa formulation n'était pas comprise |
+| Home sans défilement | Tout l'écran | L'information principale seulement | Tout faire tenir obligeait à des textes trop petits pour être lus |
+| Phrase de synthèse | « 23 avis, 21 enthousiastes » | « 21 clients contents sur 23 avis » | Commencer par les clients contents |
+| Pastilles des cartes | Brouillon prêt et gravité dans la même forme | Gravité en jauge grise, « Voir le brouillon » en invitation | On ne savait pas ce qui était cliquable |
+| Retour | Lien texte souligné | Chevron rond en haut à gauche, en plus du geste du téléphone | Une PWA installée n'a pas de barre de navigateur, et le geste ne fonctionne pas à l'ouverture depuis une notification |
+| Ton des réponses | Possible renvoi à une hiérarchie | La gérante parle en son nom | L'utilisateur est la direction |
+
+## 12. Lot 7 : la voix de l'établissement
+
+**Objectif** : la gérante règle elle-même la façon dont l'application parle à sa place, depuis l'écran Réglages, sans écrire de consigne technique. Chaque réglage a un effet visible sur le brouillon suivant.
+
+### 12.1 Ce que l'utilisateur règle
+
+Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
+
+1. **Signature.** Un champ libre par établissement, par exemple « Valentine, The Coffee Jacobins » ou « L'équipe The Coffee Jacobins ». Elle est ajoutée à la fin de chaque réponse et de chaque remerciement par l'application, pas par le modèle : elle est donc toujours exacte, et la changer met à jour les brouillons non publiés sans les régénérer.
+2. **Qui parle.** Deux choix : « je » (la gérante en son nom) ou « nous » (l'équipe). Dans les deux cas, jamais de renvoi à une direction.
+3. **Ton.** Trois réglages simples plutôt qu'un texte à rédiger : registre (sobre, chaleureux, complice), longueur (courte, moyenne), emojis (jamais, parfois).
+4. **Aperçu.** À chaque enregistrement, un brouillon est généré sur le dernier avis à traiter avec les nouveaux réglages, et affiché sous le formulaire. Il n'est pas stocké et ne remplace pas le brouillon de cet avis.
+5. **Coordonnées pour la suite.** L'adresse e-mail ou le téléphone à proposer quand une réponse invite à poursuivre l'échange. Sans coordonnées, la réponse propose de revenir au comptoir, jamais un « message privé » vague.
+6. **Règles par sujet.** Pour chaque sujet qui revient (prix, places, ordinateur, tablette et pourboire), une phrase « ce que je veux dire » et une liste « ce que je ne veux pas dire », préremplies depuis `docs/ligne-de-conduite.md`. Quand un thème revient souvent dans Tendances et n'a pas de règle, l'application propose d'en créer une.
+7. **Mots à éviter.** Une liste courte de mots ou de tournures que la gérante ne veut jamais lire dans ses réponses.
+
+8. **Apprendre de mes corrections.** Une case dans Réglages, activée par défaut et expliquée en clair. Quand la gérante réécrit vraiment un brouillon avant de le publier (pas une simple virgule), sa version est retenue et donnée au modèle comme réponse de référence. Les 8 dernières corrections sont utilisées. La liste est visible dans Réglages et chaque correction peut être retirée. Décocher la case arrête à la fois la collecte et l'utilisation.
+
+### 12.2 Fonctionnement
+
+- Les réglages sont stockés par établissement dans `settings` : signature, personne, registre, longueur, emojis, apprentissage, puis coordonnées, règles par sujet et mots à éviter. Les corrections retenues ont leur table, `corrections`.
+- Les brouillons sont stockés sans signature.
+- La ligne de conduite envoyée au modèle est composée à chaque génération : le texte de base, puis les réglages traduits en consignes, puis toutes les règles par sujet. Ce bloc reste identique d'un avis à l'autre, ce qui permet de le mettre en cache.
+- Sur la fiche d'un avis, un message signale tout mot à éviter présent dans le brouillon, quel que soit le modèle.
+- Le modèle reçoit la consigne de ne pas signer. La signature est ajoutée ensuite, et retirée avant toute régénération.
+- Le fournisseur simulé applique la personne, la longueur, les coordonnées et la règle du sujet concerné, pour que la démonstration et les tests réagissent aux réglages sans clé API. Le ton, l'emoji, les mots à éviter et les corrections retenues ne prennent effet qu'avec le vrai modèle.
+- Toute modification de ces réglages est journalisée (section 7).
+
+### 12.3 Critères d'acceptation
+
+- Changer la signature dans Réglages change la fin de tous les brouillons non publiés, sans appel à l'IA.
+- Publier une réponse réécrite l'ajoute aux corrections retenues ; publier un brouillon inchangé ou à peine retouché n'ajoute rien ; case décochée, rien n'est retenu ni utilisé.
+- Passer de « nous » à « je » puis régénérer un brouillon donne une réponse à la première personne du singulier.
+- Sur le jeu d'avis de test, aucune réponse ne contient « la direction », un mot de la liste à éviter, ni deux signatures.
+- Un avis qui parle du prix reçoit une réponse qui suit la règle « prix » de l'établissement.
+- L'écran Réglages reste utilisable d'une main sur un téléphone : pas de champ de consigne technique, aperçu visible sans quitter l'écran.
+
