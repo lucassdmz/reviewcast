@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 
 export default async function ATraiterPage({ searchParams }: PageProps<"/a-traiter">) {
   const params = await searchParams;
-  const { recents: file, rattrapage } = partagerFile(await listerFile(), new Date());
-  const contexte = await contexteDeLaFile();
+  const [tous, contexte] = await Promise.all([listerFile(), contexteDeLaFile()]);
+  const { recents: file, rattrapage } = partagerFile(tous, new Date());
   const message = params.publie
     ? "Réponse publiée. L'avis a quitté la file."
     : params.traite

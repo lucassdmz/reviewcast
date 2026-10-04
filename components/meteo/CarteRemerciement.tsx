@@ -1,3 +1,4 @@
+import { BoutonAction } from "@/components/BoutonAction";
 import { actionPublierRemerciement } from "@/app/(app)/a-traiter/actions";
 import type { RemerciementPropose } from "@/lib/file/service";
 
@@ -14,9 +15,9 @@ export function CarteRemerciement({ remerciement }: { remerciement: Remerciement
       <form action={actionPublierRemerciement} className="mt-4">
         <input type="hidden" name="reviewId" value={remerciement.reviewId} />
         <input type="hidden" name="texte" value={remerciement.texte} />
-        <button type="submit" className="w-full rounded-full bg-encre px-4 py-3 text-[15px] font-bold text-fond pressable">
+        <BoutonAction enCours="Publication…" className="pressable w-full rounded-full bg-encre px-4 py-3 text-[15px] font-bold text-fond">
           Publier ce remerciement
-        </button>
+        </BoutonAction>
       </form>
     </section>
   );

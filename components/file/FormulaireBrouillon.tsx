@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { actionEnregistrerBrouillon, actionPreparerPublication, actionRegenerer, type EtatAction } from "@/app/(app)/a-traiter/actions";
 import { CONSIGNES_RAPIDES } from "@/lib/file/validation";
 
@@ -25,6 +25,7 @@ export function FormulaireBrouillon({
 }) {
   const [etatEnregistrer, enregistrer, enregistrement] = useActionState(actionEnregistrerBrouillon, initial);
   const [etatRegenerer, regenerer, regeneration] = useActionState(actionRegenerer, initial);
+  const [relecture, setRelecture] = useState(false);
   const occupe = enregistrement || regeneration;
   const erreur = etatEnregistrer.erreur ?? etatRegenerer.erreur;
 
@@ -83,9 +84,11 @@ export function FormulaireBrouillon({
           form="form-brouillon"
           formAction={actionPreparerPublication}
           disabled={occupe}
-          className="rounded-full bg-encre px-3 py-2 text-sm font-semibold text-fond hover:opacity-90 disabled:opacity-50"
+          aria-busy={relecture}
+          onClick={() => setRelecture(true)}
+          className="pressable rounded-full bg-encre px-3 py-2 text-sm font-semibold text-fond disabled:opacity-50"
         >
-          Relire et publier
+          {relecture ? "Un instant…" : "Relire et publier"}
         </button>
       </div>
 

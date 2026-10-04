@@ -1,3 +1,4 @@
+import { BoutonAction } from "@/components/BoutonAction";
 import { Ecran } from "@/components/Ecran";
 import { NombreAnime } from "@/components/NombreAnime";
 import { SelecteurEtablissement } from "@/components/meteo/SelecteurEtablissement";
@@ -84,9 +85,9 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
                 </>
               )}
               {locationId && <input type="hidden" name="etablissement" value={locationId} />}
-              <button type="submit" className="pressable rounded-full bg-nuage px-3 py-1.5 font-medium">
+              <BoutonAction enCours="Rédaction…" className="pressable rounded-full bg-nuage px-3 py-1.5 font-medium">
                 {synthese ? "Régénérer" : "Générer la synthèse"}
-              </button>
+              </BoutonAction>
             </form>
           }
         />

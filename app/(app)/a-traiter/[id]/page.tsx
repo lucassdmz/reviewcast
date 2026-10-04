@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BoutonAction } from "@/components/BoutonAction";
 import { BoutonRetour } from "@/components/BoutonRetour";
 import { Etoiles, formatDate } from "@/components/file/Etoiles";
 import { FormulaireBrouillon } from "@/components/file/FormulaireBrouillon";
@@ -75,9 +76,9 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
             <form action={actionConfirmerPublication}>
               <input type="hidden" name="reviewId" value={fiche.id} />
               <input type="hidden" name="texte" value={fiche.brouillon.texte} />
-              <button type="submit" className="rounded-full bg-encre px-4 py-2 text-sm font-semibold text-fond hover:opacity-90">
+              <BoutonAction enCours="Publication…" className="pressable rounded-full bg-encre px-4 py-2 text-sm font-semibold text-fond">
                 Confirmer la publication
-              </button>
+              </BoutonAction>
             </form>
             <Link href={`/a-traiter/${fiche.id}`} className="rounded-full bg-nuage font-medium px-4 py-2 text-sm hover:opacity-60">
               Revenir au brouillon
@@ -90,9 +91,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
             <FormulaireBrouillon reviewId={fiche.id} texte={fiche.brouillon?.texte ?? ""} version={fiche.brouillon?.version ?? 0} signature={fiche.signature} motsEvites={fiche.motsEvitesPresents} />
             <form action={actionIgnorer} className="text-center">
               <input type="hidden" name="reviewId" value={fiche.id} />
-              <button type="submit" className="text-sm text-encre-douce underline-offset-2 hover:underline">
-                Marquer comme traité sans répondre
-              </button>
+              <BoutonAction className="text-sm text-encre-douce underline underline-offset-4">Marquer comme traité sans répondre</BoutonAction>
             </form>
           </>
         )
@@ -101,9 +100,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
       {fiche.statut === "IGNORE" && (
         <form action={actionRouvrir} className="text-center">
           <input type="hidden" name="reviewId" value={fiche.id} />
-          <button type="submit" className="text-sm underline underline-offset-4 hover:opacity-60">
-            Remettre dans la file
-          </button>
+          <BoutonAction className="text-sm underline underline-offset-4">Remettre dans la file</BoutonAction>
         </form>
       )}
 
