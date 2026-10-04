@@ -19,6 +19,15 @@ export const metadata: Metadata = {
   title: "Éclaircie — la météo de vos avis",
   description: "Vos avis Google remis en perspective : le climat d'abord, les quelques avis à traiter ensuite.",
   applicationName: "Éclaircie",
+  // Icône et mode plein écran quand l'application est ajoutée à l'écran d'accueil.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  appleWebApp: { capable: true, title: "Éclaircie", statusBarStyle: "default" },
   // Une démonstration partagée par lien ne doit pas être référencée.
   robots: process.env.MODE_DEMO === "1" ? { index: false, follow: false } : undefined,
 };
