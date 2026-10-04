@@ -4,9 +4,9 @@ const formatSemaine = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: 
 const formatNote = new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 const LARGEUR = 320;
-const HAUTEUR = 72;
+const HAUTEUR = 76;
 const MARGE_X = 10;
-const MARGE_Y = 10;
+const MARGE_Y = 12;
 
 /**
  * Mini-courbe de la note moyenne sur 8 semaines. Une seule série : pas de
@@ -36,24 +36,24 @@ export function MiniCourbe({ points }: { points: PointCourbe[] }) {
   const dernier = [...coords].reverse().find((c) => c.y !== null);
 
   return (
-    <section aria-labelledby="courbe-titre" className="rounded-2xl bg-surface px-4 pb-1 pt-2">
-      <h2 id="courbe-titre" className="text-xs font-semibold text-encre-douce">
+    <section aria-labelledby="courbe-titre" className="bloc">
+      <h2 id="courbe-titre" className="intitule">
         Note moyenne sur 8 semaines
       </h2>
-      <svg viewBox={`0 0 ${LARGEUR} ${HAUTEUR}`} className="mt-1 h-12 w-full" role="img" aria-describedby="courbe-tableau">
+      <svg viewBox={`0 0 ${LARGEUR} ${HAUTEUR}`} className="mt-2 h-auto w-full" role="img" aria-describedby="courbe-tableau">
         <line x1={MARGE_X} x2={LARGEUR - MARGE_X} y1={y(4)} y2={y(4)} stroke="var(--nuage)" strokeWidth="1" strokeDasharray="3 3" />
         {segments.map((d) => (
-          <path key={d} d={d} fill="none" stroke="var(--ciel-fonce)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+          <path key={d} d={d} pathLength={1} className="trace" fill="none" stroke="var(--encre)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         ))}
         {coords.map((c) =>
           c.y === null ? null : (
-            <circle key={c.semaine.toISOString()} cx={c.x} cy={c.y} r={c === dernier ? 5 : 4} fill={c === dernier ? "var(--accent)" : "var(--ciel-fonce)"} stroke="var(--surface)" strokeWidth="2">
+            <circle className="point" key={c.semaine.toISOString()} cx={c.x} cy={c.y} r={c === dernier ? 6 : 3.5} fill={c === dernier ? "var(--soleil)" : "var(--surface)"} stroke="var(--encre)" strokeWidth="2">
               <title>{`Semaine du ${formatSemaine.format(c.semaine)} : ${formatNote.format(c.noteMoyenne ?? 0)} ★ (${c.volume} avis)`}</title>
             </circle>
           ),
         )}
         {dernier && dernier.y !== null && (
-          <text x={Math.min(dernier.x, LARGEUR - 36)} y={dernier.y < 24 ? dernier.y + 18 : dernier.y - 10} fontSize="11" fontWeight="600" fill="var(--encre)">
+          <text x={Math.min(dernier.x, LARGEUR - 36)} y={dernier.y < 24 ? dernier.y + 18 : dernier.y - 10} fontSize="13" fontWeight="700" fill="var(--encre)">
             {formatNote.format(dernier.noteMoyenne ?? 0)}
           </text>
         )}

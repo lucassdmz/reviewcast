@@ -7,7 +7,7 @@ import { Etoiles, formatDate } from "./Etoiles";
 export function CarteAvis({ avis }: { avis: AvisDeLaFile }) {
   return (
     <li>
-      <Link href={`/a-traiter/${avis.id}`} className="block rounded-2xl bg-surface p-4 hover:bg-nuage">
+      <Link href={`/a-traiter/${avis.id}`} className="block bloc pressable">
         <div className="flex items-baseline justify-between gap-2">
           <p className="font-semibold">{avis.auteur}</p>
           <Etoiles note={avis.note} />
@@ -17,8 +17,8 @@ export function CarteAvis({ avis }: { avis: AvisDeLaFile }) {
         </p>
         <p className="mt-2 text-sm leading-snug">{avis.extrait}</p>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-          {avis.statut === "BROUILLON_PRET" && <span className="rounded-full bg-ciel px-2 py-0.5">Brouillon prêt</span>}
-          {avis.gravite && <span className="rounded-full bg-nuage px-2 py-0.5">Gravité {LIBELLES_GRAVITE[avis.gravite]}</span>}
+          {avis.statut === "BROUILLON_PRET" && <span className="rounded-full bg-fond px-2 py-0.5">Brouillon prêt</span>}
+          {avis.gravite && <span className="rounded-full bg-fond px-2 py-0.5">Gravité {LIBELLES_GRAVITE[avis.gravite]}</span>}
           <span className="text-encre-douce">{avis.contexte}</span>
         </div>
       </Link>

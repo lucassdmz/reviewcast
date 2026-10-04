@@ -9,7 +9,7 @@ const formatDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "sh
 export function NotesInternes({ reviewId, notes }: { reviewId: string; notes: { id: string; texte: string; date: Date }[] }) {
   const [etat, ajouter, enCours] = useActionState(actionAjouterNote, {} as EtatAction);
   return (
-    <section aria-labelledby="notes-titre" className="rounded-2xl bg-surface p-4">
+    <section aria-labelledby="notes-titre" className="bloc">
       <h2 id="notes-titre" className="text-sm font-semibold text-encre-douce">
         Notes internes
       </h2>
@@ -44,9 +44,9 @@ export function NotesInternes({ reviewId, notes }: { reviewId: string; notes: { 
           placeholder="Ajouter une note privée…"
           maxLength={2000}
           disabled={enCours}
-          className="min-w-0 flex-1 rounded-xl border border-nuage bg-fond px-3 py-2 text-sm focus:border-accent focus:outline-none"
+          className="min-w-0 flex-1 rounded-2xl border border-nuage bg-fond px-3 py-2 text-sm focus:border-encre focus:outline-none"
         />
-        <button type="submit" disabled={enCours} className="rounded-xl border border-nuage px-3 py-2 text-sm hover:bg-nuage disabled:opacity-50">
+        <button type="submit" disabled={enCours} className="rounded-full bg-nuage font-medium px-3 py-2 text-sm hover:opacity-60 disabled:opacity-50">
           Ajouter
         </button>
       </form>

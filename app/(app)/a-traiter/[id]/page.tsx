@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BoutonRetour } from "@/components/BoutonRetour";
 import { Etoiles, formatDate } from "@/components/file/Etoiles";
 import { FormulaireBrouillon } from "@/components/file/FormulaireBrouillon";
 import { NotesInternes } from "@/components/file/NotesInternes";
@@ -21,14 +22,10 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
   const dansLaFile = fiche.statut === "A_TRAITER" || fiche.statut === "BROUILLON_PRET";
 
   return (
-    <main className="mx-auto w-full max-w-lg flex-1 space-y-3 px-4 pb-24 pt-4">
-      <p className="text-sm">
-        <Link href="/a-traiter" className="text-accent underline-offset-2 hover:underline">
-          ‹ À traiter
-        </Link>
-      </p>
+    <main className="entree mx-auto w-full max-w-lg flex-1 space-y-3 px-4 pb-28 pt-4">
+      <BoutonRetour href="/a-traiter" libelle="À traiter" />
 
-      <header className="rounded-2xl bg-surface p-4">
+      <header className="bloc">
         <div className="flex items-baseline justify-between gap-2">
           <h1 className="text-xl font-bold">{fiche.auteur}</h1>
           <Etoiles note={fiche.note} />
@@ -40,26 +37,26 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
         {fiche.analyse && (
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             {fiche.analyse.themes.map((t) => (
-              <span key={t.libelle} className="rounded-full bg-nuage px-2 py-0.5">
+              <span key={t.libelle} className="rounded-full bg-fond px-2 py-0.5">
                 {t.libelle}
               </span>
             ))}
-            {fiche.analyse.gravite && <span className="rounded-full bg-nuage px-2 py-0.5">Gravité {LIBELLES_GRAVITE[fiche.analyse.gravite]}</span>}
+            {fiche.analyse.gravite && <span className="rounded-full bg-fond px-2 py-0.5">Gravité {LIBELLES_GRAVITE[fiche.analyse.gravite]}</span>}
             {fiche.analyse.horsSujet && <span className="rounded-full bg-soleil-doux px-2 py-0.5">Semble hors sujet : à signaler à Google</span>}
           </div>
         )}
       </header>
 
-      <p className="rounded-2xl bg-ciel px-4 py-3 text-sm">{fiche.contexteTexte}</p>
+      <p className="bloc text-sm">{fiche.contexteTexte}</p>
 
       {erreur && (
-        <p role="alert" className="rounded-xl bg-soleil-doux px-4 py-2 text-sm">
+        <p role="alert" className="rounded-2xl bg-soleil-doux px-4 py-2 text-sm">
           {erreur}
         </p>
       )}
 
       {fiche.reponseGoogle && (
-        <section className="rounded-2xl bg-surface p-4">
+        <section className="bloc">
           <h2 className="text-sm font-semibold text-encre-douce">Réponse publiée</h2>
           <p className="mt-2 whitespace-pre-line text-sm leading-snug">{fiche.reponseGoogle.texte}</p>
           {fiche.reponseGoogle.date && <p className="mt-1 text-xs text-encre-douce">Le {formatDate.format(fiche.reponseGoogle.date)}</p>}
@@ -67,21 +64,21 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
       )}
 
       {confirmer && fiche.brouillon ? (
-        <section aria-labelledby="confirmation-titre" className="rounded-2xl border-2 border-accent bg-surface p-4">
+        <section aria-labelledby="confirmation-titre" className="bloc-fort">
           <h2 id="confirmation-titre" className="font-semibold">
             Publier cette réponse sur Google ?
           </h2>
           <p className="mt-1 text-xs text-encre-douce">Elle sera visible publiquement sous l&apos;avis de {fiche.auteur}.</p>
-          <p className="mt-3 whitespace-pre-line rounded-xl bg-fond p-3 text-sm leading-snug">{fiche.brouillon.texte}</p>
+          <p className="mt-3 whitespace-pre-line rounded-2xl bg-fond p-3 text-sm leading-snug">{fiche.brouillon.texte}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <form action={actionConfirmerPublication}>
               <input type="hidden" name="reviewId" value={fiche.id} />
               <input type="hidden" name="texte" value={fiche.brouillon.texte} />
-              <button type="submit" className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+              <button type="submit" className="rounded-full bg-encre px-4 py-2 text-sm font-semibold text-fond hover:opacity-90">
                 Confirmer la publication
               </button>
             </form>
-            <Link href={`/a-traiter/${fiche.id}`} className="rounded-xl border border-nuage px-4 py-2 text-sm hover:bg-nuage">
+            <Link href={`/a-traiter/${fiche.id}`} className="rounded-full bg-nuage font-medium px-4 py-2 text-sm hover:opacity-60">
               Revenir au brouillon
             </Link>
           </div>
@@ -103,7 +100,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
       {fiche.statut === "IGNORE" && (
         <form action={actionRouvrir} className="text-center">
           <input type="hidden" name="reviewId" value={fiche.id} />
-          <button type="submit" className="text-sm text-accent underline-offset-2 hover:underline">
+          <button type="submit" className="text-sm underline underline-offset-4 hover:opacity-60">
             Remettre dans la file
           </button>
         </form>

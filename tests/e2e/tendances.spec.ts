@@ -30,6 +30,7 @@ test.describe("tendances", () => {
     await expect(page).toHaveURL(/periode=90j/);
     await expect(page.getByText("90 derniers jours", { exact: true })).toBeVisible();
 
+    await page.getByText("Choisir des dates").click();
     await page.getByLabel("Du").fill("2026-01-01");
     await page.getByLabel("au").fill("2026-03-31");
     await page.getByRole("button", { name: "Appliquer" }).click();

@@ -1,4 +1,5 @@
 import { Ecran } from "@/components/Ecran";
+import { NombreAnime } from "@/components/NombreAnime";
 import { SelecteurEtablissement } from "@/components/meteo/SelecteurEtablissement";
 import { CourbeMensuelle } from "@/components/tendances/CourbeMensuelle";
 import { ListeThemes } from "@/components/tendances/ListeThemes";
@@ -29,31 +30,35 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
 
   return (
     <Ecran titre="Tendances" large>
-      <div className="space-y-3">
+      <div className="entree space-y-3">
         <SelecteurEtablissement etablissements={t.etablissements} actif={t.etablissement} />
         <SelecteurPeriode periode={periode} locationId={locationId} />
 
-        <section aria-label="Résumé de la période" className="rounded-2xl bg-ciel p-4">
-          <p className="text-xs text-encre-douce">{periode.libelle}</p>
-          <div className="mt-1 flex flex-wrap items-end gap-x-6 gap-y-2">
-            <p>
-              <span className="text-3xl font-semibold">{t.repartition.noteMoyenne === null ? "–" : formatNote.format(t.repartition.noteMoyenne)}</span>
-              <span className="ml-1 text-encre-douce" aria-hidden="true">
-                ★
-              </span>
-              {evolutionNote !== null && <span className="ml-2 text-xs text-encre-douce">{signe(Math.round(evolutionNote * 10) / 10)} vs période précédente</span>}
-            </p>
-            <p className="text-sm">
-              <span className="font-semibold">{t.repartition.volume}</span> <span className="text-encre-douce">avis reçus</span>
-            </p>
-            <p className="text-sm">
-              <span className="font-semibold">{t.reactivite.tauxReponse === null ? "–" : `${t.reactivite.tauxReponse} %`}</span>{" "}
-              <span className="text-encre-douce">de réponses aux avis à traiter</span>
-            </p>
-            <p className="text-sm">
-              <span className="font-semibold">{formaterDelai(t.reactivite.delaiMoyenHeures)}</span> <span className="text-encre-douce">de délai moyen</span>
-            </p>
-          </div>
+        <section aria-label="Résumé de la période" className="bloc">
+          <p className="intitule">{periode.libelle}</p>
+          <p className="mt-2 flex items-baseline gap-2">
+            <span className="text-5xl font-bold leading-none tracking-tight">
+              {t.repartition.noteMoyenne === null ? "–" : <NombreAnime valeur={t.repartition.noteMoyenne} />}
+            </span>
+            <span className="text-2xl text-soleil" aria-hidden="true">
+              ★
+            </span>
+            {evolutionNote !== null && <span className="ml-1 text-[13px] text-encre-douce">{signe(Math.round(evolutionNote * 10) / 10)} vs période précédente</span>}
+          </p>
+          <dl className="mt-4 grid grid-cols-3 gap-2">
+            <div className="rounded-2xl bg-fond px-3 py-2.5">
+              <dd className="text-xl font-bold leading-none tabular-nums">{t.repartition.volume}</dd>
+              <dt className="mt-1.5 text-xs text-encre-douce">avis reçus</dt>
+            </div>
+            <div className="rounded-2xl bg-fond px-3 py-2.5">
+              <dd className="text-xl font-bold leading-none tabular-nums">{t.reactivite.tauxReponse === null ? "–" : `${t.reactivite.tauxReponse} %`}</dd>
+              <dt className="mt-1.5 text-xs text-encre-douce">de réponses aux avis à traiter</dt>
+            </div>
+            <div className="rounded-2xl bg-fond px-3 py-2.5">
+              <dd className="text-xl font-bold leading-none tabular-nums">{formaterDelai(t.reactivite.delaiMoyenHeures)}</dd>
+              <dt className="mt-1.5 text-xs text-encre-douce">de délai moyen</dt>
+            </div>
+          </dl>
         </section>
 
         <div className="grid gap-3 lg:grid-cols-2">
@@ -79,7 +84,7 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
                 </>
               )}
               {locationId && <input type="hidden" name="etablissement" value={locationId} />}
-              <button type="submit" className="rounded-xl border border-nuage bg-surface px-3 py-1.5 hover:bg-nuage">
+              <button type="submit" className="pressable rounded-full bg-nuage px-3 py-1.5 font-medium">
                 {synthese ? "Régénérer" : "Générer la synthèse"}
               </button>
             </form>

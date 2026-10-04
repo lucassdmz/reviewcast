@@ -16,11 +16,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const message = params.remercie ? "Remerciement publié. Merci pour eux !" : typeof params.erreur === "string" ? params.erreur : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-2 px-4 pb-16 pt-2">
+    <main className="entree mx-auto flex w-full max-w-lg flex-1 flex-col gap-3 px-4 pb-28 pt-3">
       <h1 className="sr-only">Météo de vos avis</h1>
       <SelecteurEtablissement etablissements={home.etablissements} actif={home.etablissementActif} />
       {message && (
-        <p role="status" className="rounded-xl bg-soleil-doux px-4 py-2 text-sm">
+        <p role="status" className="rounded-2xl bg-soleil-doux px-4 py-2 text-sm">
           {message}
         </p>
       )}
@@ -34,12 +34,12 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         evolutionVolume={home.evolutionVolume}
         phrase={home.phrase}
       />
+      <CarteATraiter nombre={home.aTraiter} />
       <Compliment compliment={home.compliment} />
       <MiniCourbe points={home.courbe} />
-      <CarteATraiter nombre={home.aTraiter} />
       <CarteRemerciement remerciement={remerciement} />
       {home.volumeMois === 0 && home.noteMoyenne12Mois === null && (
-        <p className="rounded-2xl bg-surface p-4 text-sm text-encre-douce">
+        <p className="bloc text-sm text-encre-douce">
           Connectez votre fiche Google dans Réglages pour voir le climat de vos avis.
         </p>
       )}

@@ -5,7 +5,7 @@ export function Etoiles({ note }: { note: number }) {
       <span aria-hidden="true" className="text-soleil">
         {"★".repeat(note)}
       </span>
-      <span aria-hidden="true" className="text-nuage">
+      <span aria-hidden="true" className="text-ciel-fonce">
         {"★".repeat(5 - note)}
       </span>
     </span>

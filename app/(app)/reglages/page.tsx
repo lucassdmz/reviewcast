@@ -10,7 +10,7 @@ export default async function ReglagesPage() {
   const [session, conso] = await Promise.all([auth(), consommationDuMois()]);
   return (
     <Ecran titre="Réglages">
-      <section className="rounded-2xl bg-surface p-6">
+      <section className="bloc">
         <h2 className="text-sm font-semibold text-encre-douce">Compte</h2>
         <p className="mt-1">{session?.user?.email}</p>
         <form
@@ -22,14 +22,14 @@ export default async function ReglagesPage() {
         >
           <button
             type="submit"
-            className="rounded-xl border border-nuage px-4 py-2 text-sm font-medium hover:bg-nuage"
+            className="rounded-full bg-nuage font-medium px-4 py-2 text-sm font-medium hover:opacity-60"
           >
             Se déconnecter
           </button>
         </form>
       </section>
 
-      <section className="mt-4 rounded-2xl bg-surface p-6">
+      <section className="mt-4 bloc">
         <h2 className="text-sm font-semibold text-encre-douce">Intelligence artificielle</h2>
         <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-encre-douce">Fournisseur</dt>

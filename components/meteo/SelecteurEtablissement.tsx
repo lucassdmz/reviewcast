@@ -16,7 +16,7 @@ export function SelecteurEtablissement({ etablissements, actif }: { etablissemen
                 href={o.id ? `/?etablissement=${o.id}` : "/"}
                 aria-current={estActif ? "true" : undefined}
                 className={`inline-block whitespace-nowrap rounded-full px-3 py-1 text-sm ${
-                  estActif ? "bg-accent font-semibold text-white" : "bg-surface text-encre-douce"
+                  estActif ? "border border-encre bg-encre font-semibold text-fond" : "bg-surface text-encre-douce"
                 }`}
               >
                 {o.nom}

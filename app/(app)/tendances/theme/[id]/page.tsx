@@ -16,19 +16,14 @@ export default async function ThemePage({ params, searchParams }: PageProps<"/te
   if (!resultat) notFound();
 
   return (
-    <Ecran titre={`Thème : ${resultat.libelle}`}>
-      <p className="mb-3 text-sm">
-        <Link href={`/tendances?${requete}`} className="text-accent underline-offset-2 hover:underline">
-          ‹ Tendances
-        </Link>
-        <span className="ml-2 text-encre-douce">{periode.libelle}</span>
-      </p>
+    <Ecran titre={`Thème : ${resultat.libelle}`} retour={{ href: `/tendances?${requete}`, libelle: "Tendances" }}>
+      <p className="-mt-3 mb-4 px-1 text-sm text-encre-douce">{periode.libelle}</p>
       {resultat.avis.length === 0 ? (
-        <p className="rounded-2xl bg-surface p-6 text-sm text-encre-douce">Aucun avis sur ce thème pour la période.</p>
+        <p className="bloc text-sm text-encre-douce">Aucun avis sur ce thème pour la période.</p>
       ) : (
         <ul className="space-y-3">
           {resultat.avis.map((a) => (
-            <li key={a.id} className="rounded-2xl bg-surface p-4">
+            <li key={a.id} className="bloc">
               <div className="flex items-baseline justify-between gap-2">
                 <Link href={`/a-traiter/${a.id}`} className="font-semibold underline-offset-2 hover:underline">
                   {a.auteur}

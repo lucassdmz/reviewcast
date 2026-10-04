@@ -24,7 +24,7 @@ export function Synthese({ synthese, titre, regenerer }: { synthese: SyntheseTen
   }
 
   return (
-    <section aria-labelledby="synthese-titre" className="rounded-2xl bg-soleil-doux p-4 print:bg-white">
+    <section aria-labelledby="synthese-titre" className="bloc print:bg-white">
       <h2 id="synthese-titre" className="text-sm font-semibold">
         Synthèse de la période
       </h2>
@@ -43,10 +43,10 @@ export function Synthese({ synthese, titre, regenerer }: { synthese: SyntheseTen
       <div className="no-print mt-3 flex flex-wrap gap-2 text-sm">
         {synthese && (
           <>
-            <button type="button" onClick={copier} className="rounded-xl border border-nuage bg-surface px-3 py-1.5 hover:bg-nuage">
+            <button type="button" onClick={copier} className="rounded-full bg-nuage font-medium px-3 py-1.5 hover:opacity-60">
               {copie ? "Copié" : "Copier le texte"}
             </button>
-            <button type="button" onClick={() => window.print()} className="rounded-xl border border-nuage bg-surface px-3 py-1.5 hover:bg-nuage">
+            <button type="button" onClick={() => window.print()} className="rounded-full bg-nuage font-medium px-3 py-1.5 hover:opacity-60">
               Exporter en PDF
             </button>
           </>

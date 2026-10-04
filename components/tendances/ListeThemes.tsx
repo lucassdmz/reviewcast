@@ -7,24 +7,38 @@ function evolution(e: number | null): string {
   return e > 0 ? `+${e}` : `−${Math.abs(e)}`;
 }
 
-/** Une des deux listes : « Ce qui plaît » ou « Ce qui revient comme problème ». */
+/**
+ * Une des deux listes : « Ce qui plaît » ou « Ce qui revient comme problème ».
+ * Chaque thème porte une barre proportionnelle au nombre d'avis : verte pour ce
+ * qui plaît, grise pour les points à travailler (jamais de rouge).
+ */
 export function ListeThemes({ titre, themes, requete, teinte }: { titre: string; themes: ThemeClasse[]; requete: string; teinte: "ciel" | "nuage" }) {
+  const max = Math.max(...themes.map((t) => t.nombre), 1);
+  const positif = teinte === "ciel";
   return (
-    <section aria-labelledby={`liste-${teinte}`} className={`rounded-2xl p-4 ${teinte === "ciel" ? "bg-ciel" : "bg-surface"}`}>
-      <h2 id={`liste-${teinte}`} className="text-sm font-semibold">
+    <section aria-labelledby={`liste-${teinte}`} className="bloc">
+      <h2 id={`liste-${teinte}`} className="flex items-center gap-2 font-bold">
+        <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${positif ? "bg-matcha" : "bg-ciel-fonce"}`} />
         {titre}
       </h2>
       {themes.length === 0 ? (
         <p className="mt-2 text-sm text-encre-douce">Rien de marquant sur la période.</p>
       ) : (
-        <ol className="mt-2 space-y-1.5">
+        <ol className="mt-3 space-y-3">
           {themes.map((t) => (
-            <li key={t.themeId} className="flex items-center justify-between gap-2 text-sm">
-              <Link href={`/tendances/theme/${t.themeId}?${requete}`} className="min-w-0 flex-1 truncate underline-offset-2 hover:underline">
-                {t.libelle}
-              </Link>
-              <span className="whitespace-nowrap font-semibold">{t.nombre === 1 ? "1 avis" : `${t.nombre} avis`}</span>
-              <span className="w-14 whitespace-nowrap text-right text-xs text-encre-douce">{evolution(t.evolution)}</span>
+            <li key={t.themeId}>
+              <div className="flex items-baseline justify-between gap-2 text-[15px]">
+                <Link href={`/tendances/theme/${t.themeId}?${requete}`} className="pressable min-w-0 flex-1 truncate first-letter:uppercase">
+                  {t.libelle}
+                </Link>
+                <span className="whitespace-nowrap text-sm font-bold tabular-nums">{t.nombre === 1 ? "1 avis" : `${t.nombre} avis`}</span>
+                <span className="w-16 whitespace-nowrap text-right text-xs text-encre-douce">
+                  {t.evolution === null ? <span className="rounded-full bg-fond px-2 py-0.5">nouveau</span> : evolution(t.evolution)}
+                </span>
+              </div>
+              <div className={`mt-1.5 h-1.5 overflow-hidden rounded-full ${positif ? "bg-matcha-doux" : "bg-fond"}`} role="presentation">
+                <div className={`barre h-full rounded-full ${positif ? "bg-matcha" : "bg-ciel-fonce"}`} style={{ width: `${Math.max(6, (t.nombre / max) * 100)}%` }} />
+              </div>
             </li>
           ))}
         </ol>

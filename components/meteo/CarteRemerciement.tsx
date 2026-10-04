@@ -5,15 +5,15 @@ import type { RemerciementPropose } from "@/lib/file/service";
 export function CarteRemerciement({ remerciement }: { remerciement: RemerciementPropose | null }) {
   if (!remerciement) return null;
   return (
-    <section aria-labelledby="remerciement-titre" className="rounded-2xl bg-surface px-4 py-2">
-      <h2 id="remerciement-titre" className="text-xs font-semibold text-encre-douce">
+    <section aria-labelledby="remerciement-titre" className="bloc">
+      <h2 id="remerciement-titre" className="intitule">
         Remercier {remerciement.auteur} pour ses 5 étoiles
       </h2>
-      <p className="mt-1 text-sm leading-snug">{remerciement.texte}</p>
-      <form action={actionPublierRemerciement} className="mt-1.5">
+      <p className="mt-2 text-[15px] leading-relaxed">{remerciement.texte}</p>
+      <form action={actionPublierRemerciement} className="mt-4">
         <input type="hidden" name="reviewId" value={remerciement.reviewId} />
         <input type="hidden" name="texte" value={remerciement.texte} />
-        <button type="submit" className="rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">
+        <button type="submit" className="w-full rounded-full bg-encre px-4 py-3 text-[15px] font-bold text-fond pressable">
           Publier ce remerciement
         </button>
       </form>

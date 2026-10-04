@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
-/* Palette douce inspirée de la météo (section 2 du cdc). Pas de rouge vif. */
+/*
+ * Application mobile sobre, esprit café japonais : fond brume, cartes blanches
+ * aux grands arrondis, encre noire, et une seule couleur, le jaune du soleil.
+ * Pas de rouge (section 2 du cdc).
+ */
 :root {
-  --ciel: #eaf4fb;
-  --ciel-fonce: #cfe4f3;
-  --soleil: #f6c453;
-  --soleil-doux: #fbe8b8;
-  --nuage: #e9edf1;
-  --encre: #1f2a37;
-  --encre-douce: #5b6b7c;
+  --ciel: #f1f2f0;
+  --ciel-fonce: #c5c9cc;
+  --soleil: #f2b72a;
+  --soleil-doux: #fbf0cc;
+  --nuage: #e4e6e5;
+  --encre: #16181a;
+  --encre-douce: #5f6368;
   --surface: #ffffff;
-  --fond: #f4f8fb;
-  --accent: #3b82c4;
-  --attention: #c98a3a;
+  --fond: #f1f2f0;
+  --accent: #16181a;
+  --attention: #8f6400;
+  --nuage-forme: #e3e6e9;
+  --pluie: #8b96a1;
+  --matcha: #5f7f4b;
+  --matcha-doux: #e6eedf;
 }
 
 @theme inline {
@@ -27,28 +35,147 @@
   --color-fond: var(--fond);
   --color-accent: var(--accent);
   --color-attention: var(--attention);
+  --color-matcha: var(--matcha);
+  --color-matcha-doux: var(--matcha-doux);
   --font-sans: var(--font-sans-app);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ciel: #1b2a3a;
-    --ciel-fonce: #24384d;
-    --soleil: #e6b64a;
-    --soleil-doux: #4a3f22;
-    --nuage: #2a3340;
-    --encre: #eef3f8;
-    --encre-douce: #a3b1c0;
-    --surface: #182230;
-    --fond: #0f161f;
-    --accent: #7cb4e6;
-    --attention: #d9a45b;
+    --ciel: #25282b;
+    --ciel-fonce: #4b5055;
+    --soleil: #f2b72a;
+    --soleil-doux: #3a3115;
+    --nuage: #2c2f32;
+    --encre: #f2f2ef;
+    --encre-douce: #a8acb0;
+    --surface: #1c1e20;
+    --fond: #111213;
+    --accent: #f2f2ef;
+    --attention: #f2b72a;
+    --nuage-forme: #3b3f44;
+    --pluie: #8b96a1;
+    --matcha: #a3c28d;
+    --matcha-doux: #263020;
   }
 }
 
 body {
   background: var(--fond);
   color: var(--encre);
+}
+
+@layer components {
+  /* Carte de contenu. */
+  .bloc {
+    background: var(--surface);
+    border-radius: 1.5rem;
+    padding: 1.125rem;
+  }
+
+  /* Carte qui demande une décision (confirmation de publication). */
+  .bloc-fort {
+    background: var(--surface);
+    border-radius: 1.5rem;
+    padding: 1.125rem;
+    box-shadow: inset 0 0 0 2px var(--encre);
+  }
+
+  /* Petit intitulé de carte. */
+  .intitule {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--encre-douce);
+  }
+}
+
+/*
+ * Mouvement : une seule entrée par écran (les cartes montent l'une après
+ * l'autre), le soleil qui se lève, les barres et les courbes qui se tracent,
+ * et un léger enfoncement au toucher. Rien ne bouge sans raison.
+ */
+@keyframes monter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@keyframes lever {
+  from {
+    opacity: 0;
+    transform: translate(14px, 28px) scale(0.88);
+  }
+}
+@keyframes croitre {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes tracer {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes eclore {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+.entree > * {
+  animation: monter 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.entree > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.entree > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.entree > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+.entree > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+.entree > *:nth-child(n + 6) {
+  animation-delay: 350ms;
+}
+
+.ciel-anime {
+  animation: lever 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+}
+.barre {
+  transform-origin: left center;
+  animation: croitre 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both;
+}
+.trace {
+  stroke-dasharray: 1;
+  animation: tracer 1s ease-out 0.3s both;
+}
+.point {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eclore 0.35s cubic-bezier(0.3, 1.4, 0.5, 1) 1.1s both;
+}
+.pressable {
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.pressable:active {
+  transform: scale(0.975);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* Export PDF de la synthèse : seule la synthèse et son titre sont imprimés. */

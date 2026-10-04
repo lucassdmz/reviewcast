@@ -17,7 +17,7 @@ export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: st
   const erreur = etatEnregistrer.erreur ?? etatRegenerer.erreur;
 
   return (
-    <section aria-labelledby="brouillon-titre" className="rounded-2xl bg-surface p-4">
+    <section aria-labelledby="brouillon-titre" className="bloc">
       <div className="flex items-baseline justify-between">
         <h2 id="brouillon-titre" className="text-sm font-semibold text-encre-douce">
           Brouillon de réponse
@@ -37,18 +37,18 @@ export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: st
           defaultValue={texte}
           rows={7}
           disabled={occupe}
-          className="w-full rounded-xl border border-nuage bg-fond p-3 text-sm leading-snug focus:border-accent focus:outline-none"
+          className="w-full rounded-2xl border border-nuage bg-fond p-3 text-sm leading-snug focus:border-encre focus:outline-none"
         />
       </form>
 
       {erreur && (
-        <p role="alert" className="mt-2 rounded-xl bg-soleil-doux px-3 py-2 text-sm">
+        <p role="alert" className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2 text-sm">
           {erreur}
         </p>
       )}
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <button type="submit" form="form-brouillon" disabled={occupe} className="rounded-xl border border-nuage px-3 py-2 text-sm font-medium hover:bg-nuage disabled:opacity-50">
+        <button type="submit" form="form-brouillon" disabled={occupe} className="rounded-full bg-nuage font-medium px-3 py-2 text-sm font-medium hover:opacity-60 disabled:opacity-50">
           {enregistrement ? "Enregistrement…" : "Enregistrer"}
         </button>
         <button
@@ -56,7 +56,7 @@ export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: st
           form="form-brouillon"
           formAction={actionPreparerPublication}
           disabled={occupe}
-          className="rounded-xl bg-accent px-3 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+          className="rounded-full bg-encre px-3 py-2 text-sm font-semibold text-fond hover:opacity-90 disabled:opacity-50"
         >
           Relire et publier
         </button>
@@ -73,7 +73,7 @@ export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: st
               name="consigne"
               value={c.consigne}
               disabled={occupe}
-              className="rounded-full bg-ciel px-3 py-1 text-xs hover:opacity-90 disabled:opacity-50"
+              className="rounded-full bg-fond px-3 py-1 text-xs hover:opacity-90 disabled:opacity-50"
             >
               {c.libelle}
             </button>
@@ -89,9 +89,9 @@ export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: st
             placeholder="Ou une consigne libre…"
             maxLength={300}
             disabled={occupe}
-            className="min-w-0 flex-1 rounded-xl border border-nuage bg-fond px-3 py-2 text-sm focus:border-accent focus:outline-none"
+            className="min-w-0 flex-1 rounded-2xl border border-nuage bg-fond px-3 py-2 text-sm focus:border-encre focus:outline-none"
           />
-          <button type="submit" disabled={occupe} className="rounded-xl border border-nuage px-3 py-2 text-sm hover:bg-nuage disabled:opacity-50">
+          <button type="submit" disabled={occupe} className="rounded-full bg-nuage font-medium px-3 py-2 text-sm hover:opacity-60 disabled:opacity-50">
             {regeneration ? "Rédaction…" : "Régénérer"}
           </button>
         </div>

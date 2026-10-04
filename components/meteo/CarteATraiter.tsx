@@ -1,21 +1,18 @@
 import Link from "next/link";
 
-/** Carte discrète vers la file « À traiter », absente s'il n'y a rien à faire. */
+/** Accès à la file « À traiter », absent s'il n'y a rien à faire. Ton neutre : une tâche, pas une alarme. */
 export function CarteATraiter({ nombre }: { nombre: number }) {
   if (nombre === 0) return null;
-  const libelle = nombre === 1 ? "1 avis à traiter" : `${nombre} avis à traiter`;
   return (
-    <Link
-      href="/a-traiter"
-      className="flex items-center justify-between rounded-2xl border border-nuage bg-surface px-4 py-2 text-sm hover:bg-nuage"
-    >
-      <span>
-        <span className="font-semibold">{libelle}</span>
-        <span className="ml-2 text-encre-douce">Brouillons prêts.</span>
+    <Link href="/a-traiter" className="flex items-center gap-3.5 rounded-3xl bg-surface p-3.5 pr-5 pressable">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-encre text-lg font-bold text-fond">{nombre}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-bold leading-tight">avis à traiter</span>
+        <span className="block text-sm text-encre-douce">Brouillons de réponse prêts</span>
       </span>
-      <span aria-hidden="true" className="text-encre-douce">
-        ›
-      </span>
+      <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-encre-douce" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6" />
+      </svg>
     </Link>
   );
 }

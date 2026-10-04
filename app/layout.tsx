@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import { Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
 
-const nunito = Nunito({
+const zenKaku = Zen_Kaku_Gothic_New({
   variable: "--font-sans-app",
   subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
 });
 
 export const metadata: Metadata = {
@@ -14,14 +15,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#eaf4fb",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f1f2f0" },
+    { media: "(prefers-color-scheme: dark)", color: "#111213" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={`${nunito.variable} h-full antialiased`}>
+    <html lang="fr" className={`${zenKaku.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
