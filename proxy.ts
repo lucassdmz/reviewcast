@@ -8,6 +8,8 @@ import { hasSessionCookie, isPublicPath } from "@/lib/auth/session-cookie";
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Mode démonstration : pas de connexion, l'application s'ouvre directement.
+  if (process.env.MODE_DEMO === "1") return NextResponse.next();
   if (isPublicPath(pathname)) return NextResponse.next();
 
   const connected = hasSessionCookie((name) => request.cookies.has(name));

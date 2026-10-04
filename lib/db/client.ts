@@ -8,12 +8,23 @@ import { PrismaClient } from "./generated/client";
  */
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+function schemaDepuisUrl(connectionString: string): string | null {
+  try {
+    return new URL(connectionString).searchParams.get("schema");
+  } catch {
+    return null;
+  }
+}
+
 function createClient(): PrismaClient {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error("DATABASE_URL manquante : copiez .env.example vers .env");
   }
-  const adapter = new PrismaPg({ connectionString });
+  // Base partagée avec d'autres applications : `?schema=eclaircie` dans l'URL
+  // range toutes les tables dans ce schéma (Prisma Migrate lit le même paramètre).
+  const schema = schemaDepuisUrl(connectionString);
+  const adapter = new PrismaPg({ connectionString }, schema ? { schema } : undefined);
   return new PrismaClient({ adapter });
 }
 

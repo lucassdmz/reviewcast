@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   title: "Éclaircie — la météo de vos avis",
   description: "Vos avis Google remis en perspective : le climat d'abord, les quelques avis à traiter ensuite.",
   applicationName: "Éclaircie",
+  // Une démonstration partagée par lien ne doit pas être référencée.
+  robots: process.env.MODE_DEMO === "1" ? { index: false, follow: false } : undefined,
 };
 
 export const viewport: Viewport = {

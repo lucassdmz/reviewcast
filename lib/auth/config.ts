@@ -1,10 +1,11 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth, { type NextAuthConfig } from "next-auth";
+import NextAuth, { type NextAuthConfig, type Session } from "next-auth";
 import Google from "next-auth/providers/google";
 import { logAudit } from "@/lib/audit/log";
 import { prisma } from "@/lib/db/client";
 import { getEnv } from "@/lib/env";
 import { isAllowedEmail, parseAllowedEmails } from "./allowlist";
+import { estModeDemo, sessionDemo } from "./demo";
 
 /**
  * Authentification par Google Sign-In (section 7 du cdc).
@@ -60,4 +61,12 @@ export const authConfig: NextAuthConfig = {
   },
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
+const nextAuth = NextAuth(authConfig);
+
+export const { handlers, signIn, signOut } = nextAuth;
+
+/** Session courante. En mode démonstration, une session fictive : aucune connexion n'est demandée. */
+export async function auth(): Promise<Session | null> {
+  if (estModeDemo()) return sessionDemo();
+  return nextAuth.auth();
+}

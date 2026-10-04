@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { SyntheseTendances } from "@/lib/analytics/synthese";
 
-const formatDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+const formatDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
 
 /**
  * Synthèse IA de la période, exportable : copie du texte dans le presse-papiers

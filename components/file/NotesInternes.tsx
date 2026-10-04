@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { actionAjouterNote, actionSupprimerNote, type EtatAction } from "@/app/(app)/a-traiter/actions";
 
-const formatDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const formatDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
 
 /** Notes privées sur un avis (« client rappelé le 3/10 »). Jamais publiées. */
 export function NotesInternes({ reviewId, notes }: { reviewId: string; notes: { id: string; texte: string; date: Date }[] }) {
