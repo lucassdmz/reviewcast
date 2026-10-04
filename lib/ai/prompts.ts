@@ -1,3 +1,4 @@
+import { prenomPourSalutation, salutation } from "./salutation";
 import type { ReviewAnalysisOutput } from "./schemas";
 import type {
   AnalyzeReviewInput,
@@ -92,11 +93,20 @@ function decrireAnalyse(analyse: ReviewAnalysisOutput | null): string {
   ].join("\n");
 }
 
+/** La salutation est décidée par l'application : prénom seul, ou pas de nom au moindre doute. */
+function consigneSalutation(auteur: string): string {
+  const prenom = prenomPourSalutation(auteur);
+  return prenom
+    ? `Si vous saluez le client par son nom, utilisez son prénom seul (« ${salutation(auteur)} »), jamais son nom complet.`
+    : "Saluez le client sans le nommer (« Bonjour, ») : son nom affiché ressemble à un pseudonyme ou à une enseigne.";
+}
+
 export function draftPrompt(input: DraftReplyInput): string {
   const lignes = [
     "Rédigez une réponse publique à l'avis ci-dessous, en suivant la ligne de conduite et la structure imposée.",
     "Respectez la longueur demandée par la ligne de conduite (à défaut, 40 à 90 mots). Ne contestez pas les faits publiquement, ne nommez personne, ne promettez pas de remboursement.",
     "Ne signez pas : la signature est ajoutée automatiquement après votre texte.",
+    consigneSalutation(input.review.auteur),
     "Si l'avis est manifestement faux ou hors sujet, rédigez une réponse courte et neutre.",
     "Renvoyez un JSON : { \"reponse\": \"...\" }.",
   ];
@@ -116,6 +126,7 @@ export function thankYouPrompt(input: ThankYouInput): string {
   return [
     "Rédigez un mot de remerciement public pour l'avis positif ci-dessous : deux phrases maximum,",
     "personnalisé sur ce que le client a apprécié, sans formule générique. Ne signez pas : la signature est ajoutée automatiquement.",
+    consigneSalutation(input.review.auteur),
     "Renvoyez un JSON : { \"message\": \"...\" }.",
     "",
     AVERTISSEMENT_AVIS,

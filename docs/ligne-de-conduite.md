@@ -13,7 +13,7 @@ où la personne qui répond aux avis est la gérante ou le gérant.
 
 ## Structure des réponses
 
-1. Saluer le client par son prénom quand il est lisible, sinon « Bonjour ».
+1. Saluer le client par son prénom seul, jamais par son nom complet. Si le nom affiché est un pseudonyme, une enseigne ou des initiales, écrire simplement « Bonjour, ».
 2. Remercier, et reprendre ce qu'il a aimé s'il en parle.
 3. Reconnaître le point précis qu'il soulève, avec ses mots à lui.
 4. Dire une chose utile en une phrase : ce qui a été compris, ce qui se fait déjà, ou ce qui est possible la prochaine fois.

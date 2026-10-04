@@ -8,6 +8,7 @@ import {
   type ReviewAnalysisOutput,
 } from "../schemas";
 import { reglesPourThemes } from "@/lib/voix/reglages";
+import { prenomPourSalutation, salutation } from "../salutation";
 import { TAXONOMIE_INITIALE } from "../taxonomy";
 import type {
   AiProvider,
@@ -92,7 +93,7 @@ export class FakeProvider implements AiProvider {
     const phrases = (
       je
         ? [
-            `Bonjour ${auteur}, merci d'avoir pris le temps de m'écrire.`,
+            `${salutation(auteur)} merci d'avoir pris le temps de m'écrire.`,
             `Je regrette sincèrement que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
             regle ? regle.dire : court ? "" : "Vos remarques me sont précieuses et j'en ai parlé avec l'équipe pour que cela ne se reproduise pas.",
             geste
@@ -101,7 +102,7 @@ export class FakeProvider implements AiProvider {
             court ? "" : suite,
           ]
         : [
-            `Bonjour ${auteur}, merci d'avoir pris le temps de nous écrire.`,
+            `${salutation(auteur)} merci d'avoir pris le temps de nous écrire.`,
             `Nous sommes sincèrement désolés que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
             regle ? regle.dire : court ? "" : "Vos remarques sont précieuses et nous les avons partagées avec l'équipe pour que cela ne se reproduise pas.",
             geste
@@ -115,7 +116,8 @@ export class FakeProvider implements AiProvider {
 
   async thankYouNote(input: ThankYouInput): Promise<AiResult<{ message: string }>> {
     const theme = input.review.texte ? (detecterThemes(input.review.texte, input.review.note)[0]?.libelle ?? "votre visite") : "votre visite";
-    const message = `Merci ${input.review.auteur} pour ce retour qui touche toute l'équipe, ravie que ${theme} vous ait plu. Au plaisir de vous revoir bientôt !`;
+    const prenom = prenomPourSalutation(input.review.auteur);
+    const message = `Merci${prenom ? ` ${prenom}` : ""} pour ce retour qui touche toute l'équipe, ravie que ${theme} vous ait plu. Au plaisir de vous revoir bientôt !`;
     return { data: thankYouSchema.parse({ message }), usage: usage("fake") };
   }
 
