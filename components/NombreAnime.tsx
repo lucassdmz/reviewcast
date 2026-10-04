@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
  * l'arrivée sur l'écran. Le rendu serveur porte la valeur finale : sans
  * JavaScript ou avec les animations réduites, rien ne bouge.
  */
-export function NombreAnime({ valeur, decimales = 1, duree = 900 }: { valeur: number; decimales?: number; duree?: number }) {
+export function NombreAnime({ valeur, decimales = 1, duree = 450 }: { valeur: number; decimales?: number; duree?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const format = new Intl.NumberFormat("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
 

@@ -65,6 +65,27 @@ body {
   color: var(--encre);
 }
 
+/*
+ * Toucher : pas de voile gris du navigateur (chaque élément a son propre état
+ * enfoncé), pas de délai de double appui, pas de sélection de texte ni de menu
+ * contextuel sur un appui long sur un bouton.
+ */
+a,
+button,
+label,
+summary,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button,
+summary,
+nav a {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 @layer components {
   /* Carte de contenu. */
   .bloc {
@@ -79,6 +100,13 @@ body {
     border-radius: 1.5rem;
     padding: 1.125rem;
     box-shadow: inset 0 0 0 2px var(--encre);
+  }
+
+  /* Lien ou bouton de texte : la zone tactile fait au moins 44 px de haut. */
+  .cible {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
   }
 
   /* Petit intitulé de carte. */
@@ -97,7 +125,7 @@ body {
 @keyframes monter {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(6px);
   }
 }
 @keyframes lever {
@@ -124,49 +152,50 @@ body {
 }
 
 .entree > * {
-  animation: monter 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: monter 0.26s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .entree > *:nth-child(2) {
-  animation-delay: 70ms;
+  animation-delay: 30ms;
 }
 .entree > *:nth-child(3) {
-  animation-delay: 140ms;
+  animation-delay: 60ms;
 }
 .entree > *:nth-child(4) {
-  animation-delay: 210ms;
+  animation-delay: 90ms;
 }
 .entree > *:nth-child(5) {
-  animation-delay: 280ms;
+  animation-delay: 120ms;
 }
 .entree > *:nth-child(n + 6) {
-  animation-delay: 350ms;
+  animation-delay: 120ms;
 }
 
 .ciel-anime {
-  animation: lever 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+  animation: lever 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .barre {
   transform-origin: left center;
-  animation: croitre 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both;
+  animation: croitre 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both;
 }
 .trace {
   stroke-dasharray: 1;
-  animation: tracer 1s ease-out 0.3s both;
+  animation: tracer 0.5s ease-out 0.1s both;
 }
 .point {
   transform-box: fill-box;
   transform-origin: center;
-  animation: eclore 0.35s cubic-bezier(0.3, 1.4, 0.5, 1) 1.1s both;
+  animation: eclore 0.25s cubic-bezier(0.3, 1.4, 0.5, 1) 0.5s both;
 }
 .pressable {
   transition:
-    transform 0.15s ease,
+    transform 0.1s ease,
     opacity 0.15s ease,
     background-color 0.2s ease,
     color 0.2s ease;
 }
 .pressable:active {
-  transform: scale(0.975);
+  transform: scale(0.97);
+  opacity: 0.85;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -50,6 +50,7 @@ export function BarreOnglets() {
             <li key={onglet.href} className="flex-1">
               <Link
                 href={onglet.href}
+                prefetch
                 aria-current={actif ? "page" : undefined}
                 className={`pressable flex flex-col items-center gap-0.5 rounded-full py-1.5 text-[11px] font-medium ${
                   actif ? "bg-encre text-fond" : "text-encre-douce"

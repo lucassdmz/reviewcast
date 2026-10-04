@@ -80,7 +80,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
                 Confirmer la publication
               </BoutonAction>
             </form>
-            <Link href={`/a-traiter/${fiche.id}`} className="rounded-full bg-nuage font-medium px-4 py-2 text-sm hover:opacity-60">
+            <Link href={`/a-traiter/${fiche.id}`} className="pressable rounded-full bg-nuage px-4 py-2 text-sm font-medium">
               Revenir au brouillon
             </Link>
           </div>
@@ -91,7 +91,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
             <FormulaireBrouillon reviewId={fiche.id} texte={fiche.brouillon?.texte ?? ""} version={fiche.brouillon?.version ?? 0} signature={fiche.signature} motsEvites={fiche.motsEvitesPresents} />
             <form action={actionIgnorer} className="text-center">
               <input type="hidden" name="reviewId" value={fiche.id} />
-              <BoutonAction className="text-sm text-encre-douce underline underline-offset-4">Marquer comme traité sans répondre</BoutonAction>
+              <BoutonAction className="pressable cible text-sm text-encre-douce underline underline-offset-4">Marquer comme traité sans répondre</BoutonAction>
             </form>
           </>
         )
@@ -100,7 +100,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
       {fiche.statut === "IGNORE" && (
         <form action={actionRouvrir} className="text-center">
           <input type="hidden" name="reviewId" value={fiche.id} />
-          <BoutonAction className="text-sm underline underline-offset-4">Remettre dans la file</BoutonAction>
+          <BoutonAction className="pressable cible text-sm underline underline-offset-4">Remettre dans la file</BoutonAction>
         </form>
       )}
 

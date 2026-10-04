@@ -128,7 +128,7 @@ export function FormulaireSujets({ locationId, voix, suggestions }: { locationId
       <input type="hidden" name="nbRegles" value={voix.regles.length} />
       {voix.regles.map((r, i) => (
         <details key={`${i}-${r.sujet}`} className="bloc group" open={!r.dire && !r.nePasDire}>
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+          <summary className="pressable flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
             <span className="min-w-0">
               <span className="block text-lg font-bold leading-tight">{r.sujet}</span>
               <span className="mt-0.5 block truncate text-sm text-encre-douce group-open:hidden">{r.dire || "À remplir"}</span>
@@ -147,7 +147,7 @@ export function FormulaireSujets({ locationId, voix, suggestions }: { locationId
             Ce que je ne veux pas dire
           </label>
           <textarea id={`regle-${i}-nePasDire`} name={`regle-${i}-nePasDire`} rows={3} maxLength={400} defaultValue={r.nePasDire} className={`${CHAMP} mt-2`} />
-          <BoutonAction formAction={actionRetirerRegle.bind(null, i)} className="pressable mt-3 text-sm text-encre-douce underline underline-offset-4">
+          <BoutonAction formAction={actionRetirerRegle.bind(null, i)} className="pressable cible mt-1 text-sm text-encre-douce underline underline-offset-4">
             Retirer ce sujet
           </BoutonAction>
         </details>
@@ -213,7 +213,7 @@ export function FormulaireApprentissage({ locationId, voix, corrections }: { loc
                   Réponse à {c.auteurAvis}, le {formatDate.format(c.date)}
                 </p>
                 <p className="mt-2 line-clamp-5 whitespace-pre-line text-[15px] leading-snug">{c.texte}</p>
-                <BoutonAction formAction={actionRetirerCorrection.bind(null, c.id)} className="pressable mt-3 text-sm underline underline-offset-4">
+                <BoutonAction formAction={actionRetirerCorrection.bind(null, c.id)} className="pressable cible mt-1 text-sm underline underline-offset-4">
                   Ne plus s&apos;en inspirer
                 </BoutonAction>
               </li>

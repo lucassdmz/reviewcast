@@ -7,7 +7,7 @@ import { Gravite } from "./Gravite";
 export function CarteAvis({ avis }: { avis: AvisDeLaFile }) {
   return (
     <li>
-      <Link href={`/a-traiter/${avis.id}`} className="block bloc pressable">
+      <Link href={`/a-traiter/${avis.id}`} prefetch={false} className="block bloc pressable">
         <div className="flex items-baseline justify-between gap-2">
           <p className="font-semibold">{avis.auteur}</p>
           <Etoiles note={avis.note} />

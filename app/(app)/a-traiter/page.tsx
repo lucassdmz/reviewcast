@@ -53,7 +53,7 @@ export default async function ATraiterPage({ searchParams }: PageProps<"/a-trait
         </details>
       )}
       <p className="mt-4 text-center text-sm">
-        <Link href="/a-traiter/historique" className="underline underline-offset-4 hover:opacity-60">
+        <Link href="/a-traiter/historique" className="pressable cible underline underline-offset-4">
           Voir les réponses publiées
         </Link>
       </p>

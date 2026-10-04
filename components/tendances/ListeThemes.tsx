@@ -28,7 +28,7 @@ export function ListeThemes({ titre, themes, requete, teinte }: { titre: string;
           {themes.map((t) => (
             <li key={t.themeId}>
               <div className="flex items-baseline justify-between gap-2 text-[15px]">
-                <Link href={`/tendances/theme/${t.themeId}?${requete}`} className="pressable min-w-0 flex-1 truncate first-letter:uppercase">
+                <Link href={`/tendances/theme/${t.themeId}?${requete}`} prefetch={false} className="pressable min-w-0 flex-1 truncate first-letter:uppercase">
                   {t.libelle}
                 </Link>
                 <span className="whitespace-nowrap text-sm font-bold tabular-nums">{t.nombre === 1 ? "1 avis" : `${t.nombre} avis`}</span>

@@ -103,7 +103,7 @@ export function FormulaireBrouillon({
               name="consigne"
               value={c.consigne}
               disabled={occupe}
-              className="rounded-full bg-fond px-3 py-1 text-xs hover:opacity-90 disabled:opacity-50"
+              className="pressable rounded-full bg-fond px-4 py-2.5 text-sm disabled:opacity-50"
             >
               {c.libelle}
             </button>

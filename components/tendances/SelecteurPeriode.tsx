@@ -31,7 +31,7 @@ export function SelecteurPeriode({ periode, locationId }: { periode: PeriodeTend
         })}
       </ul>
       <details open={periode.selection === "perso"} className="px-1 text-sm">
-        <summary className="cursor-pointer list-none text-encre-douce underline underline-offset-4 [&::-webkit-details-marker]:hidden">Choisir des dates</summary>
+        <summary className="pressable cible cursor-pointer list-none text-encre-douce underline underline-offset-4 [&::-webkit-details-marker]:hidden">Choisir des dates</summary>
         <form method="get" action="/tendances" className="mt-2 flex flex-wrap items-center gap-2">
         <input type="hidden" name="periode" value="perso" />
         {locationId && <input type="hidden" name="etablissement" value={locationId} />}

@@ -5,7 +5,12 @@ import "./globals.css";
 const zenKaku = Zen_Kaku_Gothic_New({
   variable: "--font-sans-app",
   subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
+  weight: ["400", "500", "700"],
+  // Cette police japonaise est découpée en plus de cent tranches par graisse.
+  // Préchargée, elle faisait télécharger plus de 300 fichiers à l'ouverture ;
+  // sans préchargement, le navigateur ne prend que les tranches utilisées.
+  preload: false,
+  display: "swap",
 });
 
 export const metadata: Metadata = {

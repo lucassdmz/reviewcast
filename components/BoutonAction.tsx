@@ -3,6 +3,11 @@
 import type { ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 
+/** Vibration très courte à l'appui, là où le téléphone le permet (Android). Sans effet sur iPhone. */
+function vibrer() {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(8);
+}
+
 /**
  * Bouton d'envoi d'un formulaire serveur. Dès l'appui, il se grise, affiche un
  * indicateur et ne peut plus être touché une seconde fois : on sait que
@@ -22,7 +27,7 @@ export function BoutonAction({
 }) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" formAction={formAction} disabled={pending} aria-busy={pending} className={`${className ?? ""} disabled:opacity-60`}>
+    <button type="submit" formAction={formAction} disabled={pending} aria-busy={pending} onClick={vibrer} className={`${className ?? ""} disabled:opacity-60`}>
       <span className="inline-flex items-center justify-center gap-2">
         {pending && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />}
         {pending && enCours ? enCours : children}
