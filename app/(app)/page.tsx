@@ -5,6 +5,7 @@ import { Compliment } from "@/components/meteo/Compliment";
 import { MiniCourbe } from "@/components/meteo/MiniCourbe";
 import { SelecteurEtablissement } from "@/components/meteo/SelecteurEtablissement";
 import { remerciementDuMoment } from "@/lib/file/service";
+import { lirePeriodeMeteo } from "@/lib/meteo/periodes";
 import { obtenirMeteoHome } from "@/lib/meteo/stats";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +13,8 @@ export const dynamic = "force-dynamic";
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const params = await searchParams;
   const locationId = typeof params.etablissement === "string" ? params.etablissement : null;
-  const [home, remerciement] = await Promise.all([obtenirMeteoHome(locationId), remerciementDuMoment()]);
+  const periode = lirePeriodeMeteo(typeof params.periode === "string" ? params.periode : null);
+  const [home, remerciement] = await Promise.all([obtenirMeteoHome(locationId, periode), remerciementDuMoment()]);
   const message = params.remercie ? "Remerciement publié. Merci pour eux !" : typeof params.erreur === "string" ? params.erreur : null;
 
   return (
@@ -27,7 +29,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       <CarteMeteo
         meteo={home.meteo}
         noteMoyenneMois={home.noteMoyenneMois}
-        noteMoyenne12Mois={home.noteMoyenne12Mois}
+        periode={home.periode}
+        etablissementId={home.etablissementActif?.id ?? null}
+        repere={home.repere}
         volumeMois={home.volumeMois}
         nbEnthousiastes={home.nbEnthousiastes}
         evolutionNote={home.evolutionNote}

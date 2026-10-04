@@ -1,4 +1,4 @@
-import { FENETRE_METEO_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
+import { FENETRE_FILE_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
 
 /**
  * Sépare la file en deux : les avis récents, qui sont l'actualité à traiter,
@@ -9,7 +9,7 @@ import { FENETRE_METEO_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
 export function partagerFile<T extends { dateCreation: Date }>(
   file: T[],
   maintenant: Date,
-  jours = FENETRE_METEO_JOURS,
+  jours = FENETRE_FILE_JOURS,
 ): { recents: T[]; rattrapage: T[] } {
   const { debut } = fenetreGlissante(maintenant, jours);
   return {

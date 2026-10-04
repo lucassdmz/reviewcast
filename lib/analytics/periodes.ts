@@ -70,7 +70,7 @@ export function periodeTendances(
   const debut = ajouterJours(demain, -jours);
   return {
     selection: selection === "perso" ? "30j" : selection,
-    libelle: `${jours} derniers jours`,
+    libelle: jours === 90 ? "3 derniers mois" : `${jours} derniers jours`,
     debut,
     fin: demain,
     precedente: { debut: ajouterJours(debut, -jours), fin: debut },

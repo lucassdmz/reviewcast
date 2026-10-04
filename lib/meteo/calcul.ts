@@ -25,9 +25,12 @@ export function calculerMeteo(
   seuils: SeuilsMeteo = SEUILS_PAR_DEFAUT,
 ): Meteo {
   if (noteMoyenne === null || partEnthousiastes === null) return "SOLEIL_VOILE";
-  if (noteMoyenne >= seuils.grandSoleilNote && partEnthousiastes >= seuils.grandSoleilPart) return "GRAND_SOLEIL";
-  if (noteMoyenne >= seuils.soleilVoileNote) return "SOLEIL_VOILE";
-  if (noteMoyenne >= seuils.nuageuxNote) return "NUAGEUX";
+  // On compare la note telle qu'elle est affichée, à une décimale : un 3,79
+  // se lit « 3,8 » à l'écran et doit donner la météo d'un 3,8.
+  const note = Math.round(noteMoyenne * 10) / 10;
+  if (note >= seuils.grandSoleilNote && partEnthousiastes >= seuils.grandSoleilPart) return "GRAND_SOLEIL";
+  if (note >= seuils.soleilVoileNote) return "SOLEIL_VOILE";
+  if (note >= seuils.nuageuxNote) return "NUAGEUX";
   return "PLUIE_LEGERE";
 }
 

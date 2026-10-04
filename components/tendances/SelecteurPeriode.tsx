@@ -3,7 +3,7 @@ import type { PeriodeTendances } from "@/lib/analytics/periodes";
 
 const CHOIX: { selection: "30j" | "90j" | "12m"; libelle: string }[] = [
   { selection: "30j", libelle: "30 jours" },
-  { selection: "90j", libelle: "90 jours" },
+  { selection: "90j", libelle: "3 mois" },
   { selection: "12m", libelle: "12 mois" },
 ];
 

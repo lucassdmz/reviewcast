@@ -26,9 +26,9 @@ test.describe("tendances", () => {
   test("change de période et accepte une plage personnalisée", async ({ page }) => {
     await page.goto("/tendances");
     await expect(page.getByText("30 derniers jours", { exact: true })).toBeVisible();
-    await page.getByRole("link", { name: "90 jours" }).click();
+    await page.getByRole("link", { name: "3 mois" }).click();
     await expect(page).toHaveURL(/periode=90j/);
-    await expect(page.getByText("90 derniers jours", { exact: true })).toBeVisible();
+    await expect(page.getByText("3 derniers mois", { exact: true })).toBeVisible();
 
     await page.getByText("Choisir des dates").click();
     await page.getByLabel("Du").fill("2026-01-01");

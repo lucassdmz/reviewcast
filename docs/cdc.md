@@ -29,8 +29,8 @@ L'outil remet les avis Google en perspective : il montre d'abord le climat globa
 
 **Règles d'interface**
 
-- La home s'ouvre sur la météo des 40 derniers jours, jamais sur la liste des avis négatifs.
-- Aucun compteur ne repart de zéro le 1er du mois : la météo, la note et la file se lisent sur une fenêtre glissante de 40 jours. Deux avis sévères en début de mois ne doivent pas assombrir tout l'écran.
+- La home s'ouvre sur la météo des 3 derniers mois, jamais sur la liste des avis négatifs. Un sélecteur en tête de carte permet de passer à 30 jours ou à 12 mois.
+- Aucun compteur ne repart de zéro le 1er du mois : la météo et la note se lisent sur une période glissante (30 jours, 3 mois par défaut, 12 mois), la file sur 40 jours glissants. On écrit « 3 mois » plutôt que « 90 jours ». Deux avis sévères en début de mois ne doivent pas assombrir tout l'écran.
 - Pas de dette affichée : les avis anciens restés sans réponse sont rangés dans un « rattrapage » replié, sans compteur.
 - Pas de rouge vif, pas de badge de notification agressif. Les avis négatifs à traiter apparaissent comme une file de tâches, en ton neutre.
 - Le contexte rassurant est dit une fois par écran, en une phrase lisible sans calcul : « 12 clients contents sur 17 avis reçus ces 40 derniers jours ».
@@ -47,8 +47,8 @@ Quatre écrans : Home (météo), À traiter, Tendances, Réglages. Navigation pa
 
 ### 3.1 Home — météo des avis
 
-- Indicateur météo des 40 derniers jours : illustration (grand soleil, soleil voilé, nuageux, pluie légère) calculée depuis la note moyenne et la part d'avis 4-5 étoiles. Seuils par défaut : grand soleil ≥ 4,7 et ≥ 90 % de 4-5 ★ ; soleil voilé ≥ 4,3 ; nuageux ≥ 3,8 ; pluie légère en dessous. Seuils modifiables dans Réglages.
-- Note moyenne sur 40 jours et sur 12 mois glissants, nombre d'avis reçus, évolution par rapport aux 40 jours précédents.
+- Indicateur météo de la période choisie (3 mois par défaut) : illustration (grand soleil, soleil voilé, nuageux, pluie légère) calculée depuis la note moyenne et la part d'avis 4-5 étoiles. Seuils par défaut : grand soleil ≥ 4,7 et ≥ 90 % de 4-5 ★ ; soleil voilé ≥ 4,3 ; nuageux ≥ 3,8 ; pluie légère en dessous. Seuils modifiables dans Réglages.
+- Note moyenne sur la période choisie et sur 12 mois glissants, nombre d'avis reçus, évolution par rapport à la période précédente de même durée.
 - Phrase de synthèse générée par l'IA, une ligne, ton positif et factuel, qui commence par les clients contents : « 21 clients contents sur 23 avis. Ils citent surtout l'accueil et la rapidité. »
 - Le compliment du moment : extrait d'un avis positif récent mis en avant, rotation à chaque ouverture.
 - Carte discrète « N avis à traiter » qui mène à l'écran À traiter. Elle ne compte que les avis des 40 derniers jours. Absente s'il n'y a rien à traiter.
@@ -79,6 +79,7 @@ Quatre écrans : Home (météo), À traiter, Tendances, Réglages. Navigation pa
 - Connexion du compte Google et choix de la fiche.
 - La voix de l'établissement (lot 7, section 12) : signature, personne qui parle, ton, coordonnées de contact, règles par sujet. La ligne de conduite complète reste éditable en texte libre pour qui veut aller plus loin.
 - Seuils météo, seuil d'inclusion des avis 4 étoiles dans la file.
+- Apparence : claire par défaut, sombre, ou réglage du téléphone. Le choix vaut pour l'appareil.
 - Fréquence de synchronisation et activation des notifications push (résumé hebdomadaire et nouvel avis à traiter).
 - Clé API du fournisseur IA et choix du modèle.
 
@@ -312,7 +313,7 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 
 | Sujet | Version 1.0 | Décision | Raison |
 | --- | --- | --- | --- |
-| Période de la météo | Mois calendaire | 40 jours glissants | Le 3 du mois, deux avis durs donnaient « pluie légère » alors que la période récente était bonne |
+| Période de la météo | Mois calendaire | Glissante, au choix : 30 jours, 3 mois (par défaut), 12 mois | Le 3 du mois, deux avis durs donnaient « pluie légère » alors que la période récente était bonne |
 | File « À traiter » | Tous les avis sans réponse | Les 40 derniers jours, le reste en « rattrapage » sans compteur | Un historique d'un an sans réponse s'affichait comme une dette de 29 tâches |
 | Contexte rassurant | Sur chaque avis, avec la note du mois | Une phrase par écran, sans calcul à faire | Répété sur chaque carte, il n'était plus lu, et sa formulation n'était pas comprise |
 | Home sans défilement | Tout l'écran | L'information principale seulement | Tout faire tenir obligeait à des textes trop petits pour être lus |

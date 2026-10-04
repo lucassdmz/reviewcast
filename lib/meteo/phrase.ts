@@ -26,6 +26,15 @@ export function libelleMois(date: Date): string {
   return `${MOIS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
 }
 
+/** Phrase calculée, sans IA : sert aux périodes autres que celle par défaut, dont la phrase n'est pas stockée. */
+export function phraseFactuelle(d: { volume: number; nbEnthousiastes: number; themesPositifs: string[] }): string | null {
+  if (d.volume === 0) return null;
+  const pluriel = d.nbEnthousiastes > 1 ? "s" : "";
+  const themes = d.themesPositifs.slice(0, 2);
+  const suite = themes.length > 0 ? ` Les thèmes les plus cités : ${themes.join(" et ")}.` : "";
+  return `${d.nbEnthousiastes} client${pluriel} content${pluriel} sur ${d.volume} avis.${suite}`;
+}
+
 /**
  * Phrase météo du mois (section 3.1) : stockée dans monthly_summaries et
  * régénérée seulement quand le volume d'avis du mois a changé. Sans avis,
