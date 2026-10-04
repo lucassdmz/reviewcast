@@ -34,7 +34,7 @@ function lireFormulaire(form: FormData): { locationId: string; voix: Voix } {
     personne: champ(form, "personne"),
     registre: champ(form, "registre"),
     longueur: champ(form, "longueur"),
-    emojis: form.get("emojis") === "on",
+    emojis: form.getAll("emojis").filter((v): v is string => typeof v === "string"),
     apprendreCorrections: form.get("apprendreCorrections") === "on",
     contact: champ(form, "contact"),
     regles,
@@ -79,8 +79,8 @@ export async function actionRetirerRegle(position: number, form: FormData): Prom
 }
 
 /** Retire une correction retenue : elle ne servira plus de modèle. */
-export async function actionRetirerCorrection(form: FormData): Promise<void> {
+export async function actionRetirerCorrection(correctionId: string): Promise<void> {
   const userId = await utilisateurConnecte();
-  await retirerCorrection(identifiantSchema.parse(champ(form, "correctionId")), userId);
-  redirect("/reglages?retire=1");
+  await retirerCorrection(identifiantSchema.parse(correctionId), userId);
+  redirect("/reglages?retire=1#apprentissage");
 }

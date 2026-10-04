@@ -117,7 +117,7 @@ export class FakeProvider implements AiProvider {
   async thankYouNote(input: ThankYouInput): Promise<AiResult<{ message: string }>> {
     const theme = input.review.texte ? (detecterThemes(input.review.texte, input.review.note)[0]?.libelle ?? "votre visite") : "votre visite";
     const prenom = prenomPourSalutation(input.review.auteur);
-    const message = `Merci${prenom ? ` ${prenom}` : ""} pour ce retour qui touche toute l'équipe, ravie que ${theme} vous ait plu. Au plaisir de vous revoir bientôt !`;
+    const message = `Merci${prenom ? ` ${prenom}` : ""} pour ce retour qui touche toute l'équipe, ravie que ${theme} vous ait plu. Au plaisir de vous revoir bientôt !${input.ligneDeConduite.voix?.emojis[0] ? ` ${input.ligneDeConduite.voix.emojis[0]}` : ""}`;
     return { data: thankYouSchema.parse({ message }), usage: usage("fake") };
   }
 

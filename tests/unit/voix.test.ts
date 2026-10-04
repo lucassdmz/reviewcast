@@ -70,6 +70,13 @@ describe("réglages de la voix", () => {
     expect(texte).toContain("### Le prix");
   });
 
+  it("ne permet que les emojis choisis, six au plus", () => {
+    expect(consignesVoix(voix({ emojis: ["☕", "😊"] }))).toContain("choisi uniquement parmi ceux-ci : ☕ 😊");
+    const base = { signature: "", personne: "NOUS", registre: "SOBRE", longueur: "COURTE", apprendreCorrections: true, contact: "", regles: [], motsEvites: [] };
+    expect(voixSchema.safeParse({ ...base, emojis: ["☕", "🍵", "🥐", "🍪", "🍰", "🧁", "😊"] }).success).toBe(false);
+    expect(voixSchema.safeParse({ ...base, emojis: ["☕", "🍵", "🥐", "🍪", "🍰", "🧁"] }).success).toBe(true);
+  });
+
   it("sans coordonnées, renvoie au comptoir plutôt qu'à un message privé", () => {
     expect(consignesVoix(voix())).toContain("en parler au comptoir");
   });
@@ -80,7 +87,7 @@ describe("réglages de la voix", () => {
       personne: "JE",
       registre: "COMPLICE",
       longueur: "MOYENNE",
-      emojis: true,
+      emojis: ["☕", "☕", "🚀"],
       apprendreCorrections: false,
       contact: " ",
       regles: [{ sujet: " Le prix ", themes: ["prix"], dire: "Nous comprenons.", nePasDire: "" }],
@@ -88,6 +95,7 @@ describe("réglages de la voix", () => {
     });
     expect(resultat.signature).toBe("Valentine, The Coffee Jacobins");
     expect(resultat.contact).toBeNull();
+    expect(resultat.emojis).toEqual(["☕"]);
     expect(resultat.regles[0].sujet).toBe("Le prix");
     expect(voixSchema.safeParse({ ...resultat, signature: "x".repeat(81), contact: "" }).success).toBe(false);
   });

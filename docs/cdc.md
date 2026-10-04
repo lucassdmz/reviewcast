@@ -331,7 +331,7 @@ Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
 
 1. **Signature.** Un champ libre par établissement, par exemple « Valentine, The Coffee Jacobins » ou « L'équipe The Coffee Jacobins ». Elle est ajoutée à la fin de chaque réponse et de chaque remerciement par l'application, pas par le modèle : elle est donc toujours exacte, et la changer met à jour les brouillons non publiés sans les régénérer.
 2. **Qui parle.** Deux choix : « je » (la gérante en son nom) ou « nous » (l'équipe). Dans les deux cas, jamais de renvoi à une direction.
-3. **Ton.** Trois réglages simples plutôt qu'un texte à rédiger : registre (sobre, chaleureux, complice), longueur (courte, moyenne), emojis (jamais, parfois).
+3. **Ton.** Trois réglages simples plutôt qu'un texte à rédiger : registre (sobre, chaleureux, complice), longueur (courte, moyenne), emojis autorisés. Pour les emojis, un tableau s'ouvre et la gérante touche ceux qu'elle autorise, six au plus. L'IA ne pioche que dans cette sélection, un seul par réponse et jamais sur un avis difficile. Aucun emoji choisi : aucun emoji dans les réponses.
 4. **Aperçu.** À chaque enregistrement, un brouillon est généré sur le dernier avis à traiter avec les nouveaux réglages, et affiché sous le formulaire. Il n'est pas stocké et ne remplace pas le brouillon de cet avis.
 5. **Coordonnées pour la suite.** L'adresse e-mail ou le téléphone à proposer quand une réponse invite à poursuivre l'échange. Sans coordonnées, la réponse propose de revenir au comptoir, jamais un « message privé » vague.
 6. **Règles par sujet.** Pour chaque sujet qui revient (prix, places, ordinateur, tablette et pourboire), une phrase « ce que je veux dire » et une liste « ce que je ne veux pas dire », préremplies depuis `docs/ligne-de-conduite.md`. Quand un thème revient souvent dans Tendances et n'a pas de règle, l'application propose d'en créer une.
@@ -357,4 +357,5 @@ Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
 - Sur le jeu d'avis de test, aucune réponse ne contient « la direction », un mot de la liste à éviter, ni deux signatures.
 - Un avis qui parle du prix reçoit une réponse qui suit la règle « prix » de l'établissement.
 - L'écran Réglages reste utilisable d'une main sur un téléphone : pas de champ de consigne technique, aperçu visible sans quitter l'écran.
+- Les réglages sont rangés par importance en quatre sections titrées (signature, ton, sujets, apprentissage), avec un seul bouton d'enregistrement toujours visible.
 

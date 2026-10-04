@@ -44,7 +44,8 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
         </p>
       )}
       {etablissement && voix && (
-        <div className="mb-4">
+        <div className="mb-8">
+          <p className="-mt-3 mb-6 px-1 text-[15px] text-encre-douce">La voix de vos réponses pour {etablissement.nom}.</p>
           <FormulaireVoix
             locationId={etablissement.id}
             etablissement={etablissement.nom}
@@ -56,9 +57,10 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
           />
         </div>
       )}
-      <section className="bloc">
-        <h2 className="text-sm font-semibold text-encre-douce">Compte</h2>
-        <p className="mt-1">{session?.user?.email}</p>
+      <h2 className="px-1 text-xl font-bold tracking-tight">Votre compte</h2>
+      <section className="bloc mt-3">
+        <p className="text-sm text-encre-douce">Connecté avec</p>
+        <p>{session?.user?.email}</p>
         <form
           action={async () => {
             "use server";
@@ -68,15 +70,15 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
         >
           <button
             type="submit"
-            className="rounded-full bg-nuage font-medium px-4 py-2 text-sm font-medium hover:opacity-60"
+            className="pressable rounded-full bg-nuage px-4 py-2 text-sm font-medium"
           >
             Se déconnecter
           </button>
         </form>
       </section>
 
-      <section className="mt-4 bloc">
-        <h2 className="text-sm font-semibold text-encre-douce">Intelligence artificielle</h2>
+      <section className="bloc mt-3">
+        <h3 className="font-bold">Intelligence artificielle</h3>
         <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-encre-douce">Fournisseur</dt>
           <dd>Anthropic</dd>

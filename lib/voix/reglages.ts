@@ -26,7 +26,8 @@ export interface Voix {
   personne: Personne;
   registre: Registre;
   longueur: Longueur;
-  emojis: boolean;
+  /** Emojis que l'IA a le droit d'utiliser. Vide : aucun emoji dans les réponses. */
+  emojis: string[];
   apprendreCorrections: boolean;
   /** E-mail ou téléphone à proposer pour poursuivre l'échange. */
   contact: string | null;
@@ -70,7 +71,7 @@ export const VOIX_PAR_DEFAUT: Voix = {
   personne: "NOUS",
   registre: "CHALEUREUX",
   longueur: "MOYENNE",
-  emojis: false,
+  emojis: [],
   apprendreCorrections: true,
   contact: null,
   regles: REGLES_PAR_DEFAUT,
@@ -78,6 +79,16 @@ export const VOIX_PAR_DEFAUT: Voix = {
 };
 
 export const NB_REGLES_MAX = 12;
+
+/** Emojis proposés dans Réglages : sobres, adaptés à un commerce de bouche. */
+export const EMOJIS_PROPOSES = [
+  "☕", "🍵", "🥐", "🍪", "🍰", "🧁",
+  "😊", "🙂", "😉", "🤗", "👋", "🙏",
+  "✨", "🌿", "🌸", "☀️", "🎉", "👏",
+  "💛", "🤍", "💚", "❤️", "🫶", "👍",
+] as const;
+
+export const NB_EMOJIS_MAX = 6;
 
 export const LIBELLES_PERSONNE: Record<Personne, { titre: string; exemple: string }> = {
   JE: { titre: "Je", exemple: "« Je regrette que… »" },
@@ -129,7 +140,10 @@ export const voixSchema = z.object({
   personne: z.enum(PERSONNES),
   registre: z.enum(REGISTRES),
   longueur: z.enum(LONGUEURS),
-  emojis: z.boolean(),
+  emojis: z
+    .array(z.string())
+    .transform((liste) => [...new Set(liste)].filter((e) => (EMOJIS_PROPOSES as readonly string[]).includes(e)))
+    .refine((liste) => liste.length <= NB_EMOJIS_MAX, `Pas plus de ${NB_EMOJIS_MAX} emojis autorisés.`),
   apprendreCorrections: z.boolean(),
   contact: ligne(120, "Les coordonnées dépassent 120 caractères.").transform((s) => (s.length === 0 ? null : s)),
   regles: z.array(regleSujetSchema).max(NB_REGLES_MAX, `Pas plus de ${NB_REGLES_MAX} sujets.`),
@@ -183,7 +197,9 @@ export function consignesVoix(voix: Voix): string {
     `- ${CONSIGNE_PERSONNE[voix.personne]}`,
     `- ${CONSIGNE_REGISTRE[voix.registre]}`,
     `- ${CONSIGNE_LONGUEUR[voix.longueur]}`,
-    voix.emojis ? "- Un emoji discret est permis, un seul, jamais sur un avis négatif grave." : "- Aucun emoji.",
+    voix.emojis.length > 0
+      ? `- Un emoji est permis, un seul par réponse, choisi uniquement parmi ceux-ci : ${voix.emojis.join(" ")}. Jamais sur un avis négatif ou difficile.`
+      : "- Aucun emoji.",
     "- Ne signez pas la réponse : la signature est ajoutée automatiquement après votre texte.",
     voix.contact
       ? `- Pour proposer de poursuivre l'échange, donnez ces coordonnées et aucune autre : ${voix.contact}`

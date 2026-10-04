@@ -388,7 +388,10 @@ model Settings {
   personne               Personne      @default(NOUS)
   registre               Registre      @default(CHALEUREUX)
   longueur               Longueur      @default(MOYENNE)
+  /// Ancien réglage oui / non, remplacé par `emojisAutorises`. Colonne conservée : sa suppression est laissée à une migration lancée à la main.
   emojis                 Boolean       @default(false)
+  /// Emojis que l'IA a le droit d'utiliser (6 au plus). Vide : aucun emoji.
+  emojisAutorises        String[]      @default([]) @map("emojis_autorises")
   /// Retenir les réponses réécrites avant publication comme modèles pour la suite.
   apprendreCorrections   Boolean       @default(true) @map("apprendre_corrections")
   /// E-mail ou téléphone à proposer pour poursuivre l'échange.
