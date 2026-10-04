@@ -6,6 +6,7 @@
  * Pas de rouge (section 2 du cdc).
  */
 :root {
+  color-scheme: light;
   --ciel: #f1f2f0;
   --ciel-fonce: #c5c9cc;
   --soleil: #f2b72a;
@@ -40,8 +41,33 @@
   --font-sans: var(--font-sans-app);
 }
 
+/*
+ * Thème sombre : appliqué quand il est choisi dans Réglages (data-theme="sombre"),
+ * ou quand le choix est « comme le téléphone » et que l'appareil est en mode sombre.
+ * Sans choix, l'application est claire.
+ */
+:root[data-theme="sombre"] {
+  color-scheme: dark;
+  --ciel: #25282b;
+  --ciel-fonce: #4b5055;
+  --soleil: #f2b72a;
+  --soleil-doux: #3a3115;
+  --nuage: #2c2f32;
+  --encre: #f2f2ef;
+  --encre-douce: #a8acb0;
+  --surface: #1c1e20;
+  --fond: #111213;
+  --accent: #f2f2ef;
+  --attention: #f2b72a;
+  --nuage-forme: #3b3f44;
+  --pluie: #8b96a1;
+  --matcha: #a3c28d;
+  --matcha-doux: #263020;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root[data-theme="systeme"] {
+    color-scheme: dark;
     --ciel: #25282b;
     --ciel-fonce: #4b5055;
     --soleil: #f2b72a;

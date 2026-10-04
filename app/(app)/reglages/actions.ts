@@ -1,7 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { COOKIE_THEME, lireTheme } from "@/lib/apparence";
 import { auth } from "@/lib/auth/config";
 import { NB_REGLES_MAX, decouperListe, voixSchema, type RegleSujet, type Voix } from "@/lib/voix/reglages";
 import { enregistrerVoix, lireVoix, retirerCorrection } from "@/lib/voix/service";
@@ -92,6 +94,17 @@ export async function actionRetirerRegle(position: number, form: FormData): Prom
 
 export async function actionEnregistrerApprentissage(form: FormData): Promise<void> {
   await appliquer(form, "apprentissage", { apprendreCorrections: form.get("apprendreCorrections") === "on" }, "/reglages?enregistre=1");
+}
+
+/** Apparence claire, sombre ou comme le téléphone : gardée un an dans un cookie, pour cet appareil. */
+export async function actionChoisirApparence(form: FormData): Promise<void> {
+  await utilisateurConnecte();
+  (await cookies()).set(COOKIE_THEME, lireTheme(champ(form, "apparence")), {
+    path: "/",
+    maxAge: 365 * 24 * 60 * 60,
+    sameSite: "lax",
+  });
+  redirect("/reglages?enregistre=1");
 }
 
 /** Retire une correction retenue : elle ne servira plus de modèle. */

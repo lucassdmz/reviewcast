@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Zen_Kaku_Gothic_New } from "next/font/google";
+import { cookies } from "next/headers";
+import { COOKIE_THEME, COULEUR_BARRE, lireTheme, type Theme } from "@/lib/apparence";
 import "./globals.css";
 
 const zenKaku = Zen_Kaku_Gothic_New({
@@ -21,18 +23,30 @@ export const metadata: Metadata = {
   robots: process.env.MODE_DEMO === "1" ? { index: false, follow: false } : undefined,
 };
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f1f2f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#111213" },
-  ],
-  width: "device-width",
-  initialScale: 1,
-};
+async function themeChoisi(): Promise<Theme> {
+  return lireTheme((await cookies()).get(COOKIE_THEME)?.value);
+}
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+/** La couleur de la barre du navigateur suit le thème choisi. */
+export async function generateViewport(): Promise<Viewport> {
+  const theme = await themeChoisi();
+  return {
+    themeColor:
+      theme === "systeme"
+        ? [
+            { media: "(prefers-color-scheme: light)", color: COULEUR_BARRE.clair },
+            { media: "(prefers-color-scheme: dark)", color: COULEUR_BARRE.sombre },
+          ]
+        : COULEUR_BARRE[theme],
+    width: "device-width",
+    initialScale: 1,
+  };
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const theme = await themeChoisi();
   return (
-    <html lang="fr" className={`${zenKaku.variable} h-full antialiased`}>
+    <html lang="fr" data-theme={theme} className={`${zenKaku.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

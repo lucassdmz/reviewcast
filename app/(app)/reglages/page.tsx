@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { Ecran } from "@/components/Ecran";
+import { COOKIE_THEME, LIBELLES_THEME, lireTheme } from "@/lib/apparence";
 import { consommationDuMois } from "@/lib/ai/ledger";
 import { MODELES_PAR_DEFAUT } from "@/lib/ai/pricing";
 import { auth, signOut } from "@/lib/auth/config";
@@ -54,12 +56,13 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
   ]);
   const [voix, corrections] = etablissement ? await Promise.all([lireVoix(etablissement.id), listerCorrections(etablissement.id)]) : [null, []];
   const r = voix ? resumes(voix, corrections.length) : null;
+  const theme = lireTheme((await cookies()).get(COOKIE_THEME)?.value);
 
   return (
     <Ecran titre="Réglages">
       {params.enregistre && (
         <p role="status" className="mb-4 rounded-2xl bg-soleil-doux px-4 py-2.5 text-[15px]">
-          Réglages enregistrés. Ils s&apos;appliquent aux prochains brouillons.
+          Réglages enregistrés.
         </p>
       )}
 
@@ -80,6 +83,11 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
           </ul>
         </section>
       )}
+
+      <h2 className="mt-9 px-1 text-xl font-bold tracking-tight">L&apos;application</h2>
+      <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
+        <Ligne href="/reglages/apparence" titre="Apparence" resume={LIBELLES_THEME[theme].titre} />
+      </ul>
 
       <h2 className="mt-9 px-1 text-xl font-bold tracking-tight">Votre compte</h2>
       <section className="bloc mt-3">
