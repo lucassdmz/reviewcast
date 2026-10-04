@@ -4,7 +4,10 @@ import { logAudit } from "@/lib/audit/log";
 import { prisma } from "@/lib/db/client";
 import type { Gravite, ReviewStatus } from "@/lib/db/generated/enums";
 import { creerPublieur, type PublieurReponses } from "@/lib/google/publication";
-import { contexteAvis, formaterContexte, type ContexteAvis } from "./contexte";
+import { retenirCorrection, lireVoix } from "@/lib/voix/service";
+import { motsEvitesPresents } from "@/lib/voix/reglages";
+import { avecSignature, sansSignature } from "@/lib/voix/signature";
+import { contexteAvis, formaterContexte, formaterContexteFile, type ContexteAvis } from "./contexte";
 import { STATUTS_FILE, verifierTransition } from "./statuts";
 
 /**
@@ -23,7 +26,6 @@ export interface AvisDeLaFile {
   statut: ReviewStatus;
   gravite: Gravite | null;
   resume: string | null;
-  contexte: string;
 }
 
 function extrait(texte: string | null, max = 120): string {
@@ -36,17 +38,19 @@ async function avisPourContexte(locationId: string) {
   return prisma.review.findMany({ where: { locationId, retireAt: null }, select: { note: true, dateCreation: true } });
 }
 
-/** Liste de la file, du plus récent au plus ancien, avec son contexte rassurant. */
+/** Climat récent, affiché une fois en tête de la file (null s'il n'y a rien d'encourageant à dire). */
+export async function contexteDeLaFile(maintenant = new Date()): Promise<string | null> {
+  const tous = await prisma.review.findMany({ where: { retireAt: null }, select: { note: true, dateCreation: true } });
+  return formaterContexteFile(contexteAvis(tous, maintenant));
+}
+
+/** Liste de la file, du plus récent au plus ancien. */
 export async function listerFile(): Promise<AvisDeLaFile[]> {
   const avis = await prisma.review.findMany({
     where: { statut: { in: STATUTS_FILE }, retireAt: null },
     orderBy: { dateCreation: "desc" },
     include: { location: { select: { id: true, nom: true } }, analysis: { select: { gravite: true, resume: true } } },
   });
-  const parEtablissement = new Map<string, { note: number; dateCreation: Date }[]>();
-  for (const a of avis) {
-    if (!parEtablissement.has(a.locationId)) parEtablissement.set(a.locationId, await avisPourContexte(a.locationId));
-  }
   return avis.map((a) => ({
     id: a.id,
     auteur: a.auteur,
@@ -57,7 +61,6 @@ export async function listerFile(): Promise<AvisDeLaFile[]> {
     statut: a.statut,
     gravite: a.analysis?.gravite ?? null,
     resume: a.analysis?.resume ?? null,
-    contexte: formaterContexte(contexteAvis(parEtablissement.get(a.locationId) ?? [], a.dateCreation)),
   }));
 }
 
@@ -74,6 +77,10 @@ export interface FicheAvis {
   contexte: ContexteAvis;
   contexteTexte: string;
   brouillon: { id: string; texte: string; version: number; consigne: string | null } | null;
+  /** Signature de l'établissement, ajoutée à la publication (null si aucune). */
+  signature: string | null;
+  /** Mots que la gérante veut éviter et que le brouillon contient. */
+  motsEvitesPresents: string[];
   notes: { id: string; texte: string; date: Date }[];
 }
 
@@ -90,6 +97,7 @@ export async function ficheAvis(reviewId: string): Promise<FicheAvis | null> {
   if (!a) return null;
   const contexte = contexteAvis(await avisPourContexte(a.locationId), a.dateCreation);
   const brouillon = a.drafts[0];
+  const { signature, motsEvites } = await lireVoix(a.locationId);
   return {
     id: a.id,
     auteur: a.auteur,
@@ -109,7 +117,11 @@ export async function ficheAvis(reviewId: string): Promise<FicheAvis | null> {
       : null,
     contexte,
     contexteTexte: formaterContexte(contexte),
-    brouillon: brouillon ? { id: brouillon.id, texte: brouillon.texte, version: brouillon.version, consigne: brouillon.consigne } : null,
+    brouillon: brouillon
+      ? { id: brouillon.id, texte: sansSignature(brouillon.texte, signature), version: brouillon.version, consigne: brouillon.consigne }
+      : null,
+    signature,
+    motsEvitesPresents: brouillon ? motsEvitesPresents(brouillon.texte, motsEvites) : [],
     notes: a.notes.map((n) => ({ id: n.id, texte: n.texte, date: n.createdAt })),
   };
 }
@@ -146,7 +158,7 @@ export async function historiquePublies(limite = 50): Promise<ReponsePubliee[]> 
 }
 
 async function chargerStatut(reviewId: string) {
-  const a = await prisma.review.findUnique({ where: { id: reviewId }, select: { id: true, statut: true, googleReviewId: true, note: true, auteur: true } });
+  const a = await prisma.review.findUnique({ where: { id: reviewId }, select: { id: true, statut: true, googleReviewId: true, note: true, auteur: true, locationId: true } });
   if (!a) throw new Error("Avis introuvable.");
   return a;
 }
@@ -203,11 +215,15 @@ export async function publierReponse(
 ): Promise<void> {
   const a = await chargerStatut(reviewId);
   verifierTransition(a.statut, "PUBLIE");
+  // Le brouillon est stocké sans signature : elle est ajoutée ici, une seule fois, au texte publié.
+  const corps = texte;
+  const { signature } = await lireVoix(a.locationId);
+  texte = avecSignature(corps, signature);
   const { dateReponse } = await publieur.publier({ googleReviewId: a.googleReviewId, texte });
   await prisma.$transaction(async (tx) => {
     const precedent = await tx.draft.findFirst({ where: { reviewId }, orderBy: { version: "desc" } });
-    if (precedent?.texte !== texte) {
-      await tx.draft.create({ data: { reviewId, texte, version: (precedent?.version ?? 0) + 1, consigne: "version publiée", modele: "humain" } });
+    if (precedent?.texte !== corps) {
+      await tx.draft.create({ data: { reviewId, texte: corps, version: (precedent?.version ?? 0) + 1, consigne: "version publiée", modele: "humain" } });
     }
     await tx.review.update({
       where: { id: reviewId },
@@ -215,6 +231,7 @@ export async function publierReponse(
     });
   });
   await recalculerPourAvis(reviewId);
+  await retenirCorrection({ reviewId, locationId: a.locationId, publie: corps });
   await logAudit({
     userId,
     action: "publication_reponse",
@@ -228,6 +245,7 @@ export interface RemerciementPropose {
   reviewId: string;
   auteur: string;
   texte: string;
+  signature: string | null;
 }
 
 export async function remerciementDuMoment(): Promise<RemerciementPropose | null> {
@@ -247,5 +265,6 @@ export async function remerciementDuMoment(): Promise<RemerciementPropose | null
       return null;
     }
   }
-  return { reviewId: avis.id, auteur: avis.auteur, texte };
+  const { signature } = await lireVoix(avis.locationId);
+  return { reviewId: avis.id, auteur: avis.auteur, texte: sansSignature(texte, signature), signature };
 }

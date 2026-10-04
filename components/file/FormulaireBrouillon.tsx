@@ -10,7 +10,19 @@ const initial: EtatAction = {};
  * Brouillon éditable : enregistrer, régénérer avec une consigne, ou passer à
  * l'écran de confirmation. Aucune publication ne part d'ici.
  */
-export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: string; texte: string; version: number }) {
+export function FormulaireBrouillon({
+  reviewId,
+  texte,
+  version,
+  signature,
+  motsEvites,
+}: {
+  reviewId: string;
+  texte: string;
+  version: number;
+  signature: string | null;
+  motsEvites: string[];
+}) {
   const [etatEnregistrer, enregistrer, enregistrement] = useActionState(actionEnregistrerBrouillon, initial);
   const [etatRegenerer, regenerer, regeneration] = useActionState(actionRegenerer, initial);
   const occupe = enregistrement || regeneration;
@@ -39,7 +51,22 @@ export function FormulaireBrouillon({ reviewId, texte, version }: { reviewId: st
           disabled={occupe}
           className="w-full rounded-2xl border border-nuage bg-fond p-3 text-sm leading-snug focus:border-encre focus:outline-none"
         />
+        <p className="mt-1.5 px-1 text-[13px] text-encre-douce">
+          {signature ? (
+            <>
+              Signé automatiquement : <span className="font-medium text-encre">{signature}</span>
+            </>
+          ) : (
+            "Sans signature. Vous pouvez en ajouter une dans Réglages."
+          )}
+        </p>
       </form>
+
+      {motsEvites.length > 0 && (
+        <p className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2 text-sm">
+          Ce brouillon contient {motsEvites.length > 1 ? "des mots que vous évitez" : "un mot que vous évitez"} : {motsEvites.map((m) => `« ${m} »`).join(", ")}.
+        </p>
+      )}
 
       {erreur && (
         <p role="alert" className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2 text-sm">

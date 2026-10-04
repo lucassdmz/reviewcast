@@ -1,15 +1,61 @@
 import { Ecran } from "@/components/Ecran";
 import { consommationDuMois } from "@/lib/ai/ledger";
 import { MODELES_PAR_DEFAUT } from "@/lib/ai/pricing";
+import { FormulaireVoix } from "@/components/reglages/FormulaireVoix";
 import { auth, signOut } from "@/lib/auth/config";
+import { prisma } from "@/lib/db/client";
+import { apercuVoix } from "@/lib/voix/apercu";
+import { lireVoix, listerCorrections, sujetsSansRegle } from "@/lib/voix/service";
 
 const formatNombre = new Intl.NumberFormat("fr-FR");
 const formatDollars = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
 
-export default async function ReglagesPage() {
-  const [session, conso] = await Promise.all([auth(), consommationDuMois()]);
+export const dynamic = "force-dynamic";
+
+export default async function ReglagesPage({ searchParams }: PageProps<"/reglages">) {
+  const params = await searchParams;
+  const [session, conso, etablissement] = await Promise.all([
+    auth(),
+    consommationDuMois(),
+    prisma.location.findFirst({ orderBy: { nom: "asc" }, select: { id: true, nom: true } }),
+  ]);
+  const [voix, corrections] = etablissement
+    ? await Promise.all([lireVoix(etablissement.id), listerCorrections(etablissement.id)])
+    : [null, []];
+  const suggestions = etablissement && voix ? await sujetsSansRegle(etablissement.id, voix.regles) : [];
+  // L'aperçu appelle l'IA : il n'est généré qu'après un enregistrement, pas à chaque visite.
+  const apercu = etablissement && params.apercu ? await apercuVoix(etablissement.id) : null;
+  const message = params.enregistre
+    ? "Réglages enregistrés. Ils s'appliquent aux prochains brouillons."
+    : params.regle === "ajoutee"
+      ? "Sujet ajouté. Dites ce que vous voulez y répondre, puis enregistrez."
+      : params.regle === "retiree"
+        ? "Sujet retiré."
+        : params.retire
+      ? "Correction retirée."
+      : typeof params.erreur === "string"
+        ? params.erreur
+        : null;
   return (
     <Ecran titre="Réglages">
+      {message && (
+        <p role="status" className="mb-3 rounded-2xl bg-soleil-doux px-4 py-2 text-sm">
+          {message}
+        </p>
+      )}
+      {etablissement && voix && (
+        <div className="mb-4">
+          <FormulaireVoix
+            locationId={etablissement.id}
+            etablissement={etablissement.nom}
+            voix={voix}
+            corrections={corrections}
+            suggestions={suggestions}
+            apercu={apercu}
+            simule={process.env.AI_PROVIDER === "fake"}
+          />
+        </div>
+      )}
       <section className="bloc">
         <h2 className="text-sm font-semibold text-encre-douce">Compte</h2>
         <p className="mt-1">{session?.user?.email}</p>

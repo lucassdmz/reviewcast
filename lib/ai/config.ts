@@ -2,6 +2,8 @@ import { decryptSecret, parseEncryptionKey } from "@/lib/crypto/secrets";
 import { prisma } from "@/lib/db/client";
 import { lireLigneDeConduiteFichier } from "./ligne-de-conduite";
 import { MODELES_PAR_DEFAUT } from "./pricing";
+import { consignesVoix } from "@/lib/voix/reglages";
+import { exemplesAppris, lireVoix } from "@/lib/voix/service";
 import type { AiConfig, LigneDeConduite } from "./types";
 
 /**
@@ -28,11 +30,21 @@ export async function resolveAiConfig(locationId: string | null): Promise<AiConf
   };
 }
 
-/** Ligne de conduite : réglages de l'établissement, sinon docs/ligne-de-conduite.md. */
+/**
+ * Ligne de conduite envoyée au modèle : le texte de l'établissement (sinon
+ * docs/ligne-de-conduite.md), puis les réglages de la voix traduits en
+ * consignes. Les corrections retenues s'ajoutent aux réponses de référence.
+ */
 export async function resolveLigneDeConduite(locationId: string | null): Promise<LigneDeConduite> {
   const settings = locationId ? await prisma.settings.findUnique({ where: { locationId } }) : null;
-  if (settings?.ligneDeConduite?.trim()) {
-    return { texte: settings.ligneDeConduite, exemples: settings.exemplesReference };
-  }
-  return lireLigneDeConduiteFichier();
+  const base = settings?.ligneDeConduite?.trim()
+    ? { texte: settings.ligneDeConduite, exemples: settings.exemplesReference }
+    : await lireLigneDeConduiteFichier();
+  const voix = await lireVoix(locationId);
+  const appris = await exemplesAppris(locationId, voix);
+  return {
+    texte: [base.texte.trim(), consignesVoix(voix)].filter(Boolean).join("\n\n"),
+    exemples: [...appris, ...base.exemples],
+    voix,
+  };
 }

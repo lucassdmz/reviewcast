@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { BoutonRetour } from "@/components/BoutonRetour";
 import { Etoiles, formatDate } from "@/components/file/Etoiles";
 import { FormulaireBrouillon } from "@/components/file/FormulaireBrouillon";
+import { Gravite } from "@/components/file/Gravite";
 import { NotesInternes } from "@/components/file/NotesInternes";
-import { LIBELLES_GRAVITE } from "@/lib/file/contexte";
 import { ficheAvis } from "@/lib/file/service";
+import { avecSignature } from "@/lib/voix/signature";
 import { LIBELLES_STATUT } from "@/lib/file/statuts";
 import { actionConfirmerPublication, actionIgnorer, actionRouvrir } from "../actions";
 
@@ -35,13 +36,13 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
         </p>
         <p className="mt-3 whitespace-pre-line text-sm leading-snug">{fiche.texte ?? "Avis sans texte."}</p>
         {fiche.analyse && (
-          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             {fiche.analyse.themes.map((t) => (
               <span key={t.libelle} className="rounded-full bg-fond px-2 py-0.5">
                 {t.libelle}
               </span>
             ))}
-            {fiche.analyse.gravite && <span className="rounded-full bg-fond px-2 py-0.5">Gravité {LIBELLES_GRAVITE[fiche.analyse.gravite]}</span>}
+            {fiche.analyse.gravite && <Gravite gravite={fiche.analyse.gravite} />}
             {fiche.analyse.horsSujet && <span className="rounded-full bg-soleil-doux px-2 py-0.5">Semble hors sujet : à signaler à Google</span>}
           </div>
         )}
@@ -69,7 +70,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
             Publier cette réponse sur Google ?
           </h2>
           <p className="mt-1 text-xs text-encre-douce">Elle sera visible publiquement sous l&apos;avis de {fiche.auteur}.</p>
-          <p className="mt-3 whitespace-pre-line rounded-2xl bg-fond p-3 text-sm leading-snug">{fiche.brouillon.texte}</p>
+          <p className="mt-3 whitespace-pre-line rounded-2xl bg-fond p-3 text-sm leading-snug">{avecSignature(fiche.brouillon.texte, fiche.signature)}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <form action={actionConfirmerPublication}>
               <input type="hidden" name="reviewId" value={fiche.id} />
@@ -86,7 +87,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
       ) : (
         dansLaFile && (
           <>
-            <FormulaireBrouillon reviewId={fiche.id} texte={fiche.brouillon?.texte ?? ""} version={fiche.brouillon?.version ?? 0} />
+            <FormulaireBrouillon reviewId={fiche.id} texte={fiche.brouillon?.texte ?? ""} version={fiche.brouillon?.version ?? 0} signature={fiche.signature} motsEvites={fiche.motsEvitesPresents} />
             <form action={actionIgnorer} className="text-center">
               <input type="hidden" name="reviewId" value={fiche.id} />
               <button type="submit" className="text-sm text-encre-douce underline-offset-2 hover:underline">

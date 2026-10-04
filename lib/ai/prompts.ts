@@ -95,7 +95,8 @@ function decrireAnalyse(analyse: ReviewAnalysisOutput | null): string {
 export function draftPrompt(input: DraftReplyInput): string {
   const lignes = [
     "Rédigez une réponse publique à l'avis ci-dessous, en suivant la ligne de conduite et la structure imposée.",
-    "Entre 40 et 120 mots. Ne contestez pas les faits publiquement, ne nommez personne, ne promettez pas de remboursement.",
+    "Respectez la longueur demandée par la ligne de conduite (à défaut, 40 à 90 mots). Ne contestez pas les faits publiquement, ne nommez personne, ne promettez pas de remboursement.",
+    "Ne signez pas : la signature est ajoutée automatiquement après votre texte.",
     "Si l'avis est manifestement faux ou hors sujet, rédigez une réponse courte et neutre.",
     "Renvoyez un JSON : { \"reponse\": \"...\" }.",
   ];
@@ -114,7 +115,7 @@ export function draftPrompt(input: DraftReplyInput): string {
 export function thankYouPrompt(input: ThankYouInput): string {
   return [
     "Rédigez un mot de remerciement public pour l'avis positif ci-dessous : deux phrases maximum,",
-    "personnalisé sur ce que le client a apprécié, sans formule générique. Signez selon la ligne de conduite.",
+    "personnalisé sur ce que le client a apprécié, sans formule générique. Ne signez pas : la signature est ajoutée automatiquement.",
     "Renvoyez un JSON : { \"message\": \"...\" }.",
     "",
     AVERTISSEMENT_AVIS,

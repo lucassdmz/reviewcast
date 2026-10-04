@@ -157,6 +157,29 @@ enum FournisseurIa {
   @@map("fournisseur_ia")
 }
 
+/// Personne qui parle dans les réponses (section 12 du cdc).
+enum Personne {
+  JE
+  NOUS
+
+  @@map("personne")
+}
+
+enum Registre {
+  SOBRE
+  CHALEUREUX
+  COMPLICE
+
+  @@map("registre")
+}
+
+enum Longueur {
+  COURTE
+  MOYENNE
+
+  @@map("longueur")
+}
+
 /// Fiche Google (établissement).
 model Location {
   id                 String   @id @default(cuid())
@@ -174,6 +197,7 @@ model Location {
   settings         Settings?
   dailyStats       DailyStat[]
   themeStats       ThemeStat[]
+  corrections      Correction[]
 
   @@map("locations")
 }
@@ -199,6 +223,7 @@ model Review {
   analysis ReviewAnalysis?
   drafts   Draft[]
   notes    Note[]
+  correction Correction?
 
   @@index([locationId, dateCreation])
   @@index([locationId, statut])
@@ -358,12 +383,43 @@ model Settings {
   modeleRedaction        String?       @map("modele_redaction")
   cleIaChiffree          String?       @map("cle_ia_chiffree")
   notificationsActives   Boolean       @default(false) @map("notifications_actives")
+  /// Voix de l'établissement : signature ajoutée par l'application à chaque réponse.
+  signature              String?
+  personne               Personne      @default(NOUS)
+  registre               Registre      @default(CHALEUREUX)
+  longueur               Longueur      @default(MOYENNE)
+  emojis                 Boolean       @default(false)
+  /// Retenir les réponses réécrites avant publication comme modèles pour la suite.
+  apprendreCorrections   Boolean       @default(true) @map("apprendre_corrections")
+  /// E-mail ou téléphone à proposer pour poursuivre l'échange.
+  contact                String?
+  /// Règles par sujet : [{ sujet, themes, dire, nePasDire }]. Null tant que l'établissement n'y a pas touché.
+  reglesSujets           Json?         @map("regles_sujets")
+  motsEvites             String[]      @default([]) @map("mots_evites")
   createdAt              DateTime      @default(now()) @map("created_at")
   updatedAt              DateTime      @updatedAt @map("updated_at")
 
   location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   @@map("settings")
+}
+
+/// Réponse réécrite par la gérante avant publication, retenue comme modèle.
+model Correction {
+  id         String   @id @default(cuid())
+  reviewId   String   @unique @map("review_id")
+  locationId String   @map("location_id")
+  /// Brouillon proposé par l'IA, sans signature.
+  brouillon  String
+  /// Version publiée, sans signature.
+  texte      String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  review   Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@index([locationId, createdAt])
+  @@map("corrections")
 }
 
 /// Note interne privée sur un avis (donnée personnelle, exportable et supprimable).

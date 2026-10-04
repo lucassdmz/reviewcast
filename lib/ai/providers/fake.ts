@@ -7,6 +7,7 @@ import {
   weatherSentenceSchema,
   type ReviewAnalysisOutput,
 } from "../schemas";
+import { reglesPourThemes } from "@/lib/voix/reglages";
 import { TAXONOMIE_INITIALE } from "../taxonomy";
 import type {
   AiProvider,
@@ -80,18 +81,35 @@ export class FakeProvider implements AiProvider {
   async draftReply(input: DraftReplyInput): Promise<AiResult<{ reponse: string }>> {
     const { auteur, etablissement } = input.review;
     const theme = input.analyse?.themes[0]?.libelle ?? "votre expérience";
-    const court = /court/i.test(input.consigne ?? "");
+    const court = /court/i.test(input.consigne ?? "") || input.ligneDeConduite.voix?.longueur === "COURTE";
     const geste = /geste/i.test(input.consigne ?? "");
-    const phrases = [
-      `Bonjour ${auteur}, merci d'avoir pris le temps de nous écrire.`,
-      `Nous sommes sincèrement désolés que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
-      court ? "" : "Vos remarques sont précieuses et nous les avons partagées avec l'équipe pour que cela ne se reproduise pas.",
-      geste
-        ? "Nous serions heureux de vous accueillir à nouveau et de vous offrir un geste pour nous faire pardonner."
-        : "Nous aimerions en discuter directement avec vous afin de trouver ensemble une solution.",
-      "N'hésitez pas à nous contacter par téléphone ou par message, nous vous répondrons rapidement.",
-      "Bien à vous, l'équipe.",
-    ].filter(Boolean);
+    const voix = input.ligneDeConduite.voix;
+    const je = voix?.personne === "JE";
+    const regle = voix ? reglesPourThemes(voix.regles, input.analyse?.themes.map((t) => t.libelle) ?? []).find((r) => r.dire) : undefined;
+    const suite = voix?.contact
+      ? `Vous pouvez ${je ? "m'" : "nous "}écrire à ${voix.contact}, ${je ? "je vous répondrai" : "nous vous répondrons"} rapidement.`
+      : `N'hésitez pas à venir ${je ? "m'" : "nous "}en parler au comptoir lors de votre prochain passage.`;
+    const phrases = (
+      je
+        ? [
+            `Bonjour ${auteur}, merci d'avoir pris le temps de m'écrire.`,
+            `Je regrette sincèrement que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
+            regle ? regle.dire : court ? "" : "Vos remarques me sont précieuses et j'en ai parlé avec l'équipe pour que cela ne se reproduise pas.",
+            geste
+              ? "J'aurais plaisir à vous accueillir à nouveau et à vous offrir un geste pour me faire pardonner."
+              : "J'aimerais en discuter directement avec vous afin de trouver ensemble une solution.",
+            court ? "" : suite,
+          ]
+        : [
+            `Bonjour ${auteur}, merci d'avoir pris le temps de nous écrire.`,
+            `Nous sommes sincèrement désolés que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
+            regle ? regle.dire : court ? "" : "Vos remarques sont précieuses et nous les avons partagées avec l'équipe pour que cela ne se reproduise pas.",
+            geste
+              ? "Nous serions heureux de vous accueillir à nouveau et de vous offrir un geste pour nous faire pardonner."
+              : "Nous aimerions en discuter directement avec vous afin de trouver ensemble une solution.",
+            court ? "" : suite,
+          ]
+    ).filter(Boolean);
     return { data: draftReplySchema.parse({ reponse: phrases.join(" ") }), usage: usage("fake") };
   }
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { AvisDeLaFile } from "@/lib/file/service";
-import { LIBELLES_GRAVITE } from "@/lib/file/contexte";
 import { Etoiles, formatDate } from "./Etoiles";
+import { Gravite } from "./Gravite";
 
 /** Un avis de la file, présenté comme une tâche en ton neutre. */
 export function CarteAvis({ avis }: { avis: AvisDeLaFile }) {
@@ -16,10 +16,14 @@ export function CarteAvis({ avis }: { avis: AvisDeLaFile }) {
           {formatDate.format(avis.dateCreation)} · {avis.etablissement}
         </p>
         <p className="mt-2 text-sm leading-snug">{avis.extrait}</p>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-          {avis.statut === "BROUILLON_PRET" && <span className="rounded-full bg-fond px-2 py-0.5">Brouillon prêt</span>}
-          {avis.gravite && <span className="rounded-full bg-fond px-2 py-0.5">Gravité {LIBELLES_GRAVITE[avis.gravite]}</span>}
-          <span className="text-encre-douce">{avis.contexte}</span>
+        <div className="mt-3 flex items-center justify-between gap-3 border-t border-nuage pt-3">
+          {avis.gravite ? <Gravite gravite={avis.gravite} /> : <span />}
+          <span className="flex items-center gap-1 text-sm font-bold">
+            {avis.statut === "BROUILLON_PRET" ? "Voir le brouillon" : "Ouvrir l'avis"}
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m9 6 6 6-6 6" />
+            </svg>
+          </span>
         </div>
       </Link>
     </li>

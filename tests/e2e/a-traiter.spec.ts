@@ -15,12 +15,12 @@ test.describe("file à traiter", () => {
   });
   test.afterEach(() => fermerSession(sessionToken));
 
-  test("liste les avis à traiter avec leur contexte", async ({ page }) => {
+  test("liste les avis à traiter après le climat récent", async ({ page }) => {
     await page.goto("/a-traiter");
     await expect(page.getByRole("heading", { name: /avis à traiter/ })).toBeVisible();
     const cartes = page.getByRole("list").first().getByRole("link");
     expect(await cartes.count()).toBeGreaterThan(0);
-    await expect(cartes.first()).toContainText(/sur la même période|Premier avis/);
+    await expect(page.getByText(/avis reçus ces 40 derniers jours/)).toBeVisible();
     await expect(page.getByText(/négatif/i)).toHaveCount(0);
   });
 
@@ -30,7 +30,7 @@ test.describe("file à traiter", () => {
     const auteur = (await premiere.locator("p").first().textContent()) ?? "";
     await premiere.click();
     await expect(page.getByRole("heading", { level: 1, name: auteur })).toBeVisible();
-    await expect(page.getByText(/sur la même période|Premier avis/)).toBeVisible();
+    await expect(page.getByText(/reçus en 40 jours|seul avis reçu/)).toBeVisible();
 
     const zone = page.getByLabel("Texte de la réponse");
     await expect(zone).not.toBeEmpty();

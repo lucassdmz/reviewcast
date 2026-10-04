@@ -1,4 +1,5 @@
 import type { FournisseurIa } from "@/lib/db/generated/enums";
+import type { Voix } from "@/lib/voix/reglages";
 import type {
   DraftReplyOutput,
   MonthlySummaryOutput,
@@ -37,6 +38,8 @@ export interface ReviewForAi {
 export interface LigneDeConduite {
   texte: string;
   exemples: string[];
+  /** Réglages de la voix de l'établissement, pour les fournisseurs qui ne lisent pas le texte (simulé). */
+  voix?: Voix;
 }
 
 export interface AnalyzeReviewInput {

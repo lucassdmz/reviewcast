@@ -9,7 +9,8 @@ export function CarteRemerciement({ remerciement }: { remerciement: Remerciement
       <h2 id="remerciement-titre" className="intitule">
         Remercier {remerciement.auteur} pour ses 5 étoiles
       </h2>
-      <p className="mt-2 text-[15px] leading-relaxed">{remerciement.texte}</p>
+      <p className="mt-2 whitespace-pre-line text-[15px] leading-relaxed">{remerciement.texte}</p>
+      {remerciement.signature && <p className="mt-1 text-[15px] text-encre-douce">{remerciement.signature}</p>}
       <form action={actionPublierRemerciement} className="mt-4">
         <input type="hidden" name="reviewId" value={remerciement.reviewId} />
         <input type="hidden" name="texte" value={remerciement.texte} />

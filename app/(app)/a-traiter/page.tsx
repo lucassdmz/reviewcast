@@ -2,13 +2,14 @@ import Link from "next/link";
 import { CarteAvis } from "@/components/file/CarteAvis";
 import { Ecran } from "@/components/Ecran";
 import { partagerFile } from "@/lib/file/recence";
-import { listerFile } from "@/lib/file/service";
+import { contexteDeLaFile, listerFile } from "@/lib/file/service";
 
 export const dynamic = "force-dynamic";
 
 export default async function ATraiterPage({ searchParams }: PageProps<"/a-traiter">) {
   const params = await searchParams;
   const { recents: file, rattrapage } = partagerFile(await listerFile(), new Date());
+  const contexte = await contexteDeLaFile();
   const message = params.publie
     ? "Réponse publiée. L'avis a quitté la file."
     : params.traite
@@ -17,6 +18,7 @@ export default async function ATraiterPage({ searchParams }: PageProps<"/a-trait
 
   return (
     <Ecran titre={file.length === 0 ? "Rien à traiter" : file.length === 1 ? "1 avis à traiter" : `${file.length} avis à traiter`}>
+      {contexte && <p className="-mt-3 mb-4 px-1 text-[15px] text-encre-douce">{contexte}</p>}
       {message && (
         <p role="status" className="mb-3 rounded-2xl bg-soleil-doux px-4 py-2 text-sm">
           {message}
