@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { courbeHebdomadaire, douzeMoisGlissants, evolution, moisCourant, moisPrecedent, statsPeriode } from "@/lib/meteo/agregation";
+import { courbeHebdomadaire, douzeMoisGlissants, evolution, fenetreGlissante, fenetrePrecedente, moisCourant, moisPrecedent, statsPeriode } from "@/lib/meteo/agregation";
 
 const maintenant = new Date("2026-10-02T10:00:00Z");
 const avis = [
@@ -16,6 +16,22 @@ describe("périodes", () => {
     expect(moisCourant(maintenant)).toEqual({ debut: new Date("2026-10-01T00:00:00Z"), fin: new Date("2026-11-01T00:00:00Z") });
     expect(moisPrecedent(maintenant)).toEqual({ debut: new Date("2026-09-01T00:00:00Z"), fin: new Date("2026-10-01T00:00:00Z") });
     expect(douzeMoisGlissants(maintenant).debut).toEqual(new Date("2025-11-01T00:00:00Z"));
+  });
+
+  it("fait glisser la fenêtre de la météo sur 40 jours, sans trou avec la précédente", () => {
+    const fenetre = fenetreGlissante(maintenant);
+    const avant = fenetrePrecedente(maintenant);
+    expect(fenetre.debut).toEqual(new Date(maintenant.getTime() - 40 * 86_400_000));
+    expect(fenetre.fin.getTime()).toBeGreaterThan(maintenant.getTime());
+    expect(avant.fin).toEqual(fenetre.debut);
+    expect(avant.debut).toEqual(new Date(maintenant.getTime() - 80 * 86_400_000));
+  });
+
+  it("garde un avis du mois précédent dans la météo au lendemain d'un changement de mois", () => {
+    const le2 = new Date("2026-10-02T08:00:00Z");
+    const s = statsPeriode([{ note: 5, dateCreation: new Date("2026-09-20T10:00:00Z") }, { note: 1, dateCreation: new Date("2026-10-01T10:00:00Z") }], fenetreGlissante(le2));
+    expect(s.volume).toBe(2);
+    expect(s.noteMoyenne).toBe(3);
   });
 });
 

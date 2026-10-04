@@ -125,7 +125,7 @@ export function thankYouPrompt(input: ThankYouInput): string {
 export function weatherPrompt(input: WeatherSentenceInput): string {
   return [
     "Écrivez une seule phrase de synthèse pour l'écran d'accueil, ton positif et factuel, sans point d'exclamation.",
-    "Exemple de forme : « 23 avis ce mois-ci, 21 enthousiastes. Les clients citent surtout l'accueil et la rapidité. »",
+    "Exemple de forme : « 21 clients contents sur 23 avis. Ils citent surtout l'accueil et la rapidité. »",
     "Renvoyez un JSON : { \"phrase\": \"...\" }.",
     "",
     "<donnees>",

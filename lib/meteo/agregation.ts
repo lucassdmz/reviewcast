@@ -25,6 +25,25 @@ export function moisPrecedent(maintenant: Date): Periode {
   return { debut: debutDuMois(maintenant, -1), fin: debutDuMois(maintenant) };
 }
 
+/**
+ * Fenêtre de la météo de la home, en jours. Un mois calendaire repart de zéro
+ * le 1er : deux avis sévères suffisent alors à assombrir tout l'écran. Une
+ * fenêtre glissante lisse ces à-coups sans rien cacher.
+ */
+export const FENETRE_METEO_JOURS = 40;
+
+const JOUR_MS = 24 * 60 * 60 * 1000;
+
+/** Les `jours` derniers jours, jusqu'à maintenant inclus. */
+export function fenetreGlissante(maintenant: Date, jours = FENETRE_METEO_JOURS): Periode {
+  return { debut: new Date(maintenant.getTime() - jours * JOUR_MS), fin: new Date(maintenant.getTime() + 1) };
+}
+
+/** La fenêtre de même durée qui précède immédiatement `fenetreGlissante`. */
+export function fenetrePrecedente(maintenant: Date, jours = FENETRE_METEO_JOURS): Periode {
+  return { debut: new Date(maintenant.getTime() - 2 * jours * JOUR_MS), fin: new Date(maintenant.getTime() - jours * JOUR_MS) };
+}
+
 export function douzeMoisGlissants(maintenant: Date): Periode {
   return { debut: debutDuMois(maintenant, -11), fin: debutDuMois(maintenant, 1) };
 }

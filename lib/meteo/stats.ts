@@ -5,8 +5,10 @@ import {
   courbeHebdomadaire,
   douzeMoisGlissants,
   evolution,
-  moisCourant,
-  moisPrecedent,
+  FENETRE_METEO_JOURS,
+  debutDuMois,
+  fenetreGlissante,
+  fenetrePrecedente,
   statsPeriode,
   type PointCourbe,
 } from "./agregation";
@@ -78,11 +80,14 @@ export async function obtenirMeteoHome(
       analysis: { select: { passagesCles: true, themes: { select: { polarite: true, theme: { select: { libelle: true } } } } } },
     },
   });
-  const aTraiter = await prisma.review.count({ where: { ...filtreLocation, retireAt: null, statut: { in: ["A_TRAITER", "BROUILLON_PRET"] } } });
-
-  const mois = moisCourant(maintenant);
+  // La météo se lit sur une fenêtre glissante, pas sur le mois calendaire.
+  const mois = fenetreGlissante(maintenant);
+  // Seuls les avis récents sont comptés : les anciens restés sans réponse sont du rattrapage, pas une alerte.
+  const aTraiter = await prisma.review.count({
+    where: { ...filtreLocation, retireAt: null, statut: { in: ["A_TRAITER", "BROUILLON_PRET"] }, dateCreation: { gte: mois.debut } },
+  });
   const ceMois = statsPeriode(avis, mois);
-  const avant = statsPeriode(avis, moisPrecedent(maintenant));
+  const avant = statsPeriode(avis, fenetrePrecedente(maintenant));
   const douzeMois = statsPeriode(avis, periode12);
   const seuils = seuilsDepuis(actif?.settings ?? (etablissements.length === 1 ? etablissements[0].settings : null));
   const meteo = calculerMeteo(ceMois.noteMoyenne, ceMois.partEnthousiastes, seuils);
@@ -91,7 +96,8 @@ export async function obtenirMeteoHome(
   const phrase = await phraseMeteoDuMois({
     locationId: actif?.id ?? null,
     etablissement: actif?.nom ?? null,
-    mois: mois.debut,
+    mois: debutDuMois(maintenant),
+    libellePeriode: `les ${FENETRE_METEO_JOURS} derniers jours`,
     volume: ceMois.volume,
     nbEnthousiastes: ceMois.nbEnthousiastes,
     noteMoyenne: ceMois.noteMoyenne,

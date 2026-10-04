@@ -8,7 +8,10 @@ import { prisma } from "@/lib/db/client";
 export interface DonneesPhrase {
   locationId: string | null;
   etablissement: string | null;
+  /** Mois de rattachement pour le stockage de la phrase. */
   mois: Date;
+  /** Période réellement couverte par les chiffres, telle qu'on la dit au modèle. */
+  libellePeriode?: string;
   volume: number;
   nbEnthousiastes: number;
   noteMoyenne: number | null;
@@ -40,7 +43,7 @@ export async function phraseMeteoDuMois(donnees: DonneesPhrase, provider?: AiPro
     const ia = provider ?? createProvider(await resolveAiConfig(donnees.locationId));
     const { data, usage } = await ia.weatherSentence({
       etablissement: donnees.etablissement,
-      mois: libelleMois(donnees.mois),
+      mois: donnees.libellePeriode ?? libelleMois(donnees.mois),
       volume: donnees.volume,
       nbEnthousiastes: donnees.nbEnthousiastes,
       noteMoyenne: donnees.noteMoyenne,
