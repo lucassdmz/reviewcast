@@ -39,11 +39,15 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         </p>
       )}
       {sansAvis ? (
-        <section className="bloc">
+        <section className="my-auto flex flex-col items-center px-6 text-center">
+          <span aria-hidden="true" className="relative mb-6 block h-24 w-24">
+            <span className="absolute inset-0 rounded-full bg-soleil" />
+            <span className="absolute -right-5 bottom-4 h-4 w-24 rounded-full bg-surface" />
+          </span>
           <h2 className="text-2xl font-bold leading-tight tracking-tight">
             Pas encore d&apos;avis
           </h2>
-          <p className="mt-1.5 text-[15px] leading-snug text-encre-douce">
+          <p className="mt-2 max-w-xs text-[15px] leading-snug text-encre-douce">
             {home.etablissementActif
               ? `Les avis de ${home.etablissementActif.nom}`
               : "Vos avis"}{" "}

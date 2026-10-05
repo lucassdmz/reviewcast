@@ -38,6 +38,8 @@
   --color-attention: var(--attention);
   --color-matcha: var(--matcha);
   --color-matcha-doux: var(--matcha-doux);
+  /* Le gras de l'application est un demi-gras : en 700, un écran chargé de titres devenait agressif sur mobile. */
+  --font-weight-bold: 600;
   /* La police du téléphone : San Francisco sur iPhone, Roboto sur Android. Rien à télécharger. */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
