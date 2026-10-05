@@ -1,0 +1,9 @@
+# Jamais envoyé à Vercel : données locales, vrais avis de démonstration, secrets.
+demo-local/
+pgdata/
+.env
+.env.*
+!.env.example
+tests/
+test-results/
+playwright-report/

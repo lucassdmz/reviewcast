@@ -53,3 +53,9 @@ yarn-error.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Client Prisma généré (npm run db:generate)
+lib/db/generated/
+
+# Postgres local hors Docker
+pgdata/

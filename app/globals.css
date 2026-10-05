@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+/*
+ * Application mobile sobre, esprit café japonais : fond brume, cartes blanches
+ * aux grands arrondis, encre noire, et une seule couleur, le jaune du soleil.
+ * Pas de rouge (section 2 du cdc).
+ */
+:root {
+  color-scheme: light;
+  --ciel: #f1f2f0;
+  --ciel-fonce: #c5c9cc;
+  --soleil: #f2b72a;
+  --soleil-doux: #fbf0cc;
+  --nuage: #e4e6e5;
+  --encre: #16181a;
+  --encre-douce: #5f6368;
+  --surface: #ffffff;
+  --fond: #f1f2f0;
+  --accent: #16181a;
+  --attention: #8f6400;
+  --nuage-forme: #e3e6e9;
+  --pluie: #8b96a1;
+  --matcha: #5f7f4b;
+  --matcha-doux: #e6eedf;
+}
+
+@theme inline {
+  --color-ciel: var(--ciel);
+  --color-ciel-fonce: var(--ciel-fonce);
+  --color-soleil: var(--soleil);
+  --color-soleil-doux: var(--soleil-doux);
+  --color-nuage: var(--nuage);
+  --color-encre: var(--encre);
+  --color-encre-douce: var(--encre-douce);
+  --color-surface: var(--surface);
+  --color-fond: var(--fond);
+  --color-accent: var(--accent);
+  --color-attention: var(--attention);
+  --color-matcha: var(--matcha);
+  --color-matcha-doux: var(--matcha-doux);
+  /* Le gras de l'application est un demi-gras : en 700, un écran chargé de titres devenait agressif sur mobile. */
+  --font-weight-bold: 600;
+  /* La police du téléphone : San Francisco sur iPhone, Roboto sur Android. Rien à télécharger. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*
+ * Thème sombre : appliqué quand il est choisi dans Réglages (data-theme="sombre"),
+ * ou quand le choix est « comme le téléphone » et que l'appareil est en mode sombre.
+ * Sans choix, l'application est claire.
+ */
+:root[data-theme="sombre"] {
+  color-scheme: dark;
+  --ciel: #25282b;
+  --ciel-fonce: #4b5055;
+  --soleil: #f2b72a;
+  --soleil-doux: #3a3115;
+  --nuage: #2c2f32;
+  --encre: #f2f2ef;
+  --encre-douce: #a8acb0;
+  --surface: #1c1e20;
+  --fond: #111213;
+  --accent: #f2f2ef;
+  --attention: #f2b72a;
+  --nuage-forme: #3b3f44;
+  --pluie: #8b96a1;
+  --matcha: #a3c28d;
+  --matcha-doux: #263020;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="systeme"] {
+    color-scheme: dark;
+    --ciel: #25282b;
+    --ciel-fonce: #4b5055;
+    --soleil: #f2b72a;
+    --soleil-doux: #3a3115;
+    --nuage: #2c2f32;
+    --encre: #f2f2ef;
+    --encre-douce: #a8acb0;
+    --surface: #1c1e20;
+    --fond: #111213;
+    --accent: #f2f2ef;
+    --attention: #f2b72a;
+    --nuage-forme: #3b3f44;
+    --pluie: #8b96a1;
+    --matcha: #a3c28d;
+    --matcha-doux: #263020;
+  }
+}
+
+body {
+  background: var(--fond);
+  color: var(--encre);
+}
+
+/*
+ * Toucher : pas de voile gris du navigateur (chaque élément a son propre état
+ * enfoncé), pas de délai de double appui, pas de sélection de texte ni de menu
+ * contextuel sur un appui long sur un bouton.
+ */
+a,
+button,
+label,
+summary,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button,
+summary,
+nav a {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+@layer components {
+  /* Carte de contenu. */
+  .bloc {
+    background: var(--surface);
+    border-radius: 1.5rem;
+    padding: 1.125rem;
+  }
+
+  /* Carte qui demande une décision (confirmation de publication). */
+  .bloc-fort {
+    background: var(--surface);
+    border-radius: 1.5rem;
+    padding: 1.125rem;
+    box-shadow: inset 0 0 0 2px var(--encre);
+  }
+
+  /* Lien ou bouton de texte : la zone tactile fait au moins 44 px de haut. */
+  .cible {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  /* Petit intitulé de carte. */
+  .intitule {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--encre-douce);
+  }
+}
+
+/*
+ * Mouvement : une seule entrée par écran (les cartes montent l'une après
+ * l'autre), le soleil qui se lève, les barres et les courbes qui se tracent,
+ * et un léger enfoncement au toucher. Rien ne bouge sans raison.
+ */
+@keyframes monter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes lever {
+  from {
+    opacity: 0;
+    transform: translate(14px, 28px) scale(0.88);
+  }
+}
+@keyframes croitre {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes tracer {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes eclore {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+.entree > * {
+  animation: monter 0.26s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.entree > *:nth-child(2) {
+  animation-delay: 30ms;
+}
+.entree > *:nth-child(3) {
+  animation-delay: 60ms;
+}
+.entree > *:nth-child(4) {
+  animation-delay: 90ms;
+}
+.entree > *:nth-child(5) {
+  animation-delay: 120ms;
+}
+.entree > *:nth-child(n + 6) {
+  animation-delay: 120ms;
+}
+
+.ciel-anime {
+  animation: lever 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.barre {
+  transform-origin: left center;
+  animation: croitre 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both;
+}
+.trace {
+  stroke-dasharray: 1;
+  animation: tracer 0.5s ease-out 0.1s both;
+}
+.point {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eclore 0.25s cubic-bezier(0.3, 1.4, 0.5, 1) 0.5s both;
+}
+.pressable {
+  transition:
+    transform 0.1s ease,
+    opacity 0.15s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.pressable:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+/* Feuille qui monte du bas de l'écran (choix de l'établissement). */
+.feuille {
+  position: fixed;
+  inset: auto 0 max(0.75rem, env(safe-area-inset-bottom)) 0;
+  margin: 0 auto;
+  width: calc(100% - 1.5rem);
+  max-width: 26rem;
+  max-height: min(34rem, 80dvh);
+  overflow-y: auto;
+  border-radius: 1.75rem;
+  background: var(--surface);
+  color: var(--encre);
+  box-shadow: 0 18px 50px -12px rgb(0 0 0 / 0.4);
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.97);
+  transform-origin: bottom center;
+  transition:
+    opacity 0.2s ease,
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    overlay 0.28s allow-discrete,
+    display 0.28s allow-discrete;
+}
+.feuille[open] {
+  opacity: 1;
+  transform: none;
+}
+.feuille::backdrop {
+  background: rgb(0 0 0 / 0);
+  transition:
+    background-color 0.28s ease,
+    overlay 0.28s allow-discrete,
+    display 0.28s allow-discrete;
+}
+.feuille[open]::backdrop {
+  background: rgb(0 0 0 / 0.32);
+}
+@starting-style {
+  .feuille[open] {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+  }
+  .feuille[open]::backdrop {
+    background: rgb(0 0 0 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Export PDF de la synthèse : seule la synthèse et son titre sont imprimés. */
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  nav,
+  .no-print,
+  [aria-label="Navigation principale"] {
+    display: none !important;
+  }
+  main > div > *:not(:has(#synthese-titre)) {
+    display: none;
+  }
+}
