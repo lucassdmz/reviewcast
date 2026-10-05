@@ -52,7 +52,7 @@ Quatre écrans : Home (météo), À traiter, Tendances, Réglages. Navigation pa
 - Phrase de synthèse générée par l'IA, une ligne, ton positif et factuel, qui commence par les clients contents : « 21 clients contents sur 23 avis. Ils citent surtout l'accueil et la rapidité. »
 - Le compliment du moment : extrait d'un avis positif récent mis en avant, rotation à chaque ouverture.
 - Carte discrète « N avis à traiter » qui mène à l'écran À traiter. Elle ne compte que les avis des 40 derniers jours. Absente s'il n'y a rien à traiter.
-- Mini-courbe de la note moyenne sur les 8 dernières semaines. Sélecteur d'établissement en haut de l'écran : météo globale de tous les établissements par défaut, météo d'un établissement en un tap.
+- Mini-courbe de la note moyenne sur les 8 dernières semaines. L'établissement affiché se choisit depuis le rond de la barre d'onglets (voir la décision en section 11) : vue d'ensemble de tous les établissements par défaut, un établissement en deux taps.
 
 ### 3.2 À traiter — gestion des avis négatifs
 
@@ -321,6 +321,7 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 | Pastilles des cartes | Brouillon prêt et gravité dans la même forme | Gravité en jauge grise, « Voir le brouillon » en invitation | On ne savait pas ce qui était cliquable |
 | Retour | Lien texte souligné | Chevron rond en haut à gauche, en plus du geste du téléphone | Une PWA installée n'a pas de barre de navigateur, et le geste ne fonctionne pas à l'ouverture depuis une notification |
 | Ton des réponses | Possible renvoi à une hiérarchie | La gérante parle en son nom | L'utilisateur est la direction |
+| Choix de l'établissement | Pastilles en haut de la Home et de Tendances | Un rond avec le logo, à droite de la barre d'onglets : un tap ou un appui long ouvre la liste. Le choix vaut pour les quatre onglets et reste mémorisé sur l'appareil | Le choix ne suivait pas d'un onglet à l'autre, et la file comme les réglages l'ignoraient |
 
 ## 12. Lot 7 : la voix de l'établissement
 

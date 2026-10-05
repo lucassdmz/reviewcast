@@ -1,19 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Zen_Kaku_Gothic_New } from "next/font/google";
 import { cookies } from "next/headers";
 import { COOKIE_THEME, COULEUR_BARRE, lireTheme, type Theme } from "@/lib/apparence";
 import "./globals.css";
-
-const zenKaku = Zen_Kaku_Gothic_New({
-  variable: "--font-sans-app",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  // Cette police japonaise est découpée en plus de cent tranches par graisse.
-  // Préchargée, elle faisait télécharger plus de 300 fichiers à l'ouverture ;
-  // sans préchargement, le navigateur ne prend que les tranches utilisées.
-  preload: false,
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Éclaircie — la météo de vos avis",
@@ -55,7 +43,7 @@ export async function generateViewport(): Promise<Viewport> {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const theme = await themeChoisi();
   return (
-    <html lang="fr" data-theme={theme} className={`${zenKaku.variable} h-full antialiased`}>
+    <html lang="fr" data-theme={theme} className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

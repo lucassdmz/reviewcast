@@ -5,14 +5,15 @@ import { Etoiles, formatDate } from "@/components/file/Etoiles";
 import { TexteSurligne } from "@/components/tendances/TexteSurligne";
 import { lireParametres } from "@/lib/analytics/requete";
 import { avisParTheme } from "@/lib/analytics/tendances";
+import { idEtablissementActif } from "@/lib/etablissements/service";
 
 export const dynamic = "force-dynamic";
 
 export default async function ThemePage({ params, searchParams }: PageProps<"/tendances/theme/[id]">) {
   const { id } = await params;
   const query = await searchParams;
-  const { periode, locationId, requete } = lireParametres(query);
-  const resultat = await avisParTheme(id, locationId, periode);
+  const { periode, requete } = lireParametres(query);
+  const resultat = await avisParTheme(id, await idEtablissementActif(), periode);
   if (!resultat) notFound();
 
   return (

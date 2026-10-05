@@ -6,7 +6,9 @@ import { consommationDuMois } from "@/lib/ai/ledger";
 import { MODELES_PAR_DEFAUT } from "@/lib/ai/pricing";
 import { auth, signOut } from "@/lib/auth/config";
 import { estModeDemo } from "@/lib/auth/demo";
-import { prisma } from "@/lib/db/client";
+import { LogoEtablissement } from "@/components/etablissements/LogoEtablissement";
+import { lireChoixEtablissement } from "@/lib/etablissements/service";
+import { actionChoisirEtablissement } from "../actions";
 import { LIBELLES_LONGUEUR, LIBELLES_PERSONNE, LIBELLES_REGISTRE, type Voix } from "@/lib/voix/reglages";
 import { lireVoix, listerCorrections } from "@/lib/voix/service";
 
@@ -49,11 +51,7 @@ function Ligne({ href, titre, resume }: { href: string; titre: string; resume: s
 
 export default async function ReglagesPage({ searchParams }: PageProps<"/reglages">) {
   const params = await searchParams;
-  const [session, conso, etablissement] = await Promise.all([
-    auth(),
-    consommationDuMois(),
-    prisma.location.findFirst({ orderBy: { nom: "asc" }, select: { id: true, nom: true } }),
-  ]);
+  const [session, conso, { etablissements, actif: etablissement }] = await Promise.all([auth(), consommationDuMois(), lireChoixEtablissement()]);
   const [voix, corrections] = etablissement ? await Promise.all([lireVoix(etablissement.id), listerCorrections(etablissement.id)]) : [null, []];
   const r = voix ? resumes(voix, corrections.length) : null;
   const theme = lireTheme((await cookies()).get(COOKIE_THEME)?.value);
@@ -80,6 +78,27 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
           </ul>
           <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
             <Ligne href="/reglages/apercu" titre="Voir un aperçu" resume="Une réponse écrite avec vos réglages" />
+          </ul>
+        </section>
+      )}
+
+      {!etablissement && etablissements.length > 1 && (
+        <section aria-labelledby="voix-titre">
+          <h2 id="voix-titre" className="px-1 text-xl font-bold tracking-tight">
+            La voix de vos réponses
+          </h2>
+          <p className="mt-0.5 px-1 text-[15px] text-encre-douce">Elle se règle établissement par établissement. Lequel voulez-vous régler ?</p>
+          <ul className="mt-3 divide-y divide-nuage overflow-hidden rounded-3xl bg-surface">
+            {etablissements.map((e) => (
+              <li key={e.id}>
+                <form action={actionChoisirEtablissement.bind(null, e.id)}>
+                  <button type="submit" className="pressable flex w-full items-center gap-3 px-[1.125rem] py-3.5 text-left">
+                    <LogoEtablissement etablissement={e} className="h-11 w-11 [--taille:2.75rem]" />
+                    <span className="min-w-0 flex-1 text-[17px] font-bold leading-tight">{e.nom}</span>
+                  </button>
+                </form>
+              </li>
+            ))}
           </ul>
         </section>
       )}

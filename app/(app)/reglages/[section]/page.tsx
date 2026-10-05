@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Ecran } from "@/components/Ecran";
 import { FormulaireApprentissage, FormulaireSignature, FormulaireSujets, FormulaireTon } from "@/components/reglages/SectionsVoix";
-import { prisma } from "@/lib/db/client";
+import { lireChoixEtablissement } from "@/lib/etablissements/service";
 import { apercuVoix } from "@/lib/voix/apercu";
 import { lireVoix, listerCorrections, sujetsSansRegle } from "@/lib/voix/service";
 
@@ -24,8 +24,9 @@ export default async function SectionReglagesPage({ params, searchParams }: Page
   const cle = section as Section;
   const query = await searchParams;
 
-  const etablissement = await prisma.location.findFirst({ orderBy: { nom: "asc" }, select: { id: true, nom: true } });
-  if (!etablissement) notFound();
+  const { actif: etablissement } = await lireChoixEtablissement();
+  // Vue d'ensemble : la voix se règle pour un établissement, on revient le choisir.
+  if (!etablissement) redirect("/reglages");
   const voix = await lireVoix(etablissement.id);
 
   const message =

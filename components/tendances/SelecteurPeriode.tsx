@@ -8,8 +8,7 @@ const CHOIX: { selection: "30j" | "90j" | "12m"; libelle: string }[] = [
 ];
 
 /** Sélecteur de période : trois raccourcis et une plage personnalisée. */
-export function SelecteurPeriode({ periode, locationId }: { periode: PeriodeTendances; locationId: string | null }) {
-  const base = locationId ? `&etablissement=${locationId}` : "";
+export function SelecteurPeriode({ periode }: { periode: PeriodeTendances }) {
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const finIncluse = new Date(periode.fin.getTime() - 86_400_000);
   return (
@@ -20,7 +19,7 @@ export function SelecteurPeriode({ periode, locationId }: { periode: PeriodeTend
           return (
             <li key={c.selection} className="flex-1">
               <Link
-                href={`/tendances?periode=${c.selection}${base}`}
+                href={`/tendances?periode=${c.selection}`}
                 aria-current={actif ? "true" : undefined}
                 className={`pressable block rounded-full px-3 py-1.5 text-center text-sm ${actif ? "bg-surface font-bold shadow-[0_1px_3px_rgb(0_0_0/0.12)]" : "text-encre-douce"}`}
               >
@@ -34,7 +33,6 @@ export function SelecteurPeriode({ periode, locationId }: { periode: PeriodeTend
         <summary className="pressable cible cursor-pointer list-none text-encre-douce underline underline-offset-4 [&::-webkit-details-marker]:hidden">Choisir des dates</summary>
         <form method="get" action="/tendances" className="mt-2 flex flex-wrap items-center gap-2">
         <input type="hidden" name="periode" value="perso" />
-        {locationId && <input type="hidden" name="etablissement" value={locationId} />}
         <label htmlFor="debut" className="text-encre-douce">
           Du
         </label>

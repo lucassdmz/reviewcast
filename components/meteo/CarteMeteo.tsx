@@ -16,7 +16,6 @@ export interface CarteMeteoProps {
   meteo: Meteo;
   noteMoyenneMois: number | null;
   periode: PeriodeMeteo;
-  etablissementId: string | null;
   repere: { libelle: string; note: number | null };
   volumeMois: number;
   nbEnthousiastes: number;
@@ -32,7 +31,7 @@ export function CarteMeteo(p: CarteMeteoProps) {
     <section aria-labelledby="meteo-titre" className="relative overflow-hidden rounded-[2rem] bg-surface p-5">
       <Ciel meteo={p.meteo} className="ciel-anime pointer-events-none absolute -right-12 -top-12 h-52 w-52" />
       <div className="relative">
-        <SelecteurPeriodeMeteo periode={p.periode} etablissementId={p.etablissementId} />
+        <SelecteurPeriodeMeteo periode={p.periode} />
 
         <p className="mt-7 text-[4.5rem] font-bold leading-none tracking-tight">
           {p.noteMoyenneMois === null ? "–" : <NombreAnime valeur={p.noteMoyenneMois} />}

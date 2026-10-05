@@ -1,7 +1,6 @@
 import { BoutonAction } from "@/components/BoutonAction";
 import { Ecran } from "@/components/Ecran";
 import { NombreAnime } from "@/components/NombreAnime";
-import { SelecteurEtablissement } from "@/components/meteo/SelecteurEtablissement";
 import { CourbeMensuelle } from "@/components/tendances/CourbeMensuelle";
 import { ListeThemes } from "@/components/tendances/ListeThemes";
 import { RepartitionEtoiles } from "@/components/tendances/RepartitionEtoiles";
@@ -11,6 +10,7 @@ import { formaterDelai } from "@/lib/analytics/agregation";
 import { lireParametres } from "@/lib/analytics/requete";
 import { syntheseTendances } from "@/lib/analytics/synthese";
 import { obtenirTendances } from "@/lib/analytics/tendances";
+import { idEtablissementActif } from "@/lib/etablissements/service";
 import { actionRegenererSynthese } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +23,8 @@ function signe(v: number): string {
 
 export default async function TendancesPage({ searchParams }: PageProps<"/tendances">) {
   const params = await searchParams;
-  const { periode, locationId, requete } = lireParametres(params);
-  const t = await obtenirTendances(locationId, periode);
+  const { periode, requete } = lireParametres(params);
+  const t = await obtenirTendances(await idEtablissementActif(), periode);
   const synthese = await syntheseTendances(t);
   const titreSynthese = `Synthèse ${t.etablissement?.nom ?? "tous établissements"} · ${periode.libelle}`;
   const evolutionNote = t.repartition.noteMoyenne !== null && t.precedente.noteMoyenne !== null ? t.repartition.noteMoyenne - t.precedente.noteMoyenne : null;
@@ -32,8 +32,7 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
   return (
     <Ecran titre="Tendances" large>
       <div className="entree space-y-3">
-        <SelecteurEtablissement etablissements={t.etablissements} actif={t.etablissement} />
-        <SelecteurPeriode periode={periode} locationId={locationId} />
+        <SelecteurPeriode periode={periode} />
 
         <section aria-label="Résumé de la période" className="bloc">
           <p className="intitule">{periode.libelle}</p>
@@ -84,7 +83,6 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
                   <input type="hidden" name="fin" value={typeof params.fin === "string" ? params.fin : ""} />
                 </>
               )}
-              {locationId && <input type="hidden" name="etablissement" value={locationId} />}
               <BoutonAction enCours="Rédaction…" className="pressable rounded-full bg-nuage px-3 py-1.5 font-medium">
                 {synthese ? "Régénérer" : "Générer la synthèse"}
               </BoutonAction>

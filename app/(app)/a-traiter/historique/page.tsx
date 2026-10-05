@@ -1,11 +1,12 @@
 import { Ecran } from "@/components/Ecran";
 import { Etoiles, formatDate } from "@/components/file/Etoiles";
+import { idEtablissementActif } from "@/lib/etablissements/service";
 import { historiquePublies } from "@/lib/file/service";
 
 export const dynamic = "force-dynamic";
 
 export default async function HistoriquePage() {
-  const reponses = await historiquePublies();
+  const reponses = await historiquePublies(await idEtablissementActif());
   return (
     <Ecran titre="Réponses publiées" retour={{ href: "/a-traiter", libelle: "À traiter" }}>
       {reponses.length === 0 ? (

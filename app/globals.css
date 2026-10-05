@@ -38,7 +38,8 @@
   --color-attention: var(--attention);
   --color-matcha: var(--matcha);
   --color-matcha-doux: var(--matcha-doux);
-  --font-sans: var(--font-sans-app);
+  /* La police du téléphone : San Francisco sur iPhone, Roboto sur Android. Rien à télécharger. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /*
@@ -222,6 +223,52 @@ nav a {
 .pressable:active {
   transform: scale(0.97);
   opacity: 0.85;
+}
+
+/* Feuille qui monte du bas de l'écran (choix de l'établissement). */
+.feuille {
+  position: fixed;
+  inset: auto 0 max(0.75rem, env(safe-area-inset-bottom)) 0;
+  margin: 0 auto;
+  width: calc(100% - 1.5rem);
+  max-width: 26rem;
+  max-height: min(34rem, 80dvh);
+  overflow-y: auto;
+  border-radius: 1.75rem;
+  background: var(--surface);
+  color: var(--encre);
+  box-shadow: 0 18px 50px -12px rgb(0 0 0 / 0.4);
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.97);
+  transform-origin: bottom center;
+  transition:
+    opacity 0.2s ease,
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    overlay 0.28s allow-discrete,
+    display 0.28s allow-discrete;
+}
+.feuille[open] {
+  opacity: 1;
+  transform: none;
+}
+.feuille::backdrop {
+  background: rgb(0 0 0 / 0);
+  transition:
+    background-color 0.28s ease,
+    overlay 0.28s allow-discrete,
+    display 0.28s allow-discrete;
+}
+.feuille[open]::backdrop {
+  background: rgb(0 0 0 / 0.32);
+}
+@starting-style {
+  .feuille[open] {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+  }
+  .feuille[open]::backdrop {
+    background: rgb(0 0 0 / 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

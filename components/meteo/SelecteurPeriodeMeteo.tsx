@@ -2,14 +2,8 @@ import Link from "next/link";
 import { LIBELLES_PERIODE, PERIODES_METEO, PERIODE_METEO_PAR_DEFAUT, type PeriodeMeteo } from "@/lib/meteo/periodes";
 
 /** Choix de la période de la météo : trois durées dans un contrôle segmenté, en tête de la carte. */
-export function SelecteurPeriodeMeteo({ periode, etablissementId }: { periode: PeriodeMeteo; etablissementId: string | null }) {
-  const lien = (p: PeriodeMeteo) => {
-    const params = new URLSearchParams();
-    if (p !== PERIODE_METEO_PAR_DEFAUT) params.set("periode", p);
-    if (etablissementId) params.set("etablissement", etablissementId);
-    const requete = params.toString();
-    return requete ? `/?${requete}` : "/";
-  };
+export function SelecteurPeriodeMeteo({ periode }: { periode: PeriodeMeteo }) {
+  const lien = (p: PeriodeMeteo) => (p === PERIODE_METEO_PAR_DEFAUT ? "/" : `/?periode=${p}`);
   return (
     <nav aria-label="Période" className="inline-block">
       <ul className="inline-flex gap-0.5 rounded-full bg-fond/85 p-1 backdrop-blur-sm">

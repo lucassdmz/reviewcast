@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CarteAvis } from "@/components/file/CarteAvis";
 import { Ecran } from "@/components/Ecran";
+import { idEtablissementActif } from "@/lib/etablissements/service";
 import { partagerFile } from "@/lib/file/recence";
 import { contexteDeLaFile, listerFile } from "@/lib/file/service";
 
@@ -8,7 +9,8 @@ export const dynamic = "force-dynamic";
 
 export default async function ATraiterPage({ searchParams }: PageProps<"/a-traiter">) {
   const params = await searchParams;
-  const [tous, contexte] = await Promise.all([listerFile(), contexteDeLaFile()]);
+  const locationId = await idEtablissementActif();
+  const [tous, contexte] = await Promise.all([listerFile(locationId), contexteDeLaFile(locationId)]);
   const { recents: file, rattrapage } = partagerFile(tous, new Date());
   const message = params.publie
     ? "Réponse publiée. L'avis a quitté la file."

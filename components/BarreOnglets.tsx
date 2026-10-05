@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { ChoixEtablissement } from "@/components/etablissements/ChoixEtablissement";
+import type { Etablissement } from "@/lib/etablissements/actif";
 
 const onglets: { href: string; libelle: string; icone: ReactNode }[] = [
   {
@@ -38,12 +40,15 @@ const onglets: { href: string; libelle: string; icone: ReactNode }[] = [
   },
 ];
 
-/** Barre d'onglets flottante : quatre destinations, l'onglet actif dans une pastille d'encre. */
-export function BarreOnglets() {
+/**
+ * Barre d'onglets flottante : quatre destinations, l'onglet actif dans une
+ * pastille d'encre, puis le rond de l'établissement affiché, tout à droite.
+ */
+export function BarreOnglets({ etablissements, actif }: { etablissements: Etablissement[]; actif: Etablissement | null }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Navigation principale" className="fixed inset-x-0 bottom-0 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-      <ul className="mx-auto flex max-w-md gap-1 rounded-full bg-surface p-1.5 shadow-[0_8px_28px_-10px_rgb(0_0_0/0.28)] ring-1 ring-nuage">
+    <nav aria-label="Navigation principale" className="fixed inset-x-0 bottom-0 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <ul className="mx-auto flex max-w-md items-center gap-0.5 rounded-full bg-surface p-1.5 shadow-[0_8px_28px_-10px_rgb(0_0_0/0.28)] ring-1 ring-nuage">
         {onglets.map((onglet) => {
           const actif = onglet.href === "/" ? pathname === "/" : pathname.startsWith(onglet.href);
           return (
@@ -64,6 +69,11 @@ export function BarreOnglets() {
             </li>
           );
         })}
+        {etablissements.length > 0 && (
+          <li className="flex-1">
+            <ChoixEtablissement etablissements={etablissements} actif={actif} />
+          </li>
+        )}
       </ul>
     </nav>
   );
