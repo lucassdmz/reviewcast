@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Le brief du matin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400;1,6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.b{
+  --bg:#1A120E;
+  --bg2:#211813;
+  --card:#271C16;
+  --card2:#2F231B;
+  --line:rgba(243,233,220,0.13);
+  --line2:rgba(243,233,220,0.07);
+  --cream:#F3E9DC;
+  --cream2:#CDBBA6;
+  --mute:#9C8B79;
+  --amber:#E8A33D;
+  --amber2:#B87A22;
+  --amberSoft:rgba(232,163,61,0.14);
+  --matcha:#A3BE7E;
+  --matchaSoft:rgba(163,190,126,0.14);
+  --sans:"Hanken Grotesk",system-ui,sans-serif;
+  --serif:"Newsreader",Georgia,serif;
+  font-family:var(--sans);
+  color:var(--cream);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+.b,.b *{box-sizing:border-box}
+.b p{margin:0}
+.b h1,.b h2,.b h3{margin:0;font-weight:400}
+.b button{font-family:var(--sans);cursor:pointer}
+.serif{font-family:var(--serif)}
+.caps{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mute)}
+.rule{height:1px;background:var(--line);width:100%}
+.ruleSoft{height:1px;background:var(--line2);width:100%}
+
+/* masthead */
+.mast{display:flex;flex-direction:column;gap:6px;padding:0 22px}
+.mastTop{display:flex;align-items:center;justify-content:space-between}
+.mastTop .caps{color:var(--amber)}
+.hello{font-family:var(--serif);font-size:34px;line-height:1;font-weight:400;letter-spacing:-0.01em;color:var(--cream)}
+.since{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:13.5px;color:var(--cream2);line-height:20px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.dot.m{background:var(--matcha)}
+.dot.a{background:var(--amber)}
+.since b{font-weight:600;color:var(--cream)}
+.since .caps{margin-right:4px}
+.since .dot.a{margin-left:6px}
+
+/* hero */
+.hero{display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 22px}
+.ringWrap{position:relative;width:156px;height:156px;display:flex;align-items:center;justify-content:center}
+.ringWrap svg{position:absolute;inset:0;width:156px;height:156px}
+.ringArc{stroke-dasharray:553;stroke-dashoffset:63;animation:arc 1.4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes arc{from{stroke-dashoffset:553}to{stroke-dashoffset:63}}
+.ringIn{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px}
+.score{font-family:var(--serif);font-size:54px;line-height:0.9;font-weight:300;letter-spacing:-0.03em;color:var(--cream)}
+.score sup{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--amber);vertical-align:top;position:relative;top:10px;left:2px;letter-spacing:0.04em}
+.ringIn .caps{margin-top:4px;font-size:10px}
+.trend{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream2)}
+.trend .up{display:inline-flex;align-items:center;gap:4px;color:var(--matcha);font-weight:600}
+.trend .sep{width:1px;height:12px;background:var(--line)}
+
+/* satisfied segments */
+.seg{display:flex;flex-direction:column;gap:8px;width:100%}
+.segHead{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--cream2)}
+.segHead b{color:var(--cream);font-weight:600}
+.segBar{display:grid;grid-template-columns:repeat(23,1fr);gap:3px;height:6px}
+.segBar i{display:block;border-radius:2px;background:var(--matcha)}
+.segBar i.off{background:var(--line)}
+
+/* contributors */
+.contrib{display:flex;flex-direction:column;gap:6px;width:100%}
+.cRow{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:12px;font-size:13px}
+.cRow .name{color:var(--cream);font-weight:500}
+.cRow .bar{height:4px;border-radius:2px;background:var(--line2);position:relative;overflow:hidden}
+.cRow .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--matcha)}
+.cRow .bar i.a{background:var(--amber)}
+.cRow .bar i.n{background:var(--cream2)}
+.cRow .note{font-size:12px;color:var(--mute);white-space:nowrap}
+.cRow .note.a{color:var(--amber)}
+
+/* sections */
+.sec{display:flex;flex-direction:column;gap:10px;padding:0 22px}
+.secHead{display:flex;align-items:baseline;gap:12px}
+.secHead .num{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--amber);line-height:1}
+.secHead h2{font-family:var(--serif);font-size:24px;line-height:1.05;letter-spacing:-0.01em;color:var(--cream)}
+.secHead .fill{flex:1;height:1px;background:var(--line);align-self:center;margin-left:4px}
+
+.card{background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.who{display:flex;align-items:center;gap:12px}
+.ava{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;color:var(--cream);background:var(--card2);border:1px solid var(--line)}
+.whoTx{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.whoTx .nm{font-size:15px;font-weight:600;color:var(--cream);display:flex;align-items:center;gap:8px}
+.whoTx .nm .pill{margin-left:auto}
+.whoTx .meta{font-size:12px;color:var(--mute);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.stars{display:inline-flex;gap:2px}
+.pill{white-space:nowrap;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:var(--amberSoft);color:var(--amber)}
+.pill.m{background:var(--matchaSoft);color:var(--matcha)}
+.sum{font-family:var(--serif);font-size:18px;line-height:1.3;color:var(--cream);font-weight:400}
+.why{display:flex;flex-direction:column;gap:6px}
+.why .caps{font-size:10px}
+.why ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.why li{font-size:13px;line-height:18px;color:var(--cream2);display:flex;gap:8px;align-items:flex-start}
+.why li i{display:block;width:4px;height:4px;border-radius:50%;background:var(--amber);flex:none;margin-top:7px}
+.effect{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px}
+.effect .lab{font-size:12px;color:var(--mute)}
+.effect .val{font-family:var(--serif);font-size:17px;color:var(--cream);display:flex;align-items:center;gap:8px}
+.effect .val svg{color:var(--mute)}
+.draft{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:var(--bg2);border:1px dashed var(--line)}
+.draft .tag{display:flex;align-items:center;gap:8px}
+.draft .tag .caps{font-size:10px;color:var(--amber)}
+.draft .tag .ruleSoft{flex:1}
+.draft p{font-family:var(--serif);font-style:italic;font-size:14px;line-height:1.36;color:var(--cream2)}
+.draft .sig{font-size:12px;color:var(--mute);font-style:normal;font-family:var(--sans)}
+.acts{display:grid;grid-template-columns:1fr auto auto;gap:8px}
+.btn{height:44px;border-radius:12px;border:1px solid transparent;font-size:14px;font-weight:600;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn.p{background:var(--amber);color:#1A120E}
+.btn.s{background:transparent;border-color:var(--line);color:var(--cream)}
+.btn.g{background:transparent;color:var(--cream2);padding:0 6px}
+.btn.wide{width:100%}
+
+/* smile */
+.quoteCard{display:flex;flex-direction:column;gap:10px}
+.quote{font-family:var(--serif);font-size:20px;line-height:1.28;color:var(--cream);font-weight:400;letter-spacing:-0.005em}
+.quote em{font-style:italic;color:var(--amber)}
+.quote .q{font-family:var(--serif);font-size:44px;line-height:0;color:var(--amber);vertical-align:-14px;margin-right:4px}
+.cite{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream2);min-height:44px}
+.cite .btn{margin-left:auto;height:40px;padding:0 12px;font-size:13px;border-radius:10px}
+.cite b{color:var(--cream);font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:12px;color:var(--cream2);padding:5px 10px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px}
+.chip i{width:5px;height:5px;border-radius:50%;background:var(--matcha);display:block}
+
+/* 4,5 */
+.goal{display:flex;flex-direction:column;gap:10px}
+.goalTop{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.goalNum{font-family:var(--serif);font-size:38px;line-height:0.9;letter-spacing:-0.02em;color:var(--cream);font-weight:300}
+.goalNum small{font-family:var(--sans);font-size:13px;letter-spacing:0;color:var(--cream2);font-weight:500;margin-left:8px}
+.goalTo{font-size:13px;color:var(--mute);text-align:right;line-height:18px}
+.goalTo b{color:var(--cream);font-weight:600;font-family:var(--serif);font-size:16px}
+.steps{display:flex;gap:4px;height:6px}
+.steps i{flex:1;border-radius:2px;background:var(--line);display:block}
+.steps i.on{background:var(--amber)}
+.lever{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;padding:10px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line2)}
+.lever .ic{width:40px;height:40px;border-radius:10px;background:var(--amberSoft);display:flex;align-items:center;justify-content:center;color:var(--amber)}
+.lever .tx{display:flex;flex-direction:column;gap:2px}
+.lever .tx b{font-size:14px;font-weight:600;color:var(--cream)}
+.lever .tx span{font-size:12px;line-height:16px;color:var(--mute)}
+.thanks{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--matchaSoft);border:1px solid rgba(163,190,126,0.22)}
+.faces{display:flex;flex:none}
+.faces .ava{width:30px;height:30px;font-size:13px;margin-left:-8px;background:var(--card2);border-color:var(--bg)}
+.faces .ava:first-child{margin-left:0}
+.thanks .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.thanks .tx b{font-size:14px;font-weight:600;color:var(--cream);white-space:nowrap}
+.thanks .tx span{font-size:12px;color:var(--cream2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thanks .btn{flex:none;height:40px;padding:0 10px;background:var(--matcha);color:#1A120E;border-radius:10px;font-size:13px}
+
+/* tab bar */
+.tabs{position:absolute;left:0;right:0;bottom:0;border-top:1px solid var(--line2);background:var(--bg2);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 12px 10px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--mute);background:none;border:0;height:50px;padding:0}
+.tab.on{color:var(--amber)}
+.tab svg{width:22px;height:22px}
+
+.fadeUp{animation:fadeUp .7s cubic-bezier(.2,.7,.2,1) both}
+.d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.28s}.d4{animation-delay:.38s}.d5{animation-delay:.48s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .fadeUp,.ringArc{animation:none}
+}
+</style>
+</helmet>
+<div class="b" style="width: 390px; height: 1600px; display: flex; flex-direction: column; gap: 15px; padding: 50px 0 72px; overflow: hidden; position: relative;">
+
+  <!-- masthead -->
+  <header class="mast fadeUp">
+    <div class="mastTop">
+      <span class="caps">Le brief du matin</span>
+      <span class="caps" style="color: var(--mute);">Lundi 19 octobre, 8 h 40</span>
+    </div>
+    <div class="rule"></div>
+    <h1 class="hello">Bonjour Margaux</h1>
+    <p class="since">
+      <span class="caps" style="font-size: 10px;">Depuis hier</span>
+      <span class="dot m"></span><b>4 sourires</b>
+      <span class="dot a"></span><b>1 cliente</b><span>à reconquérir</span>
+    </p>
+  </header>
+
+  <!-- hero : la note -->
+  <section class="hero fadeUp d1" aria-label="Note Google du Café Kumo">
+    <div class="ringWrap">
+      <svg viewBox="0 0 212 212" width="156" height="156" aria-hidden="true">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="55%" stop-color="#E8A33D" stop-opacity="0"></stop>
+            <stop offset="100%" stop-color="#E8A33D" stop-opacity="0.12"></stop>
+          </radialGradient>
+        </defs>
+        <circle cx="106" cy="106" r="106" fill="url(#glow)"></circle>
+        <circle cx="106" cy="106" r="88" fill="none" stroke="rgba(243,233,220,0.09)" stroke-width="9"></circle>
+        <g transform="rotate(-90 106 106)">
+          <circle class="ringArc" cx="106" cy="106" r="88" fill="none" stroke="#E8A33D" stroke-width="9" stroke-linecap="round"></circle>
+        </g>
+        <g stroke="rgba(243,233,220,0.22)" stroke-width="1">
+          <line x1="106" y1="6" x2="106" y2="11"></line>
+          <line x1="206" y1="106" x2="201" y2="106"></line>
+          <line x1="106" y1="206" x2="106" y2="201"></line>
+          <line x1="6" y1="106" x2="11" y2="106"></line>
+        </g>
+      </svg>
+      <div class="ringIn">
+        <div class="score">4,4<sup>/5</sup></div>
+        <span class="caps">412 avis Google</span>
+      </div>
+    </div>
+    <p class="trend">
+      <span>Sur 3 mois : <b style="font-family: var(--serif); font-size: 16px; color: var(--cream); font-weight: 400;">4,5</b></span>
+      <span class="sep"></span>
+      <span class="up">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9.5 6 5l2 2 2-3.5"></path><path d="M7.5 3.5H10V6"></path></svg>
+        en hausse de 0,1
+      </span>
+    </p>
+
+    <div class="seg">
+      <div class="segHead">
+        <span><b>19 clients contents</b> sur 23 avis</span>
+        <span style="color: var(--mute); font-size: 12px;">40 derniers jours</span>
+      </div>
+      <div class="segBar" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i>
+      </div>
+    </div>
+
+    <div class="contrib" aria-label="Ce que les clients citent">
+      <div class="segHead"><span class="caps" style="font-size: 10px;">Ce que les clients citent</span></div>
+      <div class="cRow">
+        <span class="name">Le café</span>
+        <span class="bar"><i style="width: 92%;"></i></span>
+        <span class="note">très souvent</span>
+      </div>
+      <div class="cRow">
+        <span class="name">Le lieu calme</span>
+        <span class="bar"><i style="width: 74%;"></i></span>
+        <span class="note">souvent</span>
+      </div>
+      <div class="cRow">
+        <span class="name">L’accueil</span>
+        <span class="bar"><i class="n" style="width: 52%;"></i></span>
+        <span class="note">en léger recul</span>
+      </div>
+      <div class="cRow">
+        <span class="name">La tablette</span>
+        <span class="bar"><i class="a" style="width: 30%;"></i></span>
+        <span class="note a">3 avis en 10 jours</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 : une seule chose -->
+  <section class="sec fadeUp d2" aria-label="Une seule chose aujourd’hui">
+    <div class="secHead">
+      <span class="num">01</span>
+      <h2>Une seule chose aujourd’hui</h2>
+      <span class="fill"></span>
+    </div>
+    <article class="card">
+      <div class="who">
+        <div class="ava" aria-hidden="true">C</div>
+        <div class="whoTx">
+          <div class="nm">Claire M.
+            <span class="stars" aria-label="2 étoiles sur 5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(243,233,220,0.18)" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(243,233,220,0.18)" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(243,233,220,0.18)" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+            </span>
+            <span class="pill">À reconquérir</span>
+          </div>
+          <div class="meta"><span>Il y a 3 h</span><span>·</span><span>Local Guide</span><span>·</span><span>avec photo</span></div>
+        </div>
+      </div>
+
+      <p class="sum">Accueil jugé froid, commande sur tablette, pourboire proposé par la machine.</p>
+
+      <div class="why">
+        <span class="caps">Pourquoi elle compte</span>
+        <ul>
+          <li><i></i><span>Récente, avec photo : en tête des plus pertinents.</span></li>
+          <li><i></i><span>La tablette revient pour la 3e fois en 10 jours.</span></li>
+        </ul>
+      </div>
+
+      <div class="effect">
+        <span class="lab">Effet réel sur la note</span>
+        <span class="val">4,43
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7h10M8.5 3.5 12 7l-3.5 3.5"></path></svg>
+          4,42</span>
+      </div>
+
+      <div class="draft">
+        <div class="tag"><span class="caps">Brouillon</span><span class="ruleSoft"></span><span class="caps" style="font-size: 10px;">à valider</span></div>
+        <p>Bonjour Claire, merci d’avoir pris le temps d’écrire, et merci pour le café. Vous avez raison sur un point qui compte : la tablette ne doit pas remplacer un vrai bonjour. Le pourboire reste libre, et nous en parlons à l’équipe cette semaine. Passez nous voir, le prochain bonjour sera pour vous.</p>
+        <span class="sig">Margaux, Café Kumo</span>
+      </div>
+
+      <div class="acts">
+        <button class="btn p" type="button">Publier la réponse</button>
+        <button class="btn s" type="button">Modifier</button>
+        <button class="btn g" type="button">Plus tard</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- 02 : le sourire -->
+  <section class="sec fadeUp d3" aria-label="Le sourire du jour">
+    <div class="secHead">
+      <span class="num">02</span>
+      <h2>Le sourire du jour</h2>
+      <span class="fill"></span>
+    </div>
+    <div class="quoteCard">
+      <p class="quote"><span class="q" aria-hidden="true">“</span>J’y suis allé tous les matins de mon week-end à Lyon. Ce <em>cortado au lait d’avoine</em>, je n’en ai pas trouvé de pareil à Paris. Et <em>les baristas</em> se souvenaient de ma commande dès le deuxième jour.</p>
+      <div class="cite">
+        <b>Thomas</b>
+        <span class="stars" aria-label="5 étoiles sur 5">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="#E8A33D" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"></path></svg>
+        </span>
+        <span style="color: var(--mute);">hier</span>
+        <button class="btn s" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><path d="M16 4.5a3.2 3.2 0 0 1 0 7"></path><path d="M18.5 14.5c1.8.9 2.5 2.6 2.5 5.5"></path></svg>
+          Partager avec l’équipe
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 : passer à 4,5 -->
+  <section class="sec fadeUp d4" aria-label="Pour passer à 4,5">
+    <div class="secHead">
+      <span class="num">03</span>
+      <h2>Pour passer à 4,5</h2>
+      <span class="fill"></span>
+    </div>
+    <div class="goal">
+      <div class="goalTop">
+        <div class="goalNum">15<small>avis 5 étoiles</small></div>
+        <div class="goalTo">pour afficher<br><b>4,5</b></div>
+      </div>
+      <div class="steps" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <div class="lever">
+        <span class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3M21 14v3h-3M14 21h3M21 21h-1"></path></svg>
+        </span>
+        <span class="tx">
+          <b>Votre QR d’avis Google au comptoir</b>
+          <span>Demandez à chaque client, sans tri. Les avis sollicités notent 4,3 en moyenne.</span>
+        </span>
+      </div>
+      <div class="thanks">
+        <span class="tx">
+          <b>4 mercis prêts</b>
+          <span>Inès, Hugo, Nadia, Thomas</span>
+        </span>
+        <button class="btn" type="button">Valider les 4 mercis</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- tab bar -->
+  <nav class="tabs" aria-label="Navigation principale">
+    <button class="tab on" type="button" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11 12 4l8 7v9a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"></path></svg>
+      Accueil
+    </button>
+    <button class="tab" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path><path d="M8 9h8M8 12h5"></path></svg>
+      Avis
+    </button>
+    <button class="tab" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18 9 11l4 4 8-9"></path><path d="M16 6h5v5"></path></svg>
+      Tendances
+    </button>
+    <button class="tab" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"></path></svg>
+      Réglages
+    </button>
+  </nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

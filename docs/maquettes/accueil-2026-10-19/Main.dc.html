@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ciel ouvert</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.eclaircie{
+  --brume:#f1f2f0;
+  --soleil:#f2b72a;
+  --matcha:#5f7f4b;
+  --encre:#16181a;
+  --encre-2:#3b4044;
+  --encre-3:#5c6267;
+  --sky-top:#6aaee0;
+  --sky-mid:#a7d0ee;
+  --sky-low:#dcebf2;
+  --veil:.55;
+  --sun-opacity:1;
+  --cloud-opacity:.55;
+  --glass:rgba(255,255,255,.62);
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  color:var(--encre);
+  position:relative;
+  overflow:hidden;
+  box-sizing:border-box;
+  -webkit-font-smoothing:antialiased;
+}
+.eclaircie.meteo-soleil{--sky-top:#5ea7df;--sky-mid:#9fcdef;--veil:0;--cloud-opacity:.35}
+.eclaircie.meteo-voile{--sky-top:#6aaee0;--sky-mid:#a7d0ee;--veil:.55;--cloud-opacity:.55}
+.eclaircie.meteo-nuageux{--sky-top:#8aa6bb;--sky-mid:#b8c9d6;--sky-low:#dfe5e8;--veil:.9;--sun-opacity:.55;--cloud-opacity:.95}
+
+/* ---------- Ciel ---------- */
+.sky{position:absolute;inset:0;z-index:0;pointer-events:none}
+.sky-base{position:absolute;inset:0;
+  background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 26%,var(--sky-low) 52%,#ebeeee 70%,var(--brume) 84%,var(--brume) 100%)}
+.sky-warm{position:absolute;inset:0;
+  background:radial-gradient(60% 34% at 72% 14%,rgba(255,236,190,.75) 0%,rgba(255,224,160,.28) 40%,rgba(255,224,160,0) 72%)}
+.halo{position:absolute;left:118px;top:-98px;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,240,200,.95) 0%,rgba(250,210,110,.42) 28%,rgba(250,210,110,0) 62%);
+  opacity:var(--sun-opacity);animation:halo 2.4s ease-out both}
+.sun{position:absolute;left:246px;top:56px;width:118px;height:118px;border-radius:50%;
+  background:radial-gradient(circle at 42% 38%,#fff6d8 0%,#ffe08a 42%,var(--soleil) 100%);
+  box-shadow:0 0 34px 10px rgba(255,214,110,.55),0 0 90px 36px rgba(242,183,42,.28);
+  opacity:var(--sun-opacity);animation:sunrise 1.8s cubic-bezier(.2,.7,.2,1) both}
+.veil{position:absolute;left:-40px;top:96px;width:470px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.9);filter:blur(26px);opacity:var(--veil);
+  animation:drift 46s ease-in-out infinite alternate}
+.cloud{position:absolute;border-radius:50%;background:#fff;filter:blur(22px);opacity:var(--cloud-opacity)}
+.cloud-1{left:-60px;top:170px;width:260px;height:70px;animation:drift 38s ease-in-out infinite alternate}
+.cloud-2{left:210px;top:258px;width:240px;height:60px;opacity:calc(var(--cloud-opacity) * .7);animation:drift 52s ease-in-out infinite alternate-reverse}
+.cloud-3{left:40px;top:330px;width:200px;height:44px;opacity:calc(var(--cloud-opacity) * .5);animation:drift 60s ease-in-out infinite alternate}
+.mist{position:absolute;border-radius:50%;background:#fff;filter:blur(34px)}
+.mist-1{left:-80px;top:620px;width:420px;height:150px;opacity:.75}
+.mist-2{left:120px;top:760px;width:420px;height:170px;opacity:.85}
+.mist-3{left:-120px;top:900px;width:520px;height:220px;opacity:.95}
+.grain{position:absolute;inset:0;opacity:.085;mix-blend-mode:multiply}
+
+/* ---------- Contenu ---------- */
+.content{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px;padding:50px 20px 90px;box-sizing:border-box;width:390px}
+.topline{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--encre-2);font-weight:500;animation:rise .8s ease-out .2s both}
+.hero{display:flex;flex-direction:column;gap:8px;padding-top:6px}
+.note-row{display:flex;align-items:flex-end;gap:14px}
+.note-num{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:154px;line-height:.78;letter-spacing:-.03em;color:var(--encre);
+  animation:write 1.2s cubic-bezier(.3,.8,.3,1) .7s both}
+.note-side{display:flex;flex-direction:column;gap:6px;padding-bottom:8px;animation:rise .8s ease-out 1.3s both}
+.stars{display:flex;gap:2px}
+.stars svg{width:18px;height:18px}
+.note-side .stars path{stroke:#d49a0f;stroke-width:.9;stroke-linejoin:round}
+.note-count{font-size:14px;color:var(--encre-2)}
+.trend{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--matcha);font-weight:700}
+.trend svg{width:14px;height:14px}
+.hero-line{margin:4px 0 0;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:28px;line-height:1.08;letter-spacing:-.01em;color:var(--encre);animation:rise .9s ease-out 1.1s both}
+.hero-line strong{font-weight:400;color:var(--matcha)}
+.dots{display:flex;gap:5px;margin-top:2px;animation:rise .9s ease-out 1.35s both}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--matcha);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.dot.off{background:rgba(255,255,255,.55);border:1px solid rgba(22,24,26,.22);box-sizing:border-box}
+.since{margin:4px 0 0;font-size:13.5px;line-height:1.5;color:var(--encre-2);animation:rise .9s ease-out 1.55s both}
+.since b{font-weight:700;color:var(--encre)}
+
+/* ---------- Cartes de verre ---------- */
+.card{position:relative;display:flex;flex-direction:column;gap:11px;padding:16px 16px 16px;border-radius:24px;
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(22px) saturate(1.35);backdrop-filter:blur(22px) saturate(1.35);
+  border:1px solid rgba(255,255,255,.78);
+  box-shadow:0 18px 44px rgba(40,70,100,.12),inset 0 1px 0 rgba(255,255,255,.9);
+  animation:rise 1s cubic-bezier(.2,.7,.2,1) both}
+.card-1{animation-delay:1.5s}
+.card-2{animation-delay:1.75s}
+.card-3{animation-delay:2s}
+.card-4{animation-delay:2.25s}
+.card-head{display:flex;justify-content:space-between;align-items:baseline}
+.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--encre)}
+.eyebrow-right{font-size:12px;color:var(--encre-3)}
+.who{display:flex;align-items:center;gap:12px}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--encre);background:linear-gradient(145deg,#fff3cf,#fbd77a);flex:none}
+.avatar.matcha{background:linear-gradient(145deg,#e4ecd9,#bcd0a6)}
+.name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:500;letter-spacing:.02em;padding:2px 8px;border-radius:999px;border:1px solid rgba(22,24,26,.18);color:var(--encre-2)}
+.meta{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--encre-3);margin-top:2px}
+.meta .stars svg{width:13px;height:13px}
+.resume{margin:0;font-size:14.5px;line-height:1.5;color:var(--encre)}
+.resume-label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--encre-3);margin-bottom:3px;font-weight:500}
+.why{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.why li{position:relative;padding-left:18px;font-size:13px;line-height:1.45;color:var(--encre-2)}
+.why li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:50%;background:var(--soleil)}
+.why li b{font-weight:700;color:var(--encre)}
+.draft{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.55);border:1px dashed rgba(22,24,26,.22)}
+.draft-label{align-self:flex-start;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--encre-2);padding:2px 8px;border-radius:999px;background:rgba(242,183,42,.28)}
+.draft p{margin:0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17.5px;line-height:1.3;color:var(--encre);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.draft-sign{font-size:12px;color:var(--encre-3)}
+.actions{display:flex;gap:10px;align-items:center}
+.btn{height:46px;padding:0 18px;border-radius:999px;border:0;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;color:var(--encre);white-space:nowrap}
+.btn-sun{background:var(--soleil);flex:1;box-shadow:0 8px 20px rgba(242,183,42,.35)}
+.btn-matcha{background:var(--matcha);color:#fff;box-shadow:0 8px 20px rgba(95,127,75,.28)}
+.btn-ghost{background:rgba(255,255,255,.6);border:1px solid rgba(22,24,26,.18);font-weight:500}
+.btn svg{width:16px;height:16px}
+
+/* Sourire */
+.quote{position:relative;margin:0;padding:12px 4px 0 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:20.5px;line-height:1.2;color:var(--encre)}
+.quote-mark{position:absolute;left:10px;top:26px;font-family:'Cormorant Garamond',serif;font-size:96px;line-height:1;color:var(--soleil);opacity:.9;pointer-events:none}
+.quote em{font-style:italic;color:var(--matcha)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:12.5px;font-weight:500;padding:5px 11px;border-radius:999px;background:rgba(95,127,75,.14);color:var(--matcha)}
+
+/* Pour passer à 4,5 */
+.goal{display:flex;align-items:center;gap:14px}
+.goal-num{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:66px;line-height:.9;letter-spacing:-.02em;color:var(--encre)}
+.goal-text{font-size:15px;line-height:1.35;color:var(--encre-2)}
+.goal-text b{font-weight:700;color:var(--encre)}
+.levers{display:flex;flex-direction:column;gap:10px}
+.lever{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.5)}
+.lever-icon{width:38px;height:38px;border-radius:12px;background:rgba(242,183,42,.22);display:flex;align-items:center;justify-content:center;flex:none}
+.lever-icon svg{width:20px;height:20px;stroke:var(--encre);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lever-title{font-size:14px;font-weight:700;color:var(--encre)}
+.lever p{margin:2px 0 0;font-size:12.5px;white-space:nowrap;line-height:1.45;color:var(--encre-2)}
+
+/* Mercis */
+.row-split{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row-split .btn{flex:none;padding:0 14px}
+.mercis{display:flex;align-items:center;gap:12px;min-width:0}
+.faces{display:flex}
+.face{width:28px;height:28px;flex:none;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--encre);background:linear-gradient(145deg,#fff3cf,#fbd77a)}
+.face:first-child{margin-left:0}
+.face.m{background:linear-gradient(145deg,#e4ecd9,#bcd0a6)}
+.mercis-text{font-size:14px;line-height:1.35;color:var(--encre);white-space:nowrap}
+.mercis-text small{display:block;font-size:12.5px;color:var(--encre-3)}
+.quiet{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--encre-3);text-decoration:none;padding:4px 0}
+.quiet svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Barre d'onglets ---------- */
+.tabs{position:absolute;left:0;right:0;bottom:0;z-index:2;height:84px;padding:10px 12px 22px;box-sizing:border-box;display:flex;justify-content:space-around;align-items:center;
+  background:rgba(241,242,240,.72);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);
+  border-top:1px solid rgba(255,255,255,.8);animation:fade 1s ease-out 2.4s both}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:64px;height:52px;border:0;background:transparent;font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.02em;color:var(--encre-3);cursor:pointer;padding:0}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--matcha);font-weight:700}
+
+/* ---------- Animations ---------- */
+@keyframes sunrise{from{transform:translateY(110px) scale(.9);opacity:0}to{transform:translateY(0) scale(1);opacity:var(--sun-opacity)}}
+@keyframes halo{from{opacity:0}to{opacity:var(--sun-opacity)}}
+@keyframes write{from{clip-path:inset(0 100% 0 0);opacity:.6}to{clip-path:inset(0 -8% 0 0);opacity:1}}
+@keyframes rise{from{transform:translateY(22px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes drift{from{transform:translateX(-14px)}to{transform:translateX(18px)}}
+@media (prefers-reduced-motion: reduce){
+  .eclaircie *{animation:none !important}
+}
+</style>
+</helmet>
+<div class="eclaircie {{meteoClass}}" style="width: 390px; height: 1600px; background: #f1f2f0;">
+
+  <div class="sky" aria-hidden="true">
+    <div class="sky-base"></div>
+    <div class="sky-warm"></div>
+    <div class="halo"></div>
+    <div class="sun"></div>
+    <div class="veil"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="mist mist-1"></div>
+    <div class="mist mist-2"></div>
+    <div class="mist mist-3"></div>
+    <svg class="grain" width="390" height="1600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <filter id="grain-f" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"></feTurbulence>
+        <feColorMatrix type="saturate" values="0"></feColorMatrix>
+      </filter>
+      <rect width="390" height="1600" filter="url(#grain-f)"></rect>
+    </svg>
+  </div>
+
+  <div class="content">
+
+    <div class="topline">
+      <span>Café Kumo, Lyon 2e</span>
+      <span>Lundi 19 octobre</span>
+    </div>
+
+    <div class="hero">
+      <div class="note-row">
+        <div class="note-num">4,4</div>
+        <div class="note-side">
+          <div class="stars" aria-label="4,4 étoiles sur 5">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <defs><linearGradient id="star-part" x1="0" x2="1" y1="0" y2="0"><stop offset="0.4" stop-color="#f2b72a"></stop><stop offset="0.4" stop-color="rgba(255,255,255,0.75)"></stop></linearGradient></defs>
+              <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="url(#star-part)" stroke="#e0a71f" stroke-width="0.8"></path>
+            </svg>
+          </div>
+          <div class="note-count">sur 412 avis Google</div>
+          <div class="trend">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16l6-6 4 4 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 7h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span>4,5 sur 3 mois<br>en hausse de 0,1</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="hero-line"><strong>19 clients contents sur 23</strong><br>ces 40 derniers jours.</p>
+
+      <div class="dots" aria-label="19 clients contents sur 23">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot off"></span><span class="dot off"></span><span class="dot off"></span><span class="dot off"></span>
+      </div>
+
+      <p class="since">Depuis hier&nbsp;: 5 avis, <b>4 sourires</b>, 1 cliente à reconquérir.</p>
+    </div>
+
+    <!-- Le geste du jour -->
+    <section class="card card-1">
+      <div class="card-head">
+        <span class="eyebrow">Le geste du jour</span>
+        <span class="eyebrow-right">Une seule chose ce matin</span>
+      </div>
+      <div class="who">
+        <div class="avatar">C</div>
+        <div>
+          <div class="name">Claire M. <span class="tag">Local Guide</span></div>
+          <div class="meta">
+            <span class="stars" aria-label="2 étoiles sur 5">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="#9a9fa3" stroke-width="1.4"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="#9a9fa3" stroke-width="1.4"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="#9a9fa3" stroke-width="1.4"></path></svg>
+            </span>
+            <span>il y a 3 h, avec photo, 142 mots</span>
+          </div>
+        </div>
+      </div>
+      <p class="resume">Accueil jugé froid, commande sur tablette, pourboire proposé par la machine.</p>
+      <ul class="why">
+        <li>Photo, récent&nbsp;: <b>en tête des «&nbsp;plus pertinents&nbsp;»</b>.</li>
+        <li>La tablette revient&nbsp;: <b>3e fois en 10 jours</b>.</li>
+        <li>La note&nbsp;: <b>4,43 → 4,42</b>. Presque rien.</li>
+      </ul>
+      <div class="draft">
+        <span class="draft-label">Brouillon</span>
+        <p>Bonjour Claire, merci d’avoir pris le temps d’écrire, et merci pour le café. Vous avez raison sur un point qui compte&nbsp;: la tablette ne doit pas remplacer un vrai bonjour. Le pourboire reste libre, et nous en parlons à l’équipe cette semaine. Passez nous voir, le prochain bonjour sera pour vous.</p>
+        <span class="draft-sign">Signé Margaux, Café Kumo. Rien ne part sans vous.</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sun" type="button">Voir le brouillon</button>
+        <button class="btn btn-ghost" type="button">Plus tard</button>
+      </div>
+    </section>
+
+    <!-- Le sourire -->
+    <section class="card card-2">
+      <div class="card-head">
+        <span class="eyebrow">Le sourire</span>
+        <span class="eyebrow-right">hier</span>
+      </div>
+      <div class="quote-mark" aria-hidden="true">“</div>
+      <blockquote class="quote">J’y suis allé tous les matins de mon week-end à Lyon. Ce <em>cortado au lait d’avoine</em>, je n’en ai pas trouvé de pareil à Paris. Et <em>les baristas</em> se souvenaient de ma commande dès le deuxième jour.</blockquote>
+      <div class="who">
+        <div class="avatar matcha">T</div>
+        <div>
+          <div class="name">Thomas</div>
+          <div class="meta">
+            <span class="stars" aria-label="5 étoiles sur 5">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#f2b72a"></path></svg>
+            </span>
+            <span>il cite le cortado et les baristas</span>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-matcha" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5a3 3 0 1 0 0 .01M8 12a3 3 0 1 0 0 .01M16 19a3 3 0 1 0 0 .01M10.6 10.6l2.8-4.2M10.6 13.4l2.8 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+          Partager avec l’équipe
+        </button>
+        <button class="btn btn-ghost" type="button">Dire merci</button>
+      </div>
+    </section>
+
+    <!-- Pour passer à 4,5 -->
+    <section class="card card-3">
+      <div class="card-head">
+        <span class="eyebrow">Pour passer à 4,5</span>
+        <span class="eyebrow-right">la fiche affiche 4,4 pour 4,43</span>
+      </div>
+      <div class="goal">
+        <span class="goal-num">15</span>
+        <span class="goal-text"><b>avis à 5 étoiles</b> et la fiche affiche 4,5. Un avis à 1 étoile en coûte environ 6.</span>
+      </div>
+      <div class="levers">
+        <div class="lever">
+          <div class="lever-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M14 14h3v3h-3zM20 14v1M14 20h1M18 18h3v3"></path></svg>
+          </div>
+          <div>
+            <div class="lever-title">Le QR d’avis Google au comptoir</div>
+            <p>À chaque client, sans choisir.</p>
+          </div>
+        </div>
+        <div class="lever">
+          <div class="lever-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2.5"></rect><path d="M10 18.5h4"></path></svg>
+          </div>
+          <div>
+            <div class="lever-title">Le sujet qui revient&nbsp;: la tablette</div>
+            <p>3 avis en 10 jours. Un bonjour d’abord.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mercis -->
+    <section class="card card-4">
+      <div class="row-split">
+        <div class="mercis">
+          <div class="faces" aria-hidden="true">
+            <span class="face">T</span><span class="face m">I</span><span class="face">H</span><span class="face m">N</span>
+          </div>
+          <div class="mercis-text">4 mercis prêts<small>À valider d’un geste.</small></div>
+        </div>
+        <button class="btn btn-ghost" type="button">Valider les 4</button>
+      </div>
+      <a class="quiet" href="#">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+        Les anciens avis sans réponse sont rangés dans Avis.
+      </a>
+    </section>
+
+  </div>
+
+  <nav class="tabs" aria-label="Navigation">
+    <button class="tab on" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>
+      Accueil
+    </button>
+    <button class="tab" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4z"></path></svg>
+      Avis
+    </button>
+    <button class="tab" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l5-6 4 4 7-8M16 7h4v4"></path></svg>
+      Tendances
+    </button>
+    <button class="tab" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2.5"></circle><circle cx="10" cy="17" r="2.5"></circle></svg>
+      Réglages
+    </button>
+  </nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1600},"meteo":{"editor":"enum","options":["soleil","voile","nuageux"],"default":"voile"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var m = (this.props && this.props.meteo) || "voile";
+    if (m !== "soleil" && m !== "voile" && m !== "nuageux") { m = "voile"; }
+    return { meteoClass: "meteo-" + m };
+  }
+}
+</script>
+</body>
+</html>

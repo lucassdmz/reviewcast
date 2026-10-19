@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Le comptoir</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cp{
+  --bg:#f4f2ed;
+  --brume:#f1f2f0;
+  --card:#ffffff;
+  --ink:#16181a;
+  --ink2:#5b5f64;
+  --ink3:#8a8e93;
+  --line:#e6e3dc;
+  --sun:#f2b72a;
+  --sun-soft:#fdf2d2;
+  --matcha:#5f7f4b;
+  --matcha-text:#45603a;
+  --matcha-soft:#eaf0e3;
+  --matcha-line:#b9cba9;
+  font-family:'Figtree',sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+.cp *{box-sizing:border-box}
+.cp p{margin:0}
+.cp button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit;padding:0}
+.cp a{color:inherit;text-decoration:none}
+
+.scroll{display:flex;flex-direction:column;gap:12px;padding:50px 16px 0;flex:1;min-height:0;overflow:hidden}
+
+.hdr{display:flex;align-items:center;gap:12px;height:48px}
+.hdr .logo{width:40px;height:40px;border-radius:14px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;letter-spacing:.02em}
+.hdr .t1{font-size:17px;font-weight:700;line-height:1.1}
+.hdr .t2{font-size:12.5px;color:var(--ink2);margin-top:3px}
+.hdr .sp{flex:1}
+.icbtn{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line)}
+
+.row{display:flex;gap:8px;align-items:flex-end}
+.row.out{justify-content:flex-end}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 30px}
+.av.ai{background:var(--sun-soft);color:#8a5a06}
+.bub{background:var(--card);border-radius:20px;border-bottom-left-radius:6px;padding:14px 16px;max-width:316px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 0 rgba(22,24,26,.04),0 6px 18px rgba(22,24,26,.04)}
+.bub.out{border-radius:20px;border-bottom-right-radius:6px;background:var(--matcha-soft);border:1.5px dashed var(--matcha-line);box-shadow:none;max-width:326px}
+.bub .msg{font-size:15px;line-height:1.45}
+.stamp{font-size:11.5px;color:var(--ink3);padding:0 0 0 38px}
+.stamp.out{text-align:right;padding:0 4px 0 0}
+
+.rating{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;background:var(--brume)}
+.rating .big{font-size:34px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.rating .lbl{font-size:11.5px;color:var(--ink2);margin-top:4px}
+.rating .trend{display:flex;flex-direction:column;gap:4px;flex:1}
+.rating .trend .cap{font-size:11.5px;color:var(--matcha-text);font-weight:600}
+.prop{display:flex;align-items:center;gap:10px}
+.prop .dots{display:flex;gap:3px;flex-wrap:wrap;width:140px}
+.prop .d{width:9px;height:9px;border-radius:50%;background:var(--sun)}
+.prop .d.o{background:#e3e0d8}
+.prop .txt{font-size:13px;color:var(--ink2);flex:1;line-height:1.3}
+.prop .txt b{color:var(--ink);font-weight:700}
+
+.sec{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:6px 2px 0}
+.sec .ln{flex:1;height:1px;background:var(--line)}
+
+.head{display:flex;align-items:center;gap:8px}
+.head .nm{font-weight:700;font-size:14.5px}
+.head .when{font-size:12px;color:var(--ink3);margin-left:auto}
+.stars{display:flex;gap:1px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:600;color:var(--ink2);background:var(--brume);border-radius:999px;padding:4px 9px;display:inline-flex;align-items:center;gap:5px}
+.tag.why{background:var(--sun-soft);color:#7a4f05}
+.why-l{font-size:11.5px;color:var(--ink3);font-weight:600}
+.disc{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ink2);padding:10px 12px;border-radius:12px;background:var(--brume);min-height:44px}
+.disc .ch{margin-left:auto}
+
+.draft-l{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--matcha-text);letter-spacing:.04em;text-transform:uppercase}
+.sig{font-size:13px;color:var(--ink2)}
+.sig i{color:var(--ink3);font-size:11.5px;font-style:normal}
+.acts{display:flex;gap:8px}
+.btn{height:44px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;padding:0 16px}
+.btn.pri{background:var(--ink);color:#fff;flex:1}
+.btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.soft{background:var(--card);color:var(--matcha-text);border:1px solid var(--matcha-line);flex:1}
+.fx{font-size:11.5px;color:var(--ink3);line-height:1.4;display:flex;gap:6px;align-items:flex-start}
+
+.react{position:relative}
+.react .pill{position:absolute;left:14px;bottom:-12px;display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 9px 3px 6px;font-size:11.5px;font-weight:700;color:#8a5a06;box-shadow:0 2px 8px rgba(22,24,26,.06)}
+.cite{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+.cite .c{font-weight:700;color:var(--ink);background:var(--brume);border-radius:8px;padding:2px 7px}
+.link{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--matcha-text);min-height:44px}
+
+.tip{background:var(--card);border-radius:20px;padding:14px 16px;display:flex;gap:14px;align-items:stretch;box-shadow:0 1px 0 rgba(22,24,26,.04),0 6px 18px rgba(22,24,26,.04)}
+.tip .body{display:flex;flex-direction:column;gap:8px;flex:1}
+.tip .kpi{font-size:15px;font-weight:700;line-height:1.3}
+.tip .kpi b{color:var(--matcha-text)}
+.tip .sm{font-size:13px;color:var(--ink2);line-height:1.4}
+.tip .qr{width:84px;border-radius:14px;background:var(--brume);display:flex;align-items:center;justify-content:center;flex:0 0 84px}
+
+.list{display:flex;flex-direction:column;background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 1px 0 rgba(22,24,26,.04),0 6px 18px rgba(22,24,26,.04)}
+.li{display:flex;align-items:center;gap:12px;padding:11px 14px;min-height:60px;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.li .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.li .nm{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.li .tx{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .st{font-size:11.5px;font-weight:700;color:var(--matcha-text);background:var(--matcha-soft);border-radius:999px;padding:4px 8px;white-space:nowrap}
+.li .st.done{color:var(--ink3);background:var(--brume)}
+.li .st.none{color:var(--ink3);background:transparent;border:1px solid var(--line)}
+
+.tabs{height:78px;background:rgba(255,255,255,.92);border-top:1px solid var(--line);display:flex;align-items:flex-start;padding:10px 12px 0;flex:0 0 78px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink3);min-height:44px}
+.tab.on{color:var(--ink)}
+
+.enter{animation:up .5s cubic-bezier(.2,.8,.2,1) both}
+.enter.d1{animation-delay:.06s}.enter.d2{animation-delay:.12s}.enter.d3{animation-delay:.18s}.enter.d4{animation-delay:.24s}.enter.d5{animation-delay:.30s}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.enter{animation:none}}
+</style>
+</helmet>
+<div class="cp" style="width: 390px; height: 2200px; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+  <div class="scroll">
+
+    <div class="hdr enter">
+      <div class="logo" aria-hidden="true">CK</div>
+      <div>
+        <div class="t1">Café Kumo</div>
+        <div class="t2">Lyon 2e · lundi 19 octobre</div>
+      </div>
+      <div class="sp"></div>
+      <button class="icbtn" aria-label="Rechercher un avis">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16181a" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      </button>
+    </div>
+
+    <div class="row enter d1">
+      <div class="av ai" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b7820f" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"></path></svg>
+      </div>
+      <div class="bub">
+        <p class="msg">Bonjour Margaux. <b>4 sourires</b> depuis hier et <b>une cliente à reconquérir</b>. Votre note tient à 4,4.</p>
+        <div class="rating">
+          <div>
+            <div class="big">4,4</div>
+            <div class="lbl">412 avis</div>
+          </div>
+          <div class="trend">
+            <svg width="100%" height="34" viewBox="0 0 150 34" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M2 26 C 20 25, 32 27, 46 23 S 76 19, 92 17 S 122 12, 148 8" fill="none" stroke="#5f7f4b" stroke-width="2.2" stroke-linecap="round"></path>
+              <circle cx="148" cy="8" r="3.5" fill="#5f7f4b"></circle>
+              <circle cx="148" cy="8" r="7" fill="#5f7f4b" opacity=".18"></circle>
+            </svg>
+            <span class="cap">4,5 sur 3 mois, en hausse de 0,1</span>
+          </div>
+        </div>
+        <div class="prop">
+          <div class="dots" aria-hidden="true">
+            <span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d"></span><span class="d o"></span><span class="d o"></span><span class="d o"></span><span class="d o"></span>
+          </div>
+          <p class="txt"><b>19 clients contents</b> sur 23, ces 40 derniers jours.</p>
+        </div>
+      </div>
+    </div>
+    <div class="stamp">Éclaircie · 8 h 40</div>
+
+    <div class="sec enter d2">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l1 6 3 3H5l3-3z"></path><path d="M12 13v7"></path></svg>
+      <span>Épinglé</span><span class="ln"></span>
+    </div>
+
+    <div class="row enter d2">
+      <div class="av" style="background:#f3d9c6;color:#8a4b2a;" aria-hidden="true">C</div>
+      <div class="bub">
+        <div class="head">
+          <span class="nm">Claire M.</span>
+          <span class="stars" aria-label="2 étoiles sur 5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#e3e0d8" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#e3e0d8" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#e3e0d8" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+          </span>
+          <span class="when">il y a 3 h</span>
+        </div>
+        <p class="msg">Accueil jugé froid, commande sur tablette, pourboire proposé par la machine.</p>
+        <button class="disc" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v12H9l-5 4z"></path></svg>
+          <span>Lire l’extrait · 142 mots, 1 photo</span>
+          <svg class="ch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <span class="why-l">Pourquoi elle compte</span>
+          <div class="tags">
+            <span class="tag why">Récente</span>
+            <span class="tag why">Avec photo</span>
+            <span class="tag why">Local Guide</span>
+            <span class="tag why">Sujet qui revient, 3e fois en 10 jours</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row out enter d3">
+      <div class="bub out">
+        <div class="draft-l">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16z"></path><path d="M12.5 7.5l4 4"></path></svg>
+          <span>Brouillon prêt</span>
+        </div>
+        <p class="msg">Bonjour Claire, merci d’avoir pris le temps d’écrire, et merci pour le café. Vous avez raison sur un point qui compte : la tablette ne doit pas remplacer un vrai bonjour. Le pourboire reste libre, et nous en parlons à l’équipe cette semaine. Passez nous voir, le prochain bonjour sera pour vous.</p>
+        <p class="sig">Margaux, Café Kumo <i>· signature ajoutée par l’app</i></p>
+        <div class="acts">
+          <button class="btn pri">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-7-5 16-3-6z"></path></svg>
+            Publier la réponse
+          </button>
+          <button class="btn sec">Modifier</button>
+        </div>
+        <p class="fx">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="margin-top:2px;flex:0 0 13px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+          <span>Cet avis a fait passer la note de 4,43 à 4,42. Elle reste affichée 4,4.</span>
+        </p>
+      </div>
+    </div>
+    <div class="stamp out">Rien ne part sans vous</div>
+
+    <div class="sec enter d3">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"></path></svg>
+      <span>Le sourire</span><span class="ln"></span>
+    </div>
+
+    <div class="row enter d4" style="padding-bottom:12px;">
+      <div class="av" style="background:#d6e4f0;color:#2f5673;" aria-hidden="true">T</div>
+      <div class="bub react" style="border:1px solid #f6e3b0;background:#fffdf6;">
+        <div class="head">
+          <span class="nm">Thomas</span>
+          <span class="stars" aria-label="5 étoiles sur 5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg>
+          </span>
+          <span class="when">hier</span>
+        </div>
+        <p class="msg">J’y suis allé tous les matins de mon week-end à Lyon. Ce cortado au lait d’avoine, je n’en ai pas trouvé de pareil à Paris. Et les baristas se souvenaient de ma commande dès le deuxième jour.</p>
+        <div class="cite">Il cite <span class="c">le cortado</span> et <span class="c">les baristas</span>
+          <a href="#" class="link" style="margin-left:auto;min-height:0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 10.6l6.8-4.2M8.6 13.4l6.8 4.2"></path></svg>
+            Partager avec l’équipe
+          </a>
+        </div>
+        <span class="pill" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#f2b72a" stroke="#f2b72a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"></path></svg>
+          Sourire
+        </span>
+      </div>
+    </div>
+
+    <div class="row out enter d4">
+      <div class="bub out">
+        <div class="draft-l">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16z"></path><path d="M12.5 7.5l4 4"></path></svg>
+          <span>Merci prêt</span>
+        </div>
+        <p class="msg">Merci Thomas, le cortado au lait d’avoine vous attendra à votre prochain passage à Lyon. Les baristas ont lu votre message, ils ont souri aussi.</p>
+        <div class="acts">
+          <button class="btn soft">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+            Envoyer le merci
+          </button>
+          <button class="btn sec">Modifier</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec enter d5">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6 4 4 6-7"></path><path d="M15 8h5v5"></path></svg>
+      <span>Pour passer à 4,5</span><span class="ln"></span>
+    </div>
+
+    <div class="tip enter d5">
+      <div class="body">
+        <p class="kpi"><b>15 avis à 5 étoiles</b> et votre fiche affiche 4,5.</p>
+        <p class="sm">Le plus sûr : demander un avis à chaque client, sans trier. Les avis demandés font 4,3 en moyenne, contre 3,88 pour les spontanés. Votre QR Google posé au comptoir fait le reste.</p>
+        <a href="#" class="link">
+          Afficher mon QR
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+        </a>
+      </div>
+      <div class="qr" aria-hidden="true">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="#16181a">
+          <rect x="2" y="2" width="16" height="16" rx="3" fill="none" stroke="#16181a" stroke-width="3"></rect><rect x="7" y="7" width="6" height="6" rx="1"></rect>
+          <rect x="34" y="2" width="16" height="16" rx="3" fill="none" stroke="#16181a" stroke-width="3"></rect><rect x="39" y="7" width="6" height="6" rx="1"></rect>
+          <rect x="2" y="34" width="16" height="16" rx="3" fill="none" stroke="#16181a" stroke-width="3"></rect><rect x="7" y="39" width="6" height="6" rx="1"></rect>
+          <rect x="23" y="2" width="4" height="4"></rect><rect x="23" y="10" width="4" height="4"></rect><rect x="2" y="23" width="4" height="4"></rect><rect x="10" y="23" width="4" height="4"></rect><rect x="18" y="23" width="4" height="4"></rect><rect x="23" y="23" width="4" height="4" fill="#f2b72a"></rect><rect x="31" y="23" width="4" height="4"></rect><rect x="39" y="23" width="4" height="4"></rect><rect x="46" y="23" width="4" height="4"></rect><rect x="23" y="31" width="4" height="4"></rect><rect x="31" y="31" width="4" height="4"></rect><rect x="46" y="31" width="4" height="4"></rect><rect x="23" y="39" width="4" height="4"></rect><rect x="39" y="39" width="4" height="4"></rect><rect x="31" y="46" width="4" height="4"></rect><rect x="46" y="46" width="4" height="4"></rect><rect x="23" y="46" width="4" height="4"></rect><rect x="39" y="46" width="4" height="4"></rect>
+        </svg>
+      </div>
+    </div>
+
+    <div class="sec enter d5">
+      <span>Conversations récentes</span><span class="ln"></span>
+      <a href="#" style="font-size:11.5px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--matcha-text);">Envoyer les 4 mercis</a>
+    </div>
+
+    <div class="list enter d5">
+      <div class="li">
+        <div class="av" style="background:#dfe8d3;color:#3f5a31;" aria-hidden="true">I</div>
+        <div class="mid">
+          <div class="nm">Inès
+            <span class="stars" aria-label="5 étoiles sur 5"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg></span>
+          </div>
+          <div class="tx">Le meilleur matcha du 2e, et on peut lire tranquille.</div>
+        </div>
+        <span class="st">Merci prêt</span>
+      </div>
+      <div class="li">
+        <div class="av" style="background:#e4def2;color:#4c3f78;" aria-hidden="true">H</div>
+        <div class="mid">
+          <div class="nm">Hugo
+            <span class="stars" aria-label="4 étoiles sur 5"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#e3e0d8" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg></span>
+          </div>
+          <div class="tx">Super café, un peu d’attente le samedi.</div>
+        </div>
+        <span class="st">Merci prêt</span>
+      </div>
+      <div class="li">
+        <div class="av" style="background:#f3e6c4;color:#7a5a12;" aria-hidden="true">N</div>
+        <div class="mid">
+          <div class="nm">Nadia
+            <span class="stars" aria-label="5 étoiles sur 5"><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="#f2b72a" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7l-5.9 3.1 1.2-6.5L2.5 9.7l6.6-.9z"></path></svg></span>
+          </div>
+          <div class="tx">Note seule, sans texte.</div>
+        </div>
+        <span class="st none">Rien à faire</span>
+      </div>
+      <a href="#" class="li" style="min-height:48px;color:var(--ink3);font-size:13px;font-weight:600;">
+        <span>Avis plus anciens</span>
+        <svg style="margin-left:auto;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+    </div>
+
+  </div>
+
+  <nav class="tabs" aria-label="Navigation principale">
+    <a href="#" class="tab on" aria-current="page">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"></path><path d="M10 20v-6h4v6"></path></svg>
+      Accueil
+    </a>
+    <a href="#" class="tab">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+      Avis
+    </a>
+    <a href="#" class="tab">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6 4 4 6-7"></path></svg>
+      Tendances
+    </a>
+    <a href="#" class="tab">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"></path></svg>
+      Réglages
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
