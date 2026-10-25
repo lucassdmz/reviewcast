@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>La pile, citron</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ecran{
+  --fond:#F2F2EE; --carte:#FFFFFF; --encre:#111111; --encre2:#5B5B55; --accent:#C8F03A; --accent-texte:#3F5700;
+  --doux:#F2FBD0; --sourd:#F5F5F1; --piste:#E4E4DE; --trait:#E7E7E1; --positif:#9BD21C; --etoile:#111111;
+  --btn:#C8F03A; --btn-texte:#111111; --av1:#111111; --av2:#3F5700; --av3:#7A8F2A; --av4:#4B4B45;
+  --t-display:"Geist", system-ui, sans-serif; --t-texte:"Geist", system-ui, sans-serif;
+  font-family:var(--t-texte); color:var(--encre); background:var(--fond);
+  -webkit-font-smoothing:antialiased;
+}
+.ecran *{box-sizing:border-box}
+.display{font-family:var(--t-display); font-optical-sizing:auto}
+.entete{animation:monte .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes monte{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.jauge{height:6px;border-radius:999px;background:var(--piste);overflow:hidden}
+.jauge > div{height:100%;border-radius:999px;background:var(--accent);transition:width .55s cubic-bezier(.2,.8,.2,1)}
+.pile{position:relative}
+.carte{
+  position:absolute;left:0;top:0;width:358px;height:498px;border-radius:28px;padding:22px 22px 20px;
+  display:flex;flex-direction:column;gap:14px;
+  background:var(--carte);border:1px solid var(--trait);box-shadow:0 1px 2px rgba(15,15,25,.05),0 18px 40px -12px rgba(15,15,25,.14);
+  transition:transform .55s cubic-bezier(.3,.9,.25,1),opacity .4s ease;
+  will-change:transform;
+}
+.carte.pos0{transform:none;z-index:4}
+.carte.pos1{transform:translateY(16px) scale(.955) rotate(-2.2deg);z-index:3;pointer-events:none}
+.carte.pos2{transform:translateY(32px) scale(.91) rotate(2deg);z-index:2;pointer-events:none}
+.carte.pos3{transform:translateY(46px) scale(.865) rotate(-1deg);z-index:1;pointer-events:none}
+.carte.parti{transform:translate(-130%,-60px) rotate(-22deg);opacity:0;z-index:0;pointer-events:none}
+.carte.pos1 .corps,.carte.pos2 .corps,.carte.pos3 .corps{opacity:0}
+.corps{display:flex;flex-direction:column;gap:14px;flex:1;transition:opacity .3s ease .15s}
+.etiq{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--accent-texte)}
+.etiq svg{width:28px;height:28px;padding:6px;border-radius:9px;background:var(--doux);flex:none}
+.btn{font-family:var(--t-texte);font-size:15px;font-weight:600;border:0;cursor:pointer;border-radius:999px;height:48px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-plein{background:var(--btn);color:var(--btn-texte);flex:1}
+.btn-plein:active{transform:scale(.98)}
+.btn-nu{background:transparent;color:var(--encre);min-width:44px;padding:0 14px;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.actions{display:flex;gap:6px;align-items:center;margin-top:auto}
+.brouillon{background:var(--sourd);border:1px dashed var(--piste);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.brouillon p{margin:0;font-style:italic;font-size:13.5px;line-height:1.42;color:var(--encre)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--encre2)}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--t-display);font-weight:700;font-size:13px;color:#ffffff}
+.ligne{display:flex;align-items:center;gap:12px}
+.recompense{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:0 24px}
+.soleil{animation:tourne 14s linear infinite}
+.soleil .rayons{transform-origin:70px 70px;animation:ouvre 1s cubic-bezier(.2,.9,.2,1.2) both}
+.soleil .coeur{transform-origin:70px 70px;animation:gonfle .7s cubic-bezier(.2,.9,.2,1.2) both}
+@keyframes ouvre{from{transform:scale(0) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes gonfle{from{transform:scale(.4)}to{transform:none}}
+@keyframes tourne{to{transform:rotate(360deg)}}
+.apparait{animation:monte .7s cubic-bezier(.2,.8,.2,1) both}
+.retard1{animation-delay:.25s}.retard2{animation-delay:.4s}.retard3{animation-delay:.55s}
+.onglets{display:flex;justify-content:space-around;align-items:center;height:64px;border-top:1px solid var(--trait);background:var(--carte)}
+.onglet{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:500;color:var(--encre2);text-decoration:none;min-width:56px;height:52px;justify-content:center}
+.onglet.actif{color:var(--accent-texte);font-weight:600}
+.ecran{letter-spacing:-.006em}
+.carte{padding:20px 20px 18px;gap:12px}
+.corps{gap:12px}
+.carte .corps[style*="gap: 11px"]{gap:9px !important}
+.carte .corps[style*="gap: 11px"] > div:nth-child(3){font-size:12.5px !important;gap:2px !important}
+.brouillon{padding:10px 12px;gap:4px}
+.brouillon p{font-size:12.8px;line-height:1.38}
+.btn{height:46px}
+.carte.pos1{background:var(--doux)}
+.carte.pos2{background:var(--piste)}
+.carte.pos3{background:var(--piste)}
+@media (prefers-reduced-motion: reduce){
+  .ecran *{animation:none !important;transition:none !important}
+}
+</style>
+</helmet>
+<div class="ecran" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; padding: 50px 16px 0; position: relative; overflow: hidden;">
+
+  <!-- En-tête compact -->
+  <div class="entete" style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-size: 12px; font-weight: 500; color: var(--encre2); letter-spacing: .02em;">Café Kumo · lundi 19 octobre</div>
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <span class="display" style="font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -.02em;">4,4</span>
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" style="position: relative; top: 2px; color: var(--etoile);"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
+          <span style="font-size: 13px; color: var(--encre2); font-weight: 500;">412 avis · 4,5 sur 3 mois, en hausse de 0,1</span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span class="display" style="font-size: 15px; font-weight: 700;">19 clients contents sur 23</span>
+        <span style="font-size: 12px; color: var(--encre2);">40 derniers jours</span>
+      </div>
+      <div style="display: flex; gap: 3px; height: 8px;" aria-hidden="true">
+        <div style="flex: 19; background: var(--positif); border-radius: 999px;"></div>
+        <div style="flex: 4; background: var(--piste); border-radius: 999px;"></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 4px;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 8px; row-gap: 2px;">
+        <span style="font-size: 12px; font-weight: 600; color: var(--encre);">Rituel du matin · 3 gestes, environ 3 minutes</span>
+        <span style="font-size: 12px; color: var(--encre2);">{{ etapeTexte }}</span>
+      </div>
+      <div class="jauge"><div style="{{ progressionStyle }}"></div></div>
+    </div>
+  </div>
+
+  <!-- La pile -->
+  <div class="pile" style="margin-top: 22px; height: 548px;">
+
+    <!-- 1. Le sourire d'abord -->
+    <div class="{{ carte0Classe }}" >
+      <div class="etiq">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>
+        Le sourire d'abord
+      </div>
+      <div class="corps">
+        <div style="display: flex; gap: 3px; color: var(--etoile);" aria-label="Cinq étoiles">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
+        </div>
+        <p class="display" style="margin: 0; font-size: 23px; font-weight: 600; line-height: 1.22; letter-spacing: -.01em;">« J'y suis allé tous les matins de mon week-end à Lyon. Ce cortado au lait d'avoine, je n'en ai pas trouvé de pareil à Paris. Et les baristas se souvenaient de ma commande dès le deuxième jour. »</p>
+        <div class="ligne">
+          <div class="avatar" style="background: var(--av1);">T</div>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 14px; font-weight: 600;">Thomas</span>
+            <span style="font-size: 12px; color: var(--encre2);">Hier · il cite le cortado et les baristas</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-plein" type="button" onClick="{{ suivant }}">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"></path><circle cx="17" cy="9" r="2.4"></circle><path d="M15.5 14.4c3 0 5.5 2.2 5.5 5.6"></path></svg>
+            Partager avec l'équipe
+          </button>
+          <button class="btn btn-nu" type="button" onClick="{{ suivant }}">Suivant</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. La cliente à reconquérir -->
+    <div class="{{ carte1Classe }}" >
+      <div class="etiq">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"></path><path d="M4 4v5h5"></path></svg>
+        Une cliente à reconquérir
+      </div>
+      <div class="corps" style="gap: 11px;">
+        <div class="ligne">
+          <div class="avatar" style="background: var(--av2);">CM</div>
+          <div style="display: flex; flex-direction: column; gap: 1px;">
+            <span style="font-size: 14px; font-weight: 600;">Claire M.</span>
+            <span style="font-size: 12px; color: var(--encre2);">Il y a 3 h · 2 étoiles · photo · Local Guide</span>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.4;"><span style="font-weight: 600;">En résumé :</span> accueil jugé froid, commande sur tablette, pourboire proposé par la machine.</p>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.38; color: var(--encre2);">
+          <span style="font-weight: 600; color: var(--encre);">Pourquoi elle compte</span>
+          <span>Récente, avec photo : en tête de votre fiche.</span>
+          <span>La tablette revient : 3e fois en 10 jours.</span>
+          <span>Effet sur la note : 4,43 → 4,42.</span>
+        </div>
+        <div class="brouillon">
+          <span class="tag">
+            <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg>
+            Brouillon
+          </span>
+          <p>Bonjour Claire, merci d'avoir pris le temps d'écrire, et merci pour le café. Vous avez raison sur un point qui compte : la tablette ne doit pas remplacer un vrai bonjour. Le pourboire reste libre, et nous en parlons à l'équipe cette semaine. Passez nous voir, le prochain bonjour sera pour vous.</p>
+          <span style="font-size: 12px; color: var(--encre2);">Margaux, Café Kumo</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-plein" type="button" onClick="{{ suivant }}">Publier la réponse</button>
+          <button class="btn btn-nu" type="button" onClick="{{ suivant }}">Plus tard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Les 4 mercis prêts -->
+    <div class="{{ carte2Classe }}" >
+      <div class="etiq">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12.5c0 4.4-3.6 7.5-8 7.5a9 9 0 0 1-3.3-.6L4 21l1.1-3.6A7.2 7.2 0 0 1 4 12.5C4 8.1 7.6 5 12 5s8 3.1 8 7.5z"></path></svg>
+        Quatre mercis prêts
+      </div>
+      <div class="corps" style="gap: 10px;">
+        <div style="display: flex; align-items: center; height: 44px;" aria-hidden="true">
+          <div class="avatar" style="background: var(--av1); border: 3px solid var(--carte); width: 42px; height: 42px;">T</div>
+          <div class="avatar" style="background: var(--av2); border: 3px solid var(--carte); width: 42px; height: 42px; margin-left: -10px;">I</div>
+          <div class="avatar" style="background: var(--av3); border: 3px solid var(--carte); width: 42px; height: 42px; margin-left: -10px;">H</div>
+          <div class="avatar" style="background: var(--av4); border: 3px solid var(--carte); width: 42px; height: 42px; margin-left: -10px;">N</div>
+        </div>
+        <p class="display" style="margin: 0; font-size: 21px; font-weight: 600; line-height: 1.22;">Thomas, Inès, Hugo et Nadia ont pris le temps de dire merci.</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.36;">
+          <div style="display: flex; gap: 8px;"><span style="font-weight: 600; min-width: 48px;">Inès</span><span style="color: var(--encre2);">5 étoiles · « Le meilleur matcha du 2e, et on peut lire tranquille. »</span></div>
+          <div style="display: flex; gap: 8px;"><span style="font-weight: 600; min-width: 48px;">Hugo</span><span style="color: var(--encre2);">4 étoiles · « Super café, un peu d'attente le samedi. »</span></div>
+          <div style="display: flex; gap: 8px;"><span style="font-weight: 600; min-width: 48px;">Nadia</span><span style="color: var(--encre2);">5 étoiles, sans texte</span></div>
+          <div style="display: flex; gap: 8px;"><span style="font-weight: 600; min-width: 48px;">Thomas</span><span style="color: var(--encre2);">5 étoiles · le cortado, les baristas</span></div>
+        </div>
+        <div class="brouillon">
+          <span class="tag">
+            <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg>
+            Brouillons
+          </span>
+          <p>Quatre remerciements courts, personnalisés, signés Margaux. Rien ne part sans votre geste.</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-plein" type="button" onClick="{{ suivant }}">Valider les 4 mercis</button>
+          <button class="btn btn-nu" type="button" onClick="{{ suivant }}">Plus tard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Le levier pour passer à 4,5 -->
+    <div class="{{ carte3Classe }}" >
+      <div class="etiq">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l6-6 4 4 6-8"></path><path d="M15 8h5v5"></path></svg>
+        Le levier pour passer à 4,5
+      </div>
+      <div class="corps" style="gap: 12px;">
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <span class="display" style="font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -.03em;">15</span>
+          <span class="display" style="font-size: 19px; font-weight: 600; line-height: 1.2;">avis à 5 étoiles<br>et la fiche affiche 4,5</span>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: center; background: var(--sourd); border-radius: 18px; padding: 12px;">
+          <svg aria-hidden="true" width="78" height="78" viewBox="0 0 21 21" shape-rendering="crispEdges" style="flex: none;">
+            <rect width="21" height="21" fill="#fff"></rect>
+            <g fill="currentColor">
+              <path d="M0 0h7v7H0zM1 1v5h5V1z" fill-rule="evenodd"></path><rect x="2" y="2" width="3" height="3"></rect>
+              <path d="M14 0h7v7h-7zM15 1v5h5V1z" fill-rule="evenodd"></path><rect x="16" y="2" width="3" height="3"></rect>
+              <path d="M0 14h7v7H0zM1 15v5h5v-5z" fill-rule="evenodd"></path><rect x="2" y="16" width="3" height="3"></rect>
+              <rect x="8" y="0" width="1" height="1"></rect><rect x="10" y="0" width="2" height="1"></rect><rect x="9" y="2" width="1" height="2"></rect><rect x="11" y="2" width="1" height="1"></rect><rect x="8" y="4" width="2" height="1"></rect><rect x="12" y="4" width="1" height="2"></rect><rect x="10" y="6" width="1" height="1"></rect>
+              <rect x="0" y="8" width="2" height="1"></rect><rect x="3" y="8" width="1" height="2"></rect><rect x="5" y="9" width="2" height="1"></rect><rect x="1" y="11" width="2" height="1"></rect><rect x="4" y="11" width="1" height="2"></rect><rect x="0" y="12" width="1" height="1"></rect><rect x="6" y="12" width="1" height="1"></rect>
+              <rect x="8" y="8" width="2" height="2"></rect><rect x="11" y="8" width="1" height="1"></rect><rect x="12" y="9" width="2" height="1"></rect><rect x="9" y="11" width="1" height="2"></rect><rect x="11" y="11" width="2" height="1"></rect><rect x="8" y="13" width="1" height="1"></rect><rect x="12" y="12" width="1" height="2"></rect>
+              <rect x="15" y="8" width="1" height="2"></rect><rect x="17" y="9" width="2" height="1"></rect><rect x="20" y="8" width="1" height="1"></rect><rect x="14" y="11" width="2" height="1"></rect><rect x="18" y="11" width="1" height="2"></rect><rect x="16" y="13" width="1" height="1"></rect><rect x="20" y="12" width="1" height="2"></rect>
+              <rect x="8" y="15" width="2" height="1"></rect><rect x="11" y="15" width="1" height="2"></rect><rect x="14" y="15" width="1" height="1"></rect><rect x="16" y="15" width="3" height="1"></rect><rect x="20" y="15" width="1" height="1"></rect>
+              <rect x="9" y="17" width="1" height="2"></rect><rect x="12" y="18" width="2" height="1"></rect><rect x="15" y="17" width="1" height="2"></rect><rect x="17" y="17" width="2" height="2"></rect><rect x="20" y="18" width="1" height="1"></rect>
+              <rect x="8" y="20" width="3" height="1"></rect><rect x="12" y="20" width="1" height="1"></rect><rect x="14" y="20" width="2" height="1"></rect><rect x="18" y="20" width="2" height="1"></rect>
+            </g>
+          </svg>
+          <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.38;">
+            <span style="font-weight: 600;">Votre QR d'avis Google</span>
+            <span style="color: var(--encre2);">Posez-le au comptoir et demandez à chaque client, sans tri. C'est la règle de Google, et c'est ce qui marche.</span>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.4; color: var(--encre2);">Les avis sollicités font 4,3 en moyenne, contre 3,88 pour les spontanés. Chaque avis à 1 étoile en coûte environ 6.</p>
+        <div class="actions">
+          <button class="btn btn-plein" type="button" onClick="{{ suivant }}">Afficher mon QR</button>
+          <button class="btn btn-nu" type="button" onClick="{{ suivant }}">Plus tard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Récompense -->
+    <sc-if value="{{ fini }}" hint-placeholder-val="{{ false }}">
+      <div class="recompense">
+        <svg class="soleil" aria-hidden="true" width="140" height="140" viewBox="0 0 140 140" style="color: var(--accent);">
+          <g class="rayons" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+            <path d="M70 6v16M70 118v16M6 70h16M118 70h16M24.7 24.7l11.3 11.3M104 104l11.3 11.3M24.7 115.3L36 104M104 36l11.3-11.3"></path>
+            <path d="M45.5 10.8l6.1 14.8M88.4 114.4l6.1 14.8M10.8 94.5l14.8-6.1M114.4 51.6l14.8-6.1M10.8 45.5l14.8 6.1M114.4 88.4l14.8 6.1M45.5 129.2l6.1-14.8M88.4 25.6l6.1-14.8" stroke="currentColor" opacity=".55"></path>
+          </g>
+          <circle class="coeur" cx="70" cy="70" r="30" fill="currentColor"></circle>
+        </svg>
+        <p class="display apparait retard1" style="margin: 10px 0 0; font-size: 34px; font-weight: 800; line-height: 1.05; letter-spacing: -.02em;">Tout est fait.</p>
+        <p class="display apparait retard2" style="margin: 0; font-size: 20px; font-weight: 500; color: var(--encre2);">Belle journée au comptoir.</p>
+        <p class="apparait retard3" style="margin: 6px 0 0; font-size: 13px; line-height: 1.4; color: var(--encre2); max-width: 280px;">Thomas est parti vers l'équipe, Claire a sa réponse, quatre mercis sont publiés. Les anciens avis rangés attendent un matin plus calme.</p>
+        <button class="btn btn-plein apparait retard3" type="button" onClick="{{ recommencer }}" style="flex: none; margin-top: 18px; padding: 0 26px;">Recommencer la démo</button>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- Onglets -->
+  <nav class="onglets" style="margin: auto -16px 0; padding: 0 8px;" aria-label="Navigation principale">
+    <a class="onglet actif" href="#"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Accueil</a>
+    <a class="onglet" href="#"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"></path></svg>Avis</a>
+    <a class="onglet" href="#"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18l5-6 4 3 7-9"></path></svg>Tendances</a>
+    <a class="onglet" href="#"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg>Réglages</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { etape: 0 };
+  }
+  renderVals() {
+    var etape = this.state.etape;
+    var total = 4;
+    var textes = [
+      "Un sourire pour commencer",
+      "Geste 1 sur 3 : Claire",
+      "Geste 2 sur 3 : les mercis",
+      "Geste 3 sur 3 : le levier",
+      "Rituel terminé"
+    ];
+    var classe = function (index) {
+      var decalage = index - etape;
+      if (decalage < 0) return "carte parti";
+      if (decalage > 3) decalage = 3;
+      return "carte pos" + decalage;
+    };
+    var self = this;
+    return {
+      e0: etape === 0,
+      e1: etape === 1,
+      e2: etape === 2,
+      e3: etape === 3,
+      fini: etape >= total,
+      etapeTexte: textes[Math.min(etape, total)],
+      progressionStyle: "width: " + Math.round((Math.min(etape, total) / total) * 100) + "%",
+      carte0Classe: classe(0),
+      carte1Classe: classe(1),
+      carte2Classe: classe(2),
+      carte3Classe: classe(3),
+      suivant: function () { self.setState({ etape: Math.min(self.state.etape + 1, total) }); },
+      recommencer: function () { self.setState({ etape: 0 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
