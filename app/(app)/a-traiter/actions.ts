@@ -115,6 +115,15 @@ export async function actionConfirmerPublication(form: FormData): Promise<void> 
   redirect(`/a-traiter?publie=${reviewId}`);
 }
 
+/** Publication du brouillon tel qu'il est affiché sur l'accueil, sans passer par la fiche. */
+export async function actionPublierDepuisAccueil(form: FormData): Promise<void> {
+  const userId = await utilisateurConnecte();
+  const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
+  const etat = await executer(reviewId, () => publierReponse(reviewId, texteReponseSchema.parse(champ(form, "texte")), userId));
+  if (etat.erreur) redirect(`/?erreur=${encodeURIComponent(etat.erreur)}`);
+  redirect("/?publie=1");
+}
+
 /** Remerciement d'un avis positif, publié en un geste depuis la home (section 3.2). */
 export async function actionPublierRemerciement(form: FormData): Promise<void> {
   const userId = await utilisateurConnecte();

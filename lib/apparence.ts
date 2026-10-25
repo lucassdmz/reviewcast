@@ -21,4 +21,4 @@ export function lireTheme(valeur: string | undefined | null): Theme {
   return (THEMES as readonly string[]).includes(valeur ?? "") ? (valeur as Theme) : THEME_PAR_DEFAUT;
 }
 
-export const COULEUR_BARRE = { clair: "#f1f2f0", sombre: "#111213" } as const;
+export const COULEUR_BARRE = { clair: "#ffffff", sombre: "#111213" } as const;

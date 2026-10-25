@@ -25,7 +25,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
 
   return (
     <main className="entree mx-auto w-full max-w-lg flex-1 space-y-3 px-4 pb-28 pt-4">
-      <BoutonRetour href="/a-traiter" libelle="À traiter" />
+      <BoutonRetour href="/" libelle="Accueil" />
 
       <header className="bloc">
         <div className="flex items-baseline justify-between gap-2">

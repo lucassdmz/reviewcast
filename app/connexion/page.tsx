@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { Marque } from "@/components/marque/Marque";
-import { Ciel } from "@/components/meteo/Ciel";
 import { auth, signIn } from "@/lib/auth/config";
 
 const messagesErreur: Record<string, string> = {
@@ -20,7 +19,7 @@ export default async function ConnexionPage({ searchParams }: PageProps<"/connex
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-12">
-      <Ciel meteo="SOLEIL_VOILE" className="h-28 w-28" />
+      <span aria-hidden="true" className="block h-20 w-20 rounded-full bg-soleil" />
       <h1 className="mt-6">
         <span className="sr-only">Éclaircie</span>
         <Marque taille="grande" />

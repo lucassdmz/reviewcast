@@ -108,6 +108,11 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
         <Ligne href="/reglages/apparence" titre="Apparence" resume={LIBELLES_THEME[theme].titre} />
       </ul>
 
+      <h2 className="mt-9 px-1 text-xl font-bold tracking-tight">Bon à savoir</h2>
+      <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
+        <Ligne href="/reglages/etudes" titre="Pourquoi répondre" resume="Ce que disent les études, en six repères" />
+      </ul>
+
       <h2 className="mt-9 px-1 text-xl font-bold tracking-tight">Votre compte</h2>
       <section className="bloc mt-3">
         {estModeDemo() ? (

@@ -10,7 +10,9 @@ import { LogoEtablissement } from "./LogoEtablissement";
 const APPUI_LONG_MS = 350;
 
 /** Onglets dont les pages de détail appartiennent à un établissement précis. */
-const ONGLETS_A_DETAIL = ["/a-traiter", "/tendances"];
+const ONGLETS_A_DETAIL = ["/tendances"];
+/** Les fiches d'avis renvoient à l'accueil. */
+const FICHES = ["/a-traiter/"];
 
 /**
  * Rond de la barre d'onglets : le logo de l'établissement affiché. Un tap ou
@@ -55,6 +57,7 @@ export function ChoixEtablissement({ etablissements, actif }: { etablissements: 
       // Une fiche d'avis ou un thème ouvert appartient à l'établissement quitté : retour à l'onglet.
       const onglet = ONGLETS_A_DETAIL.find((o) => pathname.startsWith(`${o}/`));
       if (onglet) router.replace(onglet);
+      else if (FICHES.some((f) => pathname.startsWith(f))) router.replace("/");
     });
   };
 
@@ -125,7 +128,7 @@ export function ChoixEtablissement({ etablissements, actif }: { etablissements: 
       <dialog
         ref={dialogue}
         aria-labelledby="choix-etablissement-titre"
-        className="feuille"
+        className="feuille verre"
         onClick={(e) => {
           // Un tap sur le voile ferme la feuille, sauf le relâchement de l'appui long qui vient de l'ouvrir.
           if (e.target === e.currentTarget && !vientDOuvrir.current) fermer();

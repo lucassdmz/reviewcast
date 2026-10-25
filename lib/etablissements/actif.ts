@@ -26,10 +26,10 @@ export function choisirActif<T extends { id: string }>(etablissements: T[], vale
   return etablissements.find((e) => e.id === valeur) ?? null;
 }
 
-/** Initiales affichées quand un établissement n'a pas de logo : « The Coffee Jacobins » donne « TJ ». */
+/** Initiales affichées quand un établissement n'a pas de logo : « The Coffee Jacobins » donne « TJ », « Zelios » donne « Z ». */
 export function initiales(nom: string): string {
   const mots = nom.trim().split(/\s+/).filter(Boolean);
   if (mots.length === 0) return "?";
-  if (mots.length === 1) return mots[0].slice(0, 2).toUpperCase();
+  if (mots.length === 1) return mots[0].charAt(0).toUpperCase();
   return `${mots[0][0]}${mots[mots.length - 1][0]}`.toUpperCase();
 }

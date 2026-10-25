@@ -31,8 +31,8 @@ describe("initiales", () => {
     expect(initiales("The Coffee Jacobins")).toBe("TJ");
   });
 
-  it("prend deux lettres d'un nom en un mot", () => {
-    expect(initiales("éclaircie")).toBe("ÉC");
+  it("prend une lettre d'un nom en un mot", () => {
+    expect(initiales("zelios")).toBe("Z");
   });
 
   it("supporte un nom vide", () => {
