@@ -37,7 +37,7 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
         <section aria-label="Résumé de la période" className="bloc">
           <p className="intitule">{periode.libelle}</p>
           <p className="mt-2 flex items-baseline gap-2">
-            <span className="text-5xl font-bold leading-none tracking-tight">
+            <span className="titre-display text-6xl font-extrabold leading-none tracking-tight">
               {t.repartition.noteMoyenne === null ? "–" : <NombreAnime valeur={t.repartition.noteMoyenne} />}
             </span>
             <span className="text-2xl text-soleil" aria-hidden="true">

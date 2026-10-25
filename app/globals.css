@@ -441,3 +441,31 @@ nav a {
   transform-origin: center;
   animation: ouvrir-rayons 1s cubic-bezier(0.2, 0.9, 0.2, 1.2) both;
 }
+
+/*
+ * Barres de Tendances : les pastilles apparaissent l'une après l'autre avec un
+ * léger rebond, les jauges poussent depuis la gauche avec un ressort. Le
+ * décalage vient de --delai, posé sur chaque élément.
+ */
+@keyframes pastille-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+.pastille {
+  animation: pastille-pop 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) var(--delai, 0ms) both;
+}
+@keyframes jauge-pousse {
+  from {
+    transform: scaleX(0);
+  }
+}
+.jauge {
+  transform-origin: left center;
+  animation: jauge-pousse 0.7s cubic-bezier(0.25, 1.35, 0.4, 1) var(--delai, 0ms) both;
+}

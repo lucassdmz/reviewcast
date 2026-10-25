@@ -41,7 +41,8 @@ test.describe("tendances", () => {
   test("un thème ouvre les avis concernés avec le passage surligné", async ({ page }) => {
     await page.goto("/tendances?periode=12m");
     const premier = page.getByRole("region", { name: "Ce qui plaît" }).getByRole("link").first();
-    const libelle = (await premier.textContent())?.trim() ?? "";
+    // Le lien porte le nom du thème puis son nombre d'avis : le nom est la première ligne.
+    const libelle = ((await premier.innerText()).split("\n")[0] ?? "").trim();
     await premier.click();
     await expect(page).toHaveURL(/\/tendances\/theme\//);
     await expect(page.getByRole("heading", { name: `Thème : ${libelle}` })).toBeVisible();

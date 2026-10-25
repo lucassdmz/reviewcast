@@ -31,7 +31,7 @@ export function CourbeMensuelle({ points }: { points: PointMensuel[] }) {
 
   return (
     <section aria-labelledby="courbe-mensuelle-titre" className="bloc">
-      <h2 id="courbe-mensuelle-titre" className="font-bold">
+      <h2 id="courbe-mensuelle-titre" className="titre-display text-lg font-bold">
         Note moyenne par mois
       </h2>
       <svg viewBox={`0 0 ${L} ${H}`} className="mt-2 h-28 w-full" role="img" aria-describedby="courbe-mensuelle-tableau">
@@ -45,15 +45,15 @@ export function CourbeMensuelle({ points }: { points: PointMensuel[] }) {
         ))}
         {segments.map((d) => {
           const xs = [...d.matchAll(/[ML]([\d.]+),/g)].map((m) => m[1]);
-          return <path key={`aire-${d}`} d={`${d} L${xs[xs.length - 1]},${H - MB} L${xs[0]},${H - MB} Z`} fill="var(--soleil-doux)" opacity="0.75" />;
+          return <path key={`aire-${d}`} d={`${d} L${xs[xs.length - 1]},${H - MB} L${xs[0]},${H - MB} Z`} fill="var(--matcha-doux)" />;
         })}
         {segments.map((d) => (
-          <path key={d} d={d} pathLength={1} className="trace" fill="none" stroke="var(--encre)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+          <path key={d} d={d} pathLength={1} className="trace" fill="none" stroke="var(--encre)" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
         ))}
         {coords.map((c, i) => (
           <g key={c.mois.toISOString()}>
             {c.y !== null && (
-              <circle className="point" cx={c.x} cy={c.y} r={c === dernier ? 5.5 : 3.5} fill={c === dernier ? "var(--soleil)" : "var(--surface)"} stroke="var(--encre)" strokeWidth="2">
+              <circle className="point" cx={c.x} cy={c.y} r={c === dernier ? 6.5 : 3.5} fill={c === dernier ? "var(--matcha-vif)" : "var(--surface)"} stroke="var(--trait)" strokeWidth="2.5">
                 <title>{`${formatMoisLong.format(c.mois)} : ${formatNote.format(c.noteMoyenne ?? 0)} ★ (${c.volume} avis)`}</title>
               </circle>
             )}
@@ -65,7 +65,7 @@ export function CourbeMensuelle({ points }: { points: PointMensuel[] }) {
           </g>
         ))}
         {dernier && dernier.y !== null && (
-          <text x={dernier.x} y={dernier.y < 26 ? dernier.y + 20 : dernier.y - 11} fontSize="13" fontWeight="700" textAnchor={dernier.x > L - 40 ? "end" : "middle"} fill="var(--encre)">
+          <text x={dernier.x} y={dernier.y < 26 ? dernier.y + 20 : dernier.y - 11} fontSize="14" fontWeight="800" fontFamily="var(--font-display)" textAnchor={dernier.x > L - 40 ? "end" : "middle"} fill="var(--encre)">
             {formatNote.format(dernier.noteMoyenne ?? 0)}
           </text>
         )}
