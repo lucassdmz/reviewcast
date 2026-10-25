@@ -402,6 +402,8 @@ model Settings {
   /// Règles par sujet : [{ sujet, themes, dire, nePasDire }]. Null tant que l'établissement n'y a pas touché.
   reglesSujets           Json?         @map("regles_sujets")
   motsEvites             String[]      @default([]) @map("mots_evites")
+  /// Lien « Laisser un avis » de la fiche Google, pour le QR du comptoir. Saisi dans Réglages en attendant la synchronisation.
+  lienAvis               String?       @map("lien_avis")
   createdAt              DateTime      @default(now()) @map("created_at")
   updatedAt              DateTime      @updatedAt @map("updated_at")
 

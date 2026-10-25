@@ -1,11 +1,20 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { fermerSession, ouvrirSession } from "./helpers/session";
 
 /**
  * Parcours clé du lot 4 sur les données de démonstration, avec le
  * fournisseur IA simulé et le publieur simulé : ouvrir un avis, modifier le
- * brouillon, relire, publier, l'avis sort de la file.
+ * brouillon, relire, publier, l'avis sort des brouillons à relire. La file
+ * vit désormais dans la liste des avis, où les brouillons sont en tête.
  */
+const brouillons = (page: Page) => page.getByRole("link").filter({ hasText: "Brouillon prêt à relire" });
+
+/** Le nom de l'auteur, dans la ligne de conversation : la première ligne qui n'est pas l'avatar (ses initiales). */
+async function auteurDe(lien: ReturnType<typeof brouillons>): Promise<string> {
+  const lignes = (await lien.innerText()).split("\n").map((l) => l.trim());
+  return lignes.find((l) => l.length > 0 && !/^\p{Lu}{1,3}$/u.test(l)) ?? "";
+}
+
 test.describe("file à traiter", () => {
   // Les tests modifient la même file : ils s'enchaînent, chacun sur un avis distinct.
   test.describe.configure({ mode: "serial" });
@@ -15,19 +24,17 @@ test.describe("file à traiter", () => {
   });
   test.afterEach(() => fermerSession(sessionToken));
 
-  test("liste les avis à traiter après le climat récent", async ({ page }) => {
-    await page.goto("/a-traiter");
-    await expect(page.getByRole("heading", { name: /avis à traiter/ })).toBeVisible();
-    const cartes = page.getByRole("list").first().getByRole("link");
-    expect(await cartes.count()).toBeGreaterThan(0);
-    await expect(page.getByText(/avis reçus ces 40 derniers jours/)).toBeVisible();
+  test("liste les brouillons à relire en tête des avis", async ({ page }) => {
+    await page.goto("/avis");
+    await expect(page.getByRole("heading", { name: "Tous les avis" })).toBeVisible();
+    expect(await brouillons(page).count()).toBeGreaterThan(0);
     await expect(page.getByText(/négatif/i)).toHaveCount(0);
   });
 
   test("modifie le brouillon, relit, publie et l'avis quitte la file", async ({ page }) => {
-    await page.goto("/a-traiter");
-    const premiere = page.getByRole("list").first().getByRole("link").first();
-    const auteur = (await premiere.locator("p").first().textContent()) ?? "";
+    await page.goto("/avis");
+    const premiere = brouillons(page).first();
+    const auteur = await auteurDe(premiere);
     await premiere.click();
     await expect(page.getByRole("heading", { level: 1, name: auteur })).toBeVisible();
     await expect(page.getByText(/reçus en 40 jours|seul avis reçu/)).toBeVisible();
@@ -42,17 +49,17 @@ test.describe("file à traiter", () => {
     await expect(page.getByText(marqueur)).toBeVisible();
     await page.getByRole("button", { name: "Confirmer la publication" }).click();
 
-    await expect(page).toHaveURL(/\/a-traiter\?publie=/);
+    await expect(page).toHaveURL(/\/avis\?publie=/);
     await expect(page.getByRole("status")).toContainText("Réponse publiée");
-    await expect(page.getByRole("list").first().getByRole("link", { name: new RegExp(auteur) })).toHaveCount(0);
+    await expect(brouillons(page).filter({ hasText: auteur })).toHaveCount(0);
 
     await page.goto("/a-traiter/historique");
     await expect(page.getByText(marqueur)).toBeVisible();
   });
 
   test("régénère avec une consigne et ajoute une note interne", async ({ page }) => {
-    await page.goto("/a-traiter");
-    await page.getByRole("list").first().getByRole("link").nth(1).click();
+    await page.goto("/avis");
+    await brouillons(page).first().click();
     const zone = page.getByLabel("Texte de la réponse");
     const avant = await zone.inputValue();
     const version = await page.getByText(/version \d+/).textContent();
@@ -67,12 +74,12 @@ test.describe("file à traiter", () => {
   });
 
   test("marque un avis comme traité sans répondre", async ({ page }) => {
-    await page.goto("/a-traiter");
-    const derniere = page.getByRole("list").first().getByRole("link").last();
-    const auteur = (await derniere.locator("p").first().textContent()) ?? "";
+    await page.goto("/avis");
+    const derniere = brouillons(page).last();
+    const auteur = await auteurDe(derniere);
     await derniere.click();
     await page.getByRole("button", { name: "Marquer comme traité sans répondre" }).click();
-    await expect(page).toHaveURL(/\/a-traiter\?traite=1/);
-    await expect(page.getByRole("list").first().getByRole("link", { name: new RegExp(auteur) })).toHaveCount(0);
+    await expect(page).toHaveURL(/\/avis\?traite=1/);
+    await expect(brouillons(page).filter({ hasText: auteur })).toHaveCount(0);
   });
 });

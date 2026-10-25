@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Ecran } from "@/components/Ecran";
-import { FormulaireApprentissage, FormulaireSignature, FormulaireSujets, FormulaireTon } from "@/components/reglages/SectionsVoix";
+import { FormulaireApprentissage, FormulaireLienAvis, FormulaireSignature, FormulaireSujets, FormulaireTon } from "@/components/reglages/SectionsVoix";
+import { lireLienAvis } from "@/lib/accueil/service";
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
 import { apercuVoix } from "@/lib/voix/apercu";
 import { lireVoix, listerCorrections, sujetsSansRegle } from "@/lib/voix/service";
@@ -13,6 +14,7 @@ const TITRES = {
   sujets: "Sujets",
   apprentissage: "Apprentissage",
   apercu: "Aperçu",
+  avis: "Lien d’avis Google",
 } as const;
 
 type Section = keyof typeof TITRES;
@@ -52,6 +54,7 @@ export default async function SectionReglagesPage({ params, searchParams }: Page
       {cle === "sujets" && <FormulaireSujets locationId={etablissement.id} voix={voix} suggestions={await sujetsSansRegle(etablissement.id, voix.regles)} />}
       {cle === "apprentissage" && <FormulaireApprentissage locationId={etablissement.id} voix={voix} corrections={await listerCorrections(etablissement.id)} />}
       {cle === "apercu" && <Apercu locationId={etablissement.id} />}
+      {cle === "avis" && <FormulaireLienAvis locationId={etablissement.id} lien={await lireLienAvis(etablissement.id)} />}
     </Ecran>
   );
 }

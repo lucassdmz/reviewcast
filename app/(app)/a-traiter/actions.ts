@@ -42,6 +42,7 @@ function messageErreur(error: unknown): string {
 }
 
 function rafraichir(reviewId: string) {
+  revalidatePath("/avis");
   revalidatePath("/a-traiter");
   revalidatePath(`/a-traiter/${reviewId}`);
   revalidatePath("/");
@@ -74,7 +75,7 @@ export async function actionIgnorer(form: FormData): Promise<void> {
   const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
   const etat = await executer(reviewId, () => ignorerAvis(reviewId, userId));
   if (etat.erreur) redirect(`/a-traiter/${reviewId}?erreur=${encodeURIComponent(etat.erreur)}`);
-  redirect("/a-traiter?traite=1");
+  redirect("/avis?traite=1");
 }
 
 export async function actionRouvrir(form: FormData): Promise<void> {
@@ -112,23 +113,39 @@ export async function actionConfirmerPublication(form: FormData): Promise<void> 
   const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
   const etat = await executer(reviewId, () => publierReponse(reviewId, texteReponseSchema.parse(champ(form, "texte")), userId));
   if (etat.erreur) redirect(`/a-traiter/${reviewId}?erreur=${encodeURIComponent(etat.erreur)}`);
-  redirect(`/a-traiter?publie=${reviewId}`);
+  redirect(`/avis?publie=${reviewId}`);
 }
 
-/** Publication du brouillon tel qu'il est affiché sur l'accueil, sans passer par la fiche. */
-export async function actionPublierDepuisAccueil(form: FormData): Promise<void> {
+/**
+ * Publications depuis la pile de l'accueil : pas de redirection ni de
+ * rafraîchissement de l'accueil, la pile passe simplement à la carte suivante.
+ * Chaque appel suit un geste explicite (« Publier la réponse », « Valider les mercis »).
+ */
+export async function actionPublierDepuisPile(reviewId: string, texte: string): Promise<EtatAction> {
   const userId = await utilisateurConnecte();
-  const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
-  const etat = await executer(reviewId, () => publierReponse(reviewId, texteReponseSchema.parse(champ(form, "texte")), userId));
-  if (etat.erreur) redirect(`/?erreur=${encodeURIComponent(etat.erreur)}`);
-  redirect("/?publie=1");
+  try {
+    const id = identifiantSchema.parse(reviewId);
+    await publierReponse(id, texteReponseSchema.parse(texte), userId);
+    revalidatePath("/a-traiter");
+    revalidatePath("/avis");
+    return {};
+  } catch (error) {
+    return { erreur: messageErreur(error) };
+  }
 }
 
-/** Remerciement d'un avis positif, publié en un geste depuis la home (section 3.2). */
-export async function actionPublierRemerciement(form: FormData): Promise<void> {
+export async function actionPublierMercis(mercis: { reviewId: string; texte: string }[]): Promise<EtatAction & { publies: number }> {
   const userId = await utilisateurConnecte();
-  const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
-  const etat = await executer(reviewId, () => publierReponse(reviewId, texteReponseSchema.parse(champ(form, "texte")), userId));
-  if (etat.erreur) redirect(`/?erreur=${encodeURIComponent(etat.erreur)}`);
-  redirect("/?remercie=1");
+  let publies = 0;
+  try {
+    for (const m of mercis.slice(0, 10)) {
+      await publierReponse(identifiantSchema.parse(m.reviewId), texteReponseSchema.parse(m.texte), userId);
+      publies += 1;
+    }
+    revalidatePath("/avis");
+    return { publies };
+  } catch (error) {
+    revalidatePath("/avis");
+    return { publies, erreur: messageErreur(error) };
+  }
 }

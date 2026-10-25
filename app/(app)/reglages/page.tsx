@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { Ecran } from "@/components/Ecran";
 import { COOKIE_THEME, LIBELLES_THEME, lireTheme } from "@/lib/apparence";
+import { lireLienAvis } from "@/lib/accueil/service";
 import { consommationDuMois } from "@/lib/ai/ledger";
 import { MODELES_PAR_DEFAUT } from "@/lib/ai/pricing";
 import { auth, signOut } from "@/lib/auth/config";
@@ -52,7 +53,9 @@ function Ligne({ href, titre, resume }: { href: string; titre: string; resume: s
 export default async function ReglagesPage({ searchParams }: PageProps<"/reglages">) {
   const params = await searchParams;
   const [session, conso, { etablissements, actif: etablissement }] = await Promise.all([auth(), consommationDuMois(), lireChoixEtablissement()]);
-  const [voix, corrections] = etablissement ? await Promise.all([lireVoix(etablissement.id), listerCorrections(etablissement.id)]) : [null, []];
+  const [voix, corrections, lienAvis] = etablissement
+    ? await Promise.all([lireVoix(etablissement.id), listerCorrections(etablissement.id), lireLienAvis(etablissement.id)])
+    : [null, [], null];
   const r = voix ? resumes(voix, corrections.length) : null;
   const theme = lireTheme((await cookies()).get(COOKIE_THEME)?.value);
 
@@ -80,6 +83,15 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
             <Ligne href="/reglages/apercu" titre="Voir un aperçu" resume="Une réponse écrite avec vos réglages" />
           </ul>
         </section>
+      )}
+
+      {etablissement && (
+        <>
+          <h2 className="mt-9 px-1 text-xl font-bold tracking-tight">Recevoir des avis</h2>
+          <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
+            <Ligne href="/reglages/avis" titre="Lien d’avis Google" resume={lienAvis ? "Renseigné, le QR est prêt" : "À renseigner pour le QR du comptoir"} />
+          </ul>
+        </>
       )}
 
       {!etablissement && etablissements.length > 1 && (

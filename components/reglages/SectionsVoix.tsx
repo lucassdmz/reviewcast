@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import {
   actionAjouterRegle,
   actionEnregistrerApprentissage,
+  actionEnregistrerLienAvis,
   actionEnregistrerSignature,
   actionEnregistrerSujets,
   actionEnregistrerTon,
@@ -69,7 +70,7 @@ function Choix<T extends string>({ nom, valeur, options }: { nom: string; valeur
 
 function Enregistrer() {
   return (
-    <BoutonAction enCours="Enregistrement…" className="pressable w-full rounded-full bg-encre px-4 py-3.5 text-base font-bold text-fond">
+    <BoutonAction enCours="Enregistrement…" className="pressable w-full rounded-full bouton-principal px-4 py-3.5 text-base font-bold">
       Enregistrer
     </BoutonAction>
   );
@@ -221,6 +222,25 @@ export function FormulaireApprentissage({ locationId, voix, corrections }: { loc
           </ul>
         )}
       </div>
+    </form>
+  );
+}
+
+export function FormulaireLienAvis({ locationId, lien }: { locationId: string; lien: string | null }) {
+  return (
+    <form action={actionEnregistrerLienAvis} className="space-y-3">
+      <input type="hidden" name="locationId" value={locationId} />
+      <Carte
+        titre="Votre lien d’avis Google"
+        aide="Dans Google, ouvrez votre fiche, puis « Demander des avis » : copiez le lien et collez-le ici. Il devient le QR à poser au comptoir."
+      >
+        <label htmlFor="lienAvis" className="sr-only">
+          Lien d’avis Google
+        </label>
+        <input id="lienAvis" name="lienAvis" type="url" inputMode="url" maxLength={500} defaultValue={lien ?? ""} placeholder="https://g.page/r/…/review" className={CHAMP} />
+        <p className="mt-3 text-sm leading-snug text-encre-douce">Demandez un avis à chaque client, sans choisir : c’est la règle de Google.</p>
+      </Carte>
+      <Enregistrer />
     </form>
   );
 }

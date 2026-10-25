@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prochainPalier } from "@/lib/accueil/palier";
-import { phraseAccueil, prenomDepuisSignature } from "@/lib/accueil/phrase";
+import { prenomDepuisSignature, salutation } from "@/lib/accueil/phrase";
 
 describe("prochainPalier", () => {
   it("vise le demi-point suivant et compte les 5 étoiles qu'il faut", () => {
@@ -32,17 +32,12 @@ describe("prenomDepuisSignature", () => {
   });
 });
 
-describe("phraseAccueil", () => {
-  it("parle des clients contents puis de ce qui attend", () => {
-    const p = phraseAccueil({ prenom: "Valentine", volume: 24, nbContents: 17, aRelire: 2, heure: 9 });
-    expect(p.ouverture).toBe("Bonjour, Valentine.");
-    expect(p.contents).toBe("17 clients contents sur 24");
-    expect(p.suite).toBe(", et 2 avis attendent un mot de vous.");
+describe("salutation", () => {
+  it("dit bonjour le jour, avec le prénom", () => {
+    expect(salutation(9, "Margaux")).toBe("Bonjour Margaux");
   });
-  it("dit bonsoir et se passe de prénom", () => {
-    const p = phraseAccueil({ prenom: null, volume: 3, nbContents: 1, aRelire: 0, heure: 20 });
-    expect(p.ouverture).toBe("Bonsoir.");
-    expect(p.contents).toBe("1 client content sur 3");
-    expect(p.suite).toBe(", et rien n’attend votre réponse.");
+  it("dit bonsoir le soir et la nuit, et se passe de prénom", () => {
+    expect(salutation(20, null)).toBe("Bonsoir");
+    expect(salutation(3, "Margaux")).toBe("Bonsoir Margaux");
   });
 });

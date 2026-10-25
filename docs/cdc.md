@@ -39,7 +39,7 @@ L'outil remet les avis Google en perspective : il montre d'abord le climat globa
 - Lecture rapide : chaque écran livre son information principale sans scroll sur un écran de téléphone. Le reste se découvre en défilant.
 - Une information ne ressemble jamais à un bouton, et une invitation dit ce qui se passe quand on appuie (« Voir le brouillon »).
 
-**Direction visuelle** : une application mobile sobre, dans l'esprit d'un café japonais. Fond gris brume, cartes blanches aux grands arrondis, encre noire. Une seule couleur forte, le jaune du soleil, et une touche de vert matcha pour ce qui plaît. Le ciel du moment est illustré par un grand disque solaire plus ou moins couvert. Mouvements discrets (entrée des cartes, courbes qui se tracent), coupés si l'utilisateur réduit les animations. Mode clair et sombre. Pas de dashboard dense type BI.
+**Direction visuelle** (révisée le 25 octobre 2026) : une application joyeuse et nette. Fond crème, cartes blanches cernées d'encre avec une ombre décalée, comme des autocollants. Vert matcha vif pour ce qui plaît et pour l'action principale, jaune soleil pour la note, rose et bleu ciel seulement au dos des cartes de la pile. Titres en Bricolage Grotesque, texte en Hanken Grotesk. Mouvements francs mais rares (le tampon de la note, la pile qui se joue), coupés si l'utilisateur réduit les animations. Mode clair et sombre. Pas de dashboard dense type BI. Recherche et maquettes : `docs/recherche/`, `docs/maquettes/accueil-2026-10-19/`.
 
 ## 3. Périmètre fonctionnel V1
 
@@ -322,6 +322,11 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 | Retour | Lien texte souligné | Chevron rond en haut à gauche, en plus du geste du téléphone | Une PWA installée n'a pas de barre de navigateur, et le geste ne fonctionne pas à l'ouverture depuis une notification |
 | Ton des réponses | Possible renvoi à une hiérarchie | La gérante parle en son nom | L'utilisateur est la direction |
 | Choix de l'établissement | Pastilles en haut de la Home et de Tendances | Un rond avec le logo, à droite de la barre d'onglets : un tap ou un appui long ouvre la liste. Le choix vaut pour les quatre onglets et reste mémorisé sur l'appareil | Le choix ne suivait pas d'un onglet à l'autre, et la file comme les réglages l'ignoraient |
+| Accueil | Météo, compliment, carte « N avis à traiter » | Un bandeau vert (clients contents en très grand, note en pastille) puis une pile de cartes, une à la fois : un sourire, l'avis à reconquérir le plus prioritaire, les mercis prêts, le levier pour monter d'un palier. Récompense quand tout est fait | Tout était à plat : la gérante doit savoir en arrivant ce qu'elle a à faire, et finir. Recherche du 19 octobre : le frein est la peur, pas l'effort |
+| Avis à reconquérir | Le plus récent | Un score explicable : gravité 35 %, visibilité probable 25 %, fraîcheur 20 %, sujet qui revient ou question 20 % | Un seul avis mérite la réponse du jour ; les poids sont à ajuster à l'usage |
+| Publication depuis l'accueil | Un appui | Deux appuis : le geste, puis « Confirmer » | Aucune réponse ne part sans action explicite, même en un geste |
+| QR d'avis | Absent | Lien d'avis Google saisi dans Réglages, QR affiché depuis la carte levier ; demander à chaque client, sans tri | Levier le plus fort et autorisé par Google, qui interdit de ne solliciter que les clients contents |
+| Palette | Brume, jaune, matcha discret | Crème, matcha vif, soleil, cartes autocollants | Cinq directions comparées les 19 et 25 octobre ; « ça manque d'enthousiasme » |
 
 ## 12. Lot 7 : la voix de l'établissement
 

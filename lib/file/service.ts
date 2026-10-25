@@ -1,4 +1,4 @@
-import { genererBrouillon, genererRemerciement } from "@/lib/ai/service";
+import { genererBrouillon } from "@/lib/ai/service";
 import { recalculerPourAvis } from "@/lib/analytics/recalcul";
 import { logAudit } from "@/lib/audit/log";
 import { prisma } from "@/lib/db/client";
@@ -243,33 +243,4 @@ export async function publierReponse(
     cible: reviewId,
     details: { note: a.note, auteur: a.auteur, simule: publieur.simule, longueur: texte.length },
   });
-}
-
-/** Mot de remerciement pré-rédigé pour le dernier avis 5 étoiles sans réponse (section 3.2). */
-export interface RemerciementPropose {
-  reviewId: string;
-  auteur: string;
-  texte: string;
-  signature: string | null;
-}
-
-export async function remerciementDuMoment(locationId: string | null): Promise<RemerciementPropose | null> {
-  const avis = await prisma.review.findFirst({
-    where: { ...filtre(locationId), note: 5, statut: "HORS_FILE", reponseGoogleTexte: null, retireAt: null, NOT: { texte: null } },
-    orderBy: { dateCreation: "desc" },
-    include: { drafts: { orderBy: { version: "desc" }, take: 1 } },
-  });
-  if (!avis) return null;
-  let texte = avis.drafts[0]?.texte;
-  if (!texte) {
-    try {
-      texte = await genererRemerciement(avis.id);
-      await prisma.draft.create({ data: { reviewId: avis.id, texte, version: 1, consigne: "remerciement", modele: "ia" } });
-    } catch (error) {
-      console.error("Remerciement indisponible :", error instanceof Error ? error.message : error);
-      return null;
-    }
-  }
-  const { signature } = await lireVoix(avis.locationId);
-  return { reviewId: avis.id, auteur: avis.auteur, texte: sansSignature(texte, signature), signature };
 }

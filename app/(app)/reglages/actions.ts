@@ -3,6 +3,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { lienAvisSchema } from "@/lib/accueil/lien-avis";
+import { enregistrerLienAvis } from "@/lib/accueil/service";
 import { COOKIE_THEME, lireTheme } from "@/lib/apparence";
 import { auth } from "@/lib/auth/config";
 import { NB_REGLES_MAX, decouperListe, voixSchema, type RegleSujet, type Voix } from "@/lib/voix/reglages";
@@ -112,4 +114,14 @@ export async function actionRetirerCorrection(correctionId: string): Promise<voi
   const userId = await utilisateurConnecte();
   await retirerCorrection(identifiantSchema.parse(correctionId), userId);
   redirect("/reglages/apprentissage?retire=1");
+}
+
+/** Lien d'avis Google, pour le QR du comptoir (carte « Pour passer au palier » de l'accueil). */
+export async function actionEnregistrerLienAvis(form: FormData): Promise<void> {
+  await utilisateurConnecte();
+  const locationId = identifiantSchema.parse(champ(form, "locationId"));
+  const resultat = lienAvisSchema.safeParse(champ(form, "lienAvis"));
+  if (!resultat.success) redirect(`/reglages/avis?erreur=${encodeURIComponent(resultat.error.issues[0]?.message ?? "Lien invalide.")}`);
+  await enregistrerLienAvis(locationId, resultat.data);
+  redirect("/reglages?enregistre=1");
 }
