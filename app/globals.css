@@ -1,47 +1,58 @@
 @import "tailwindcss";
 
 /*
- * Application mobile sobre, esprit café japonais : fond brume, cartes blanches
- * aux grands arrondis, encre noire, et une seule couleur, le jaune du soleil.
- * Pas de rouge (section 2 du cdc).
+ * Application joyeuse et nette : fond crème, cartes blanches cernées d'encre
+ * avec une ombre décalée (comme des autocollants), vert matcha vif pour ce
+ * qui plaît et pour l'action, jaune soleil pour la note. Bricolage Grotesque
+ * pour les titres, Hanken Grotesk pour le texte. Pas de rouge (section 2 du cdc).
  */
 :root {
   color-scheme: light;
-  --ciel: #f1f2f0;
-  --ciel-fonce: #c5c9cc;
+  --fond: #f6efe2;
+  --surface: #ffffff;
+  --nuage: #e9e0cf;
+  --encre: #15140f;
+  --encre-douce: #5e584c;
+  --ciel: #f6efe2;
+  --ciel-fonce: #d9cdb6;
   --soleil: #f2b72a;
-  --soleil-doux: #fbf0cc;
-  --nuage: #e4e6e5;
-  --encre: #16181a;
-  --encre-douce: #5f6368;
-  --surface: #f4f4f2;
-  --fond: #ffffff;
-  --accent: #16181a;
+  --soleil-doux: #fbe6a4;
+  --accent: #15140f;
   --attention: #8f6400;
-  --nuage-forme: #e3e6e9;
-  --pluie: #8b96a1;
-  --matcha: #5f7f4b;
-  --matcha-doux: #e6eedf;
+  --matcha: #3e6b12;
+  --matcha-vif: #79c043;
+  --matcha-doux: #e3f1d2;
+  --rose: #f4c4cf;
+  --bleu: #bfe0f2;
+  /* Texte posé sur le vert ou le jaune vifs : toujours l'encre, dans les deux thèmes. */
+  --sur-vif: #15140f;
+  /* Contour et ombre des cartes autocollants. */
+  --trait: #15140f;
 }
 
 @theme inline {
+  --color-fond: var(--fond);
+  --color-surface: var(--surface);
+  --color-nuage: var(--nuage);
+  --color-encre: var(--encre);
+  --color-encre-douce: var(--encre-douce);
   --color-ciel: var(--ciel);
   --color-ciel-fonce: var(--ciel-fonce);
   --color-soleil: var(--soleil);
   --color-soleil-doux: var(--soleil-doux);
-  --color-nuage: var(--nuage);
-  --color-encre: var(--encre);
-  --color-encre-douce: var(--encre-douce);
-  --color-surface: var(--surface);
-  --color-fond: var(--fond);
   --color-accent: var(--accent);
   --color-attention: var(--attention);
   --color-matcha: var(--matcha);
+  --color-matcha-vif: var(--matcha-vif);
   --color-matcha-doux: var(--matcha-doux);
+  --color-rose: var(--rose);
+  --color-bleu: var(--bleu);
+  --color-sur-vif: var(--sur-vif);
+  --color-trait: var(--trait);
   /* Le gras de l'application est un demi-gras : en 700, un écran chargé de titres devenait agressif sur mobile. */
   --font-weight-bold: 600;
-  /* La police du téléphone : San Francisco sur iPhone, Roboto sur Android. Rien à télécharger. */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--police-texte), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: var(--police-titre), var(--police-texte), system-ui, sans-serif;
 }
 
 /*
@@ -51,41 +62,47 @@
  */
 :root[data-theme="sombre"] {
   color-scheme: dark;
-  --ciel: #25282b;
-  --ciel-fonce: #4b5055;
+  --fond: #14130f;
+  --surface: #211f19;
+  --nuage: #353127;
+  --encre: #f6efe2;
+  --encre-douce: #b8af9d;
+  --ciel: #14130f;
+  --ciel-fonce: #4a4436;
   --soleil: #f2b72a;
-  --soleil-doux: #3a3115;
-  --nuage: #2c2f32;
-  --encre: #f2f2ef;
-  --encre-douce: #a8acb0;
-  --surface: #1c1e20;
-  --fond: #111213;
-  --accent: #f2f2ef;
+  --soleil-doux: #3d3216;
+  --accent: #f6efe2;
   --attention: #f2b72a;
-  --nuage-forme: #3b3f44;
-  --pluie: #8b96a1;
-  --matcha: #a3c28d;
-  --matcha-doux: #263020;
+  --matcha: #a6d96a;
+  --matcha-vif: #79c043;
+  --matcha-doux: #263218;
+  --rose: #4a2f36;
+  --bleu: #23394a;
+  --sur-vif: #15140f;
+  --trait: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
   :root[data-theme="systeme"] {
     color-scheme: dark;
-    --ciel: #25282b;
-    --ciel-fonce: #4b5055;
+    --fond: #14130f;
+    --surface: #211f19;
+    --nuage: #353127;
+    --encre: #f6efe2;
+    --encre-douce: #b8af9d;
+    --ciel: #14130f;
+    --ciel-fonce: #4a4436;
     --soleil: #f2b72a;
-    --soleil-doux: #3a3115;
-    --nuage: #2c2f32;
-    --encre: #f2f2ef;
-    --encre-douce: #a8acb0;
-    --surface: #1c1e20;
-    --fond: #111213;
-    --accent: #f2f2ef;
+    --soleil-doux: #3d3216;
+    --accent: #f6efe2;
     --attention: #f2b72a;
-    --nuage-forme: #3b3f44;
-    --pluie: #8b96a1;
-    --matcha: #a3c28d;
-    --matcha-doux: #263020;
+    --matcha: #a6d96a;
+    --matcha-vif: #79c043;
+    --matcha-doux: #263218;
+    --rose: #4a2f36;
+    --bleu: #23394a;
+    --sur-vif: #15140f;
+    --trait: #000000;
   }
 }
 
@@ -121,6 +138,25 @@ nav a {
     background: var(--surface);
     border-radius: 1.5rem;
     padding: 1.125rem;
+  }
+
+  /* Carte autocollant : contour d'encre et ombre décalée, pour ce qui compte. */
+  .sticker {
+    border: 2px solid var(--trait);
+    box-shadow: 4px 5px 0 var(--trait);
+  }
+
+  /* Bouton principal : vert matcha, texte et contour d'encre. */
+  .bouton-principal {
+    background: var(--matcha-vif);
+    color: var(--sur-vif);
+    border: 2px solid var(--trait);
+    font-weight: 700;
+  }
+
+  .titre-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
 
   /* Carte qui demande une décision (confirmation de publication). */
@@ -319,4 +355,89 @@ nav a {
   main > div > *:not(:has(#synthese-titre)) {
     display: none;
   }
+}
+
+/*
+ * La pile de l'accueil : les cartes sont empilées dans la même case de grille
+ * (la pile prend la hauteur de la plus haute), celle du dessus se joue, les
+ * suivantes dépassent en dessous, légèrement tournées. Une carte jouée part
+ * vers la gauche.
+ */
+.pile {
+  display: grid;
+  padding-bottom: 2.75rem;
+}
+.pile > * {
+  grid-area: 1 / 1;
+}
+.pile-carte {
+  transition:
+    transform 0.55s cubic-bezier(0.3, 0.9, 0.25, 1),
+    opacity 0.4s ease;
+  transform-origin: 50% 0;
+}
+.pile-carte[data-pos="0"] {
+  z-index: 4;
+}
+.pile-carte[data-pos="1"] {
+  z-index: 3;
+  transform: translateY(16px) scale(0.955) rotate(-2.2deg);
+  background: var(--soleil-doux);
+  box-shadow: none;
+}
+.pile-carte[data-pos="2"] {
+  z-index: 2;
+  transform: translateY(30px) scale(0.91) rotate(2deg);
+  background: var(--rose);
+  box-shadow: none;
+}
+.pile-carte[data-pos="3"] {
+  z-index: 1;
+  transform: translateY(42px) scale(0.865) rotate(-1deg);
+  background: var(--bleu);
+  box-shadow: none;
+}
+.pile-carte[data-pos="parti"] {
+  z-index: 0;
+  opacity: 0;
+  transform: translate(-130%, -40px) rotate(-20deg);
+  pointer-events: none;
+}
+.pile-carte:not([data-pos="0"]) {
+  pointer-events: none;
+}
+.pile-carte:not([data-pos="0"]) > * {
+  visibility: hidden;
+}
+
+@keyframes tamponner {
+  from {
+    opacity: 0;
+    transform: rotate(-20deg) scale(0.6);
+  }
+}
+.tampon {
+  transform: rotate(4deg);
+  animation: tamponner 0.8s cubic-bezier(0.3, 1.6, 0.4, 1) 0.2s both;
+}
+@keyframes sauter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.7);
+  }
+}
+.saute {
+  display: inline-block;
+  animation: sauter 0.7s cubic-bezier(0.3, 1.8, 0.4, 1) 0.3s both;
+}
+@keyframes ouvrir-rayons {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-40deg);
+  }
+}
+.rayons {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ouvrir-rayons 1s cubic-bezier(0.2, 0.9, 0.2, 1.2) both;
 }

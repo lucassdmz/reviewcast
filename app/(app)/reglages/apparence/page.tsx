@@ -30,7 +30,7 @@ export default async function ApparencePage() {
             ))}
           </div>
         </div>
-        <BoutonAction enCours="Enregistrement…" className="pressable w-full rounded-full bg-encre px-4 py-3.5 text-base font-bold text-fond">
+        <BoutonAction enCours="Enregistrement…" className="pressable w-full rounded-full bouton-principal px-4 py-3.5 text-base font-bold">
           Enregistrer
         </BoutonAction>
       </form>

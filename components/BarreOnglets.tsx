@@ -32,7 +32,7 @@ const onglets: { href: string; libelle: string; icone: ReactNode }[] = [
 
 /**
  * Barre d'onglets flottante : trois destinations, l'onglet actif dans une
- * pastille d'encre, puis le rond de l'établissement affiché, tout à droite.
+ * pastille vert matcha, puis le rond de l'établissement affiché, tout à droite.
  */
 export function BarreOnglets({ etablissements, actif }: { etablissements: Etablissement[]; actif: Etablissement | null }) {
   const pathname = usePathname();
@@ -48,7 +48,7 @@ export function BarreOnglets({ etablissements, actif }: { etablissements: Etabli
                 prefetch
                 aria-current={actif ? "page" : undefined}
                 className={`pressable flex flex-col items-center gap-0.5 rounded-full py-1.5 text-[11px] font-medium ${
-                  actif ? "bg-encre text-fond" : "text-encre-douce"
+                  actif ? "bouton-principal" : "border-2 border-transparent text-encre-douce"
                 }`}
               >
                 <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

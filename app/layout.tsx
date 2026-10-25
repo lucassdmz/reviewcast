@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
 import { cookies } from "next/headers";
 import { COOKIE_THEME, COULEUR_BARRE, lireTheme, type Theme } from "@/lib/apparence";
 import "./globals.css";
+
+// Polices servies par l'application elle-même (téléchargées au build) : rien ne part vers Google à l'ouverture.
+const policeTitre = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--police-titre", display: "swap" });
+const policeTexte = Hanken_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], variable: "--police-texte", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Éclaircie — la météo de vos avis",
@@ -43,7 +48,7 @@ export async function generateViewport(): Promise<Viewport> {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const theme = await themeChoisi();
   return (
-    <html lang="fr" data-theme={theme} className="h-full antialiased">
+    <html lang="fr" data-theme={theme} className={`h-full antialiased ${policeTitre.variable} ${policeTexte.variable}`}>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

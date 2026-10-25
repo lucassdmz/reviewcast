@@ -76,7 +76,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
             <form action={actionConfirmerPublication}>
               <input type="hidden" name="reviewId" value={fiche.id} />
               <input type="hidden" name="texte" value={fiche.brouillon.texte} />
-              <BoutonAction enCours="Publication…" className="pressable rounded-full bg-encre px-4 py-2 text-sm font-semibold text-fond">
+              <BoutonAction enCours="Publication…" className="pressable rounded-full bouton-principal px-4 py-2 text-sm font-semibold">
                 Confirmer la publication
               </BoutonAction>
             </form>

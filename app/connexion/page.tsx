@@ -41,7 +41,7 @@ export default async function ConnexionPage({ searchParams }: PageProps<"/connex
       >
         <button
           type="submit"
-          className="w-full rounded-full bg-encre px-4 py-3.5 text-base font-bold text-fond active:opacity-80"
+          className="w-full rounded-full bouton-principal px-4 py-3.5 text-base active:opacity-80"
         >
           Se connecter avec Google
         </button>

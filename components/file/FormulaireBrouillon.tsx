@@ -86,7 +86,7 @@ export function FormulaireBrouillon({
           disabled={occupe}
           aria-busy={relecture}
           onClick={() => setRelecture(true)}
-          className="pressable rounded-full bg-encre px-3 py-2 text-sm font-semibold text-fond disabled:opacity-50"
+          className="pressable rounded-full bouton-principal px-3 py-2 text-sm disabled:opacity-50"
         >
           {relecture ? "Un instant…" : "Relire et publier"}
         </button>
