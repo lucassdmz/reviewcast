@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>La pile, violet</title>
+<title>La pile, mandarine</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -13,9 +13,9 @@
 <style>
 body{margin:0}
 .ecran{
-  --fond:#F5F5F7; --carte:#FFFFFF; --encre:#0F0F12; --encre2:#5E5E69; --accent:#6E56CF; --accent-texte:#5B43BD;
-  --doux:#EFEBFC; --sourd:#F6F6F8; --piste:#E6E6EA; --trait:#E9E9ED; --positif:#6E56CF; --etoile:#F5B400;
-  --btn:#6E56CF; --btn-texte:#FFFFFF; --av1:#0F0F12; --av2:#6E56CF; --av3:#A08BEB; --av4:#3F3F48;
+  --fond:#FAF8F6; --carte:#FFFFFF; --encre:#1C1712; --encre2:#6B625A; --accent:#F26A1B; --accent-texte:#B4470A;
+  --doux:#FDE6D6; --sourd:#FBF7F4; --piste:#ECE5DF; --trait:#EFE9E3; --positif:#F26A1B; --etoile:#F26A1B;
+  --btn:#F26A1B; --btn-texte:#1C1712; --av1:#1C1712; --av2:#B4470A; --av3:#E08A55; --av4:#6B625A;
   --t-display:"Geist", system-ui, sans-serif; --t-texte:"Geist", system-ui, sans-serif;
   font-family:var(--t-texte); color:var(--encre); background:var(--fond);
   -webkit-font-smoothing:antialiased;
@@ -76,6 +76,10 @@ body{margin:0}
 .carte.pos1{background:var(--doux)}
 .carte.pos2{background:var(--piste)}
 .carte.pos3{background:var(--piste)}
+.points{display:flex;justify-content:center;align-items:center;gap:6px;height:12px;margin-top:4px}
+.point{width:7px;height:7px;border-radius:99px;background:var(--piste);transition:width .35s cubic-bezier(.3,.9,.25,1),background .35s}
+.point.actif{width:22px;background:var(--accent)}
+.point.fait{background:var(--accent);opacity:.4}
 @media (prefers-reduced-motion: reduce){
   .ecran *{animation:none !important;transition:none !important}
 }
@@ -83,39 +87,18 @@ body{margin:0}
 </helmet>
 <div class="ecran" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; padding: 50px 16px 0; position: relative; overflow: hidden;">
 
-  <!-- En-tête compact -->
-  <div class="entete" style="display: flex; flex-direction: column; gap: 10px;">
-    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
-      <div style="display: flex; flex-direction: column; gap: 2px;">
-        <div style="font-size: 12px; font-weight: 500; color: var(--encre2); letter-spacing: .02em;">Café Kumo · lundi 19 octobre</div>
-        <div style="display: flex; align-items: baseline; gap: 8px;">
-          <span class="display" style="font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -.02em;">4,4</span>
-          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" style="position: relative; top: 2px; color: var(--etoile);"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
-          <span style="font-size: 13px; color: var(--encre2); font-weight: 500;">412 avis · 4,5 sur 3 mois, en hausse de 0,1</span>
-        </div>
-      </div>
+  <!-- En-tête : bonjour, la note, une phrase -->
+  <div class="entete" style="display: flex; flex-direction: column; gap: 4px; padding: 0 4px;">
+    <span style="font-size: 15px; font-weight: 500; color: var(--encre2);">Bonjour Margaux</span>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="display" style="font-size: 60px; font-weight: 700; line-height: 1.05; letter-spacing: -.045em;">4,4</span>
+      <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" style="color: var(--etoile);"><path d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z" fill="currentColor"></path></svg>
     </div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <span class="display" style="font-size: 15px; font-weight: 700;">19 clients contents sur 23</span>
-        <span style="font-size: 12px; color: var(--encre2);">40 derniers jours</span>
-      </div>
-      <div style="display: flex; gap: 3px; height: 8px;" aria-hidden="true">
-        <div style="flex: 19; background: var(--positif); border-radius: 999px;"></div>
-        <div style="flex: 4; background: var(--piste); border-radius: 999px;"></div>
-      </div>
-    </div>
-    <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 4px;">
-      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 8px; row-gap: 2px;">
-        <span style="font-size: 12px; font-weight: 600; color: var(--encre);">Rituel du matin · 3 gestes, environ 3 minutes</span>
-        <span style="font-size: 12px; color: var(--encre2);">{{ etapeTexte }}</span>
-      </div>
-      <div class="jauge"><div style="{{ progressionStyle }}"></div></div>
-    </div>
+    <span style="font-size: 15px; line-height: 1.4; color: var(--encre2);"><span style="font-weight: 600; color: var(--encre);">19 clients contents</span> sur 23 ces dernières semaines</span>
   </div>
 
   <!-- La pile -->
-  <div class="pile" style="margin-top: 22px; height: 548px;">
+  <div class="pile" style="margin-top: 26px; height: 520px;">
 
     <!-- 1. Le sourire d'abord -->
     <div class="{{ carte0Classe }}" >
@@ -277,6 +260,12 @@ body{margin:0}
     </sc-if>
   </div>
 
+  <div class="points" aria-label="{{ etapeTexte }}">
+    <sc-for list="{{ points }}" as="p" hint-placeholder-count="4">
+      <span class="{{ p.cls }}"></span>
+    </sc-for>
+  </div>
+
   <!-- Onglets -->
   <nav class="onglets" style="margin: auto -16px 0; padding: 0 8px;" aria-label="Navigation principale">
     <a class="onglet actif" href="#"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg>Accueil</a>
@@ -321,6 +310,9 @@ class Component extends DCLogic {
       carte1Classe: classe(1),
       carte2Classe: classe(2),
       carte3Classe: classe(3),
+      points: [0, 1, 2, 3].map(function (i) {
+        return { cls: i < etape ? "point fait" : (i === etape ? "point actif" : "point") };
+      }),
       suivant: function () { self.setState({ etape: Math.min(self.state.etape + 1, total) }); },
       recommencer: function () { self.setState({ etape: 0 }); }
     };
