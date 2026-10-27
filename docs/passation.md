@@ -20,7 +20,7 @@ Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, 
 
 Historique complet avec `git log --oneline`, un commit par fonctionnalité, en français.
 
-État vérifié le 27 octobre sur `claude/admiring-maxwell-do4l4f` : lint, typecheck, 171 tests unitaires et 24 parcours Playwright passent, à condition de partir d'une base vierge fraîchement seedée (voir section 6). Lighthouse mobile, build de production en mode démo : accessibilité et bonnes pratiques 100 sur les quatre écrans, performance de 83 à 97 selon la charge de la machine, LCP de 1,7 à 2,2 s en throttling réel ; Chrome ne relève aucune erreur d'installabilité. Après le correctif de la pile, lint, typecheck, tests unitaires et les 4 parcours de l'accueil ont été repassés ; les 24 parcours complets et Lighthouse ne l'ont pas été.
+État vérifié le 27 octobre sur `claude/admiring-maxwell-do4l4f` : lint, typecheck, 171 tests unitaires et 24 parcours Playwright passent, à condition de partir d'une base vierge fraîchement seedée (voir section 6). Lighthouse mobile, build de production en mode démo : accessibilité et bonnes pratiques 100 sur les quatre écrans, performance de 83 à 97 selon la charge de la machine, LCP de 1,7 à 2,2 s en throttling réel ; Chrome ne relève aucune erreur d'installabilité. Après le correctif de la pile, lint, typecheck, tests unitaires et les 24 parcours Playwright ont été repassés sur une base fraîchement seedée ; Lighthouse ne l'a pas été.
 
 ## 2. Reprendre en local en dix minutes
 
@@ -108,6 +108,7 @@ La section 11 du cdc consigne les décisions d'interface prises en construisant 
 
 - **Les parcours Playwright consomment la file** : ils publient et ignorent des avis. Sur une base déjà utilisée, le parcours « régénère avec une consigne » peut échouer faute de second avis dans la file. Repartir propre : supprimer et recréer la base, `npm run db:deploy`, `npm run db:seed`. `prisma migrate reset` demande une confirmation interactive. Le seed met à jour les dates mais ne remet pas les statuts.
 - **Google Sign-In exige des identifiants OAuth** dans Google Cloud (type application web, URI de redirection `http://localhost:3000/api/auth/callback/google`). Sans eux, utilisez `MODE_DEMO=1`. Les parcours Playwright ouvrent une session directement en base (`tests/e2e/helpers/session.ts`).
+- **Ne pas lancer les parcours avec `MODE_DEMO=1`** dans `.env` : le mode démo ouvre l'app sans connexion, et les parcours de connexion et de fin de session échouent (6 sur 24).
 - **Playwright et Chromium** : si la version installée ne correspond pas, `PLAYWRIGHT_CHROMIUM_PATH=/chemin/vers/chromium` est lu par `playwright.config.ts`.
 - **Vitest ne charge pas `.env`** : les modules qui importent le client Prisma ne sont pas testables en unitaire. Les fonctions pures sont volontairement séparées (`agregation.ts`, `calcul.ts`, `ligne-de-conduite.ts`, `recence.ts`, `signature.ts`).
 - **Le compteur de tokens** n'enregistre rien avec le fournisseur simulé.
