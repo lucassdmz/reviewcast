@@ -189,7 +189,7 @@ Le backend est le seul composant qui parle à Google et au fournisseur IA ; le f
 
 - Première ouverture en moins de 2 s sur 4G ; ouvertures suivantes instantanées grâce au cache.
 - Toutes les statistiques de la page Tendances sont précalculées en base à la synchronisation, pas à l'affichage.
-- Score Lighthouse PWA et accessibilité ≥ 90.
+- Score Lighthouse PWA et accessibilité ≥ 90. Lighthouse n'a plus de catégorie PWA depuis sa version 12 : l'installabilité est vérifiée par Chrome (aucune erreur), l'accessibilité reste mesurée par Lighthouse.
 
 **Sécurité et confidentialité**
 
