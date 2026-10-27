@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useTransition, type ReactNode } from "react";
 import { actionPublierDepuisPile, actionPublierMercis } from "@/app/(app)/a-traiter/actions";
+import { useAttenteReseau } from "@/components/pwa/reseau";
 import type { Carte, CarteLevier, CarteMercis, CarteReconquete, CarteSourire } from "@/lib/accueil/rituel";
 
 /**
@@ -128,6 +129,7 @@ function CarteReconqueteVue({ carte, suivant }: { carte: CarteReconquete; suivan
   const [confirmer, setConfirmer] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, demarrer] = useTransition();
+  const enAttente = useAttenteReseau(enCours);
   const fiche = `/a-traiter/${carte.reviewId}`;
 
   function publier() {
@@ -196,7 +198,7 @@ function CarteReconqueteVue({ carte, suivant }: { carte: CarteReconquete; suivan
       <Actions>
         {carte.brouillon ? (
           <button type="button" onClick={publier} disabled={enCours} className={BOUTON}>
-            {enCours ? "Publication…" : confirmer ? "Confirmer la publication" : "Publier la réponse"}
+            {enCours ? (enAttente ? "En attente du réseau…" : "Publication…") : confirmer ? "Confirmer la publication" : "Publier la réponse"}
           </button>
         ) : (
           <Link href={fiche} prefetch={false} className={BOUTON}>
@@ -233,6 +235,7 @@ function CarteMercisVue({ carte, suivant }: { carte: CarteMercis; suivant: (fait
   const [confirmer, setConfirmer] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, demarrer] = useTransition();
+  const enAttente = useAttenteReseau(enCours);
   const n = carte.mercis.length;
 
   function valider() {
@@ -279,7 +282,7 @@ function CarteMercisVue({ carte, suivant }: { carte: CarteMercis; suivant: (fait
       <Erreur message={erreur} />
       <Actions>
         <button type="button" onClick={valider} disabled={enCours} className={BOUTON}>
-          {enCours ? "Publication…" : confirmer ? `Confirmer, publier ${n > 1 ? `les ${n}` : "le merci"}` : n > 1 ? `Valider les ${n} mercis` : "Valider le merci"}
+          {enCours ? (enAttente ? "En attente du réseau…" : "Publication…") : confirmer ? `Confirmer, publier ${n > 1 ? `les ${n}` : "le merci"}` : n > 1 ? `Valider les ${n} mercis` : "Valider le merci"}
         </button>
         <button type="button" onClick={() => (confirmer ? setConfirmer(false) : suivant())} disabled={enCours} className={BOUTON_TEXTE}>
           {confirmer ? "Annuler" : "Plus tard"}

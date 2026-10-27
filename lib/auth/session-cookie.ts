@@ -10,7 +10,7 @@ export function hasSessionCookie(getCookie: (name: string) => boolean): boolean 
 }
 
 /** Chemins accessibles sans session. */
-const PUBLIC_PATHS = ["/connexion", "/api/auth"];
+const PUBLIC_PATHS = ["/connexion", "/api/auth", "/hors-ligne"];
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((base) => pathname === base || pathname.startsWith(`${base}/`));

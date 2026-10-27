@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { Marque } from "@/components/marque/Marque";
+import { OubliHorsLigne } from "@/components/pwa/OubliHorsLigne";
 import { auth, signIn } from "@/lib/auth/config";
 
 const messagesErreur: Record<string, string> = {
@@ -19,6 +20,7 @@ export default async function ConnexionPage({ searchParams }: PageProps<"/connex
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-12">
+      <OubliHorsLigne />
       <span aria-hidden="true" className="block h-20 w-20 rounded-full bg-soleil" />
       <h1 className="mt-6">
         <span className="sr-only">Éclaircie</span>

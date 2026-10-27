@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { BarreOnglets } from "@/components/BarreOnglets";
+import { HorsLigne } from "@/components/pwa/HorsLigne";
 import { auth } from "@/lib/auth/config";
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
 
@@ -11,6 +12,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const { etablissements, actif } = await lireChoixEtablissement();
   return (
     <>
+      <HorsLigne />
       {children}
       <BarreOnglets etablissements={etablissements} actif={actif} />
     </>

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useFormStatus } from "react-dom";
+import { useAttenteReseau } from "@/components/pwa/reseau";
 
 /** Vibration très courte à l'appui, là où le téléphone le permet (Android). Sans effet sur iPhone. */
 function vibrer() {
@@ -11,7 +12,8 @@ function vibrer() {
 /**
  * Bouton d'envoi d'un formulaire serveur. Dès l'appui, il se grise, affiche un
  * indicateur et ne peut plus être touché une seconde fois : on sait que
- * l'action est partie, même si la réponse met un moment à revenir.
+ * l'action est partie, même si la réponse met un moment à revenir. Sans
+ * réseau, il le dit : l'action partira au retour de la connexion.
  */
 export function BoutonAction({
   children,
@@ -26,11 +28,12 @@ export function BoutonAction({
   enCours?: string;
 }) {
   const { pending } = useFormStatus();
+  const enAttente = useAttenteReseau(pending);
   return (
     <button type="submit" formAction={formAction} disabled={pending} aria-busy={pending} onClick={vibrer} className={`${className ?? ""} disabled:opacity-60`}>
       <span className="inline-flex items-center justify-center gap-2">
         {pending && <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />}
-        {pending && enCours ? enCours : children}
+        {enAttente ? "En attente du réseau…" : pending && enCours ? enCours : children}
       </span>
     </button>
   );

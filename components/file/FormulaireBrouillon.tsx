@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useAttenteReseau } from "@/components/pwa/reseau";
 import { actionEnregistrerBrouillon, actionPreparerPublication, actionRegenerer, type EtatAction } from "@/app/(app)/a-traiter/actions";
 import { CONSIGNES_RAPIDES } from "@/lib/file/validation";
 
@@ -27,6 +28,7 @@ export function FormulaireBrouillon({
   const [etatRegenerer, regenerer, regeneration] = useActionState(actionRegenerer, initial);
   const [relecture, setRelecture] = useState(false);
   const occupe = enregistrement || regeneration;
+  const enAttente = useAttenteReseau(occupe || relecture);
   const erreur = etatEnregistrer.erreur ?? etatRegenerer.erreur;
 
   return (
@@ -77,7 +79,7 @@ export function FormulaireBrouillon({
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="submit" form="form-brouillon" disabled={occupe} className="rounded-full bg-nuage font-medium px-3 py-2 text-sm font-medium hover:opacity-60 disabled:opacity-50">
-          {enregistrement ? "Enregistrement…" : "Enregistrer"}
+          {enregistrement ? (enAttente ? "En attente du réseau…" : "Enregistrement…") : "Enregistrer"}
         </button>
         <button
           type="submit"
@@ -88,7 +90,7 @@ export function FormulaireBrouillon({
           onClick={() => setRelecture(true)}
           className="pressable rounded-full bouton-principal px-3 py-2 text-sm disabled:opacity-50"
         >
-          {relecture ? "Un instant…" : "Relire et publier"}
+          {relecture ? (enAttente ? "En attente du réseau…" : "Un instant…") : "Relire et publier"}
         </button>
       </div>
 
@@ -122,7 +124,7 @@ export function FormulaireBrouillon({
             className="min-w-0 flex-1 rounded-2xl border border-nuage bg-fond px-3 py-2 text-sm focus:border-encre focus:outline-none"
           />
           <button type="submit" disabled={occupe} className="rounded-full bg-nuage font-medium px-3 py-2 text-sm hover:opacity-60 disabled:opacity-50">
-            {regeneration ? "Rédaction…" : "Régénérer"}
+            {regeneration ? (enAttente ? "En attente du réseau…" : "Rédaction…") : "Régénérer"}
           </button>
         </div>
       </form>
