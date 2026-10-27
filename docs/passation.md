@@ -27,7 +27,7 @@ Historique complet avec `git log --oneline`, un commit par fonctionnalité, en f
 ```bash
 git clone https://github.com/lucassdmz/reviewcast.git
 cd reviewcast
-git checkout claude/fervent-bell-zgldfx
+git checkout claude/admiring-maxwell-do4l4f
 cp .env.example .env            # puis renseignez les valeurs, voir section 3
 docker compose up -d            # Postgres local sur le port 5432
 npm install                     # génère aussi le client Prisma
