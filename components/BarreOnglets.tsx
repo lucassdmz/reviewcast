@@ -13,6 +13,11 @@ const onglets: { href: string; libelle: string; icone: ReactNode }[] = [
     icone: <path d="M4 11.2 12 4l8 7.2V19a1.5 1.5 0 0 1-1.5 1.5H14v-5.5h-4v5.5H5.5A1.5 1.5 0 0 1 4 19v-7.8Z" />,
   },
   {
+    href: "/a-traiter",
+    libelle: "À traiter",
+    icone: <path d="M4 13.5 6.6 5.6A1.5 1.5 0 0 1 8 4.5h8a1.5 1.5 0 0 1 1.4 1.1l2.6 7.9V18a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18v-4.5Zm0 0h4.5l1.5 2.5h4l1.5-2.5H20" />,
+  },
+  {
     href: "/tendances",
     libelle: "Tendances",
     icone: <path d="M4 19V5M4 19h16M8 15l3.5-4 3 2.5L19 8" />,
@@ -31,7 +36,7 @@ const onglets: { href: string; libelle: string; icone: ReactNode }[] = [
 ];
 
 /**
- * Barre d'onglets flottante : trois destinations, l'onglet actif dans une
+ * Barre d'onglets flottante : quatre destinations, l'onglet actif dans une
  * pastille vert matcha, puis le rond de l'établissement affiché, tout à droite.
  */
 export function BarreOnglets({ etablissements, actif }: { etablissements: Etablissement[]; actif: Etablissement | null }) {

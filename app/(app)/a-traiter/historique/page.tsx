@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function HistoriquePage() {
   const reponses = await historiquePublies(await idEtablissementActif());
   return (
-    <Ecran titre="Réponses publiées" retour={{ href: "/", libelle: "Accueil" }}>
+    <Ecran titre="Réponses publiées" retour={{ href: "/a-traiter", libelle: "À traiter" }}>
       {reponses.length === 0 ? (
         <p className="bloc text-sm text-encre-douce">Aucune réponse publiée pour le moment.</p>
       ) : (

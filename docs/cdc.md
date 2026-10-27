@@ -327,6 +327,7 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 | Publication depuis l'accueil | Un appui | Deux appuis : le geste, puis « Confirmer » | Aucune réponse ne part sans action explicite, même en un geste |
 | QR d'avis | Absent | Lien d'avis Google saisi dans Réglages, QR affiché depuis la carte levier ; demander à chaque client, sans tri | Levier le plus fort et autorisé par Google, qui interdit de ne solliciter que les clients contents |
 | Palette | Brume, jaune, matcha discret | Crème, matcha vif, soleil, cartes autocollants | Cinq directions comparées les 19 et 25 octobre ; « ça manque d'enthousiasme » |
+| Place de la file | Onglet « À traiter » | Fondue dans l'accueil (15 octobre), puis rétablie en onglet le 27 octobre : la pile de l'accueil propose l'avis le plus prioritaire, l'onglet liste tous les avis en attente, le rattrapage à part, les réponses publiées et tous les avis | C'est la fonction principale de l'outil : on ne retrouvait plus la liste des avis en attente |
 
 ## 12. Lot 7 : la voix de l'établissement
 

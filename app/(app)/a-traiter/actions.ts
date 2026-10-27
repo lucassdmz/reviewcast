@@ -75,7 +75,7 @@ export async function actionIgnorer(form: FormData): Promise<void> {
   const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
   const etat = await executer(reviewId, () => ignorerAvis(reviewId, userId));
   if (etat.erreur) redirect(`/a-traiter/${reviewId}?erreur=${encodeURIComponent(etat.erreur)}`);
-  redirect("/avis?traite=1");
+  redirect("/a-traiter?traite=1");
 }
 
 export async function actionRouvrir(form: FormData): Promise<void> {
@@ -113,7 +113,7 @@ export async function actionConfirmerPublication(form: FormData): Promise<void> 
   const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
   const etat = await executer(reviewId, () => publierReponse(reviewId, texteReponseSchema.parse(champ(form, "texte")), userId));
   if (etat.erreur) redirect(`/a-traiter/${reviewId}?erreur=${encodeURIComponent(etat.erreur)}`);
-  redirect(`/avis?publie=${reviewId}`);
+  redirect(`/a-traiter?publie=${reviewId}`);
 }
 
 /**
