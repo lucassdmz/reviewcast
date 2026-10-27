@@ -188,7 +188,7 @@ function CarteReconqueteVue({ carte, suivant }: { carte: CarteReconquete; suivan
       {carte.brouillon ? (
         <div className="rounded-2xl border border-dashed border-ciel-fonce bg-fond px-3.5 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-encre-douce">Brouillon</p>
-          <p className="mt-1 line-clamp-5 text-sm italic leading-snug">{carte.brouillon}</p>
+          <p className="mt-1 line-clamp-4 text-sm italic leading-snug">{carte.brouillon}</p>
           {carte.signature && <p className="mt-1.5 text-xs text-encre-douce">{carte.signature}</p>}
         </div>
       ) : (
@@ -438,7 +438,7 @@ export function Pile({ cartes: cartesAJour }: { cartes: Carte[] }) {
               key={`${carte.type}-${i}`}
               data-pos={pos}
               aria-hidden={pos !== "0"}
-              className="pile-carte sticker flex min-h-[27rem] flex-col gap-3.5 rounded-[1.75rem] bg-surface p-5"
+              className="pile-carte sticker flex flex-col gap-3.5 rounded-[1.75rem] bg-surface p-5"
             >
               {carte.type === "sourire" && <CarteSourireVue carte={carte} suivant={suivant} />}
               {carte.type === "reconquete" && <CarteReconqueteVue carte={carte} suivant={suivant} />}

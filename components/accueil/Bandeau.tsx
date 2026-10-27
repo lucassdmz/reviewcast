@@ -9,20 +9,20 @@ import type { Entete } from "@/lib/accueil/service";
 export function Bandeau({ entete, salutation }: { entete: Entete; salutation: string }) {
   const { contents, volume, note } = entete;
   return (
-    <header className="sticker relative overflow-hidden rounded-[1.75rem] bg-matcha-vif px-[1.125rem] pb-[1.125rem] pt-4 text-sur-vif">
-      <p className="text-[15px] font-semibold">{salutation}</p>
+    <header className="sticker relative overflow-hidden rounded-[1.75rem] bg-matcha-vif px-5 pb-5 pt-5 text-sur-vif">
+      <p className="text-base font-semibold">{salutation}</p>
       {volume > 0 ? (
-        <h1 className="mt-1 flex items-end gap-2.5">
-          <span className="saute titre-display text-[76px] font-extrabold leading-[0.86] tracking-[-0.06em]">{contents}</span>
-          <span className="pb-1 leading-tight">
-            <span className="titre-display block text-[19px] font-bold">
+        <h1 className="mt-2 flex items-end gap-3">
+          <span className="saute titre-display text-[96px] font-extrabold leading-[0.84] tracking-[-0.06em]">{contents}</span>
+          <span className="pb-1.5 leading-tight">
+            <span className="titre-display block text-[22px] font-bold">
               {contents > 1 ? "clients contents" : "client content"}
             </span>
-            <span className="block text-sm font-medium">sur {volume} ces dernières semaines</span>
+            <span className="mt-0.5 block text-[15px] font-medium">sur {volume} ces dernières semaines</span>
           </span>
         </h1>
       ) : (
-        <h1 className="titre-display mt-2 max-w-[13rem] text-[22px] font-bold leading-tight">Pas encore d’avis ces dernières semaines</h1>
+        <h1 className="titre-display mt-3 max-w-[14rem] text-[26px] font-bold leading-tight">Pas encore d’avis ces dernières semaines</h1>
       )}
       {note && (
         <Link

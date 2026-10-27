@@ -361,17 +361,24 @@ nav a {
 }
 
 /*
- * La pile de l'accueil : les cartes sont empilées dans la même case de grille
- * (la pile prend la hauteur de la plus haute), celle du dessus se joue, les
+ * La pile de l'accueil : les cartes sont empilées dans la même case de grille.
+ * Seule la carte du dessus est dans le flux : la pile prend sa hauteur, sans
+ * vide sous une carte courte. Celle du dessus se joue, les
  * suivantes dépassent en dessous, légèrement tournées. Une carte jouée part
  * vers la gauche.
  */
 .pile {
+  position: relative;
   display: grid;
-  padding-bottom: 2.75rem;
+  /* Une marge, pas un padding : les cartes en position absolue s'alignent ainsi sur la carte du dessus. */
+  margin-bottom: 2.75rem;
 }
 .pile > * {
   grid-area: 1 / 1;
+}
+.pile-carte:not([data-pos="0"]) {
+  position: absolute;
+  inset: 0;
 }
 .pile-carte {
   transition:
