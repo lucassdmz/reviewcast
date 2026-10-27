@@ -1,10 +1,10 @@
 # Passation — Éclaircie (météo des avis Google)
 
-Document de reprise rédigé le 18 octobre 2026 et mis à jour le 27 octobre 2026 (refonte de l'accueil, onglet À traiter, lot 6). Il permet de reprendre le projet en local, avec Claude Code ou à la main, sans perdre le contexte. Référence fonctionnelle : [cdc.md](cdc.md), version 1.1. Règles de travail : `CLAUDE.md` à la racine. Idées et références : [backlog.md](backlog.md).
+Document de reprise rédigé le 18 octobre 2026 et mis à jour le 27 octobre 2026 (refonte de l'accueil, onglet À traiter, lot 6, hauteur de la pile). Il permet de reprendre le projet en local, avec Claude Code ou à la main, sans perdre le contexte. Référence fonctionnelle : [cdc.md](cdc.md), version 1.1. Règles de travail : `CLAUDE.md` à la racine. Idées et références : [backlog.md](backlog.md).
 
 ## 1. Où en est le projet
 
-Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, partie de `claude/fervent-bell-zgldfx`, toutes deux poussées sur GitHub (`lucassdmz/reviewcast`). Rien n'est encore fusionné dans `main`. Plusieurs sessions ont contribué : lots 0, 2, 3, 4, 5 (2 octobre), lot 7, mode démo et refonte mobile (3 au 5 octobre), recherche, maquettes et accueil en pile (19 au 25 octobre), onglet À traiter et lot 6 (27 octobre). Tout fonctionne sans compte Google Business grâce aux avis de démonstration, à un fournisseur IA simulé ou réel, et à une publication simulée.
+Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, partie de `claude/fervent-bell-zgldfx`, toutes deux poussées sur GitHub (`lucassdmz/reviewcast`). Rien n'est encore fusionné dans `main`. Plusieurs sessions ont contribué : lots 0, 2, 3, 4, 5 (2 octobre), lot 7, mode démo et refonte mobile (3 au 5 octobre), recherche, maquettes et accueil en pile (19 au 25 octobre), onglet À traiter et lot 6, puis correctif de hauteur de la pile et bandeau agrandi (27 octobre). Tout fonctionne sans compte Google Business grâce aux avis de démonstration, à un fournisseur IA simulé ou réel, et à une publication simulée.
 
 | Lot | Contenu | État |
 | --- | --- | --- |
@@ -20,7 +20,7 @@ Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, 
 
 Historique complet avec `git log --oneline`, un commit par fonctionnalité, en français.
 
-État vérifié le 27 octobre sur `claude/admiring-maxwell-do4l4f` : lint, typecheck, 171 tests unitaires et 24 parcours Playwright passent, à condition de partir d'une base vierge fraîchement seedée (voir section 6). Lighthouse mobile, build de production en mode démo : accessibilité et bonnes pratiques 100 sur les quatre écrans, performance de 83 à 97 selon la charge de la machine, LCP de 1,7 à 2,2 s en throttling réel ; Chrome ne relève aucune erreur d'installabilité.
+État vérifié le 27 octobre sur `claude/admiring-maxwell-do4l4f` : lint, typecheck, 171 tests unitaires et 24 parcours Playwright passent, à condition de partir d'une base vierge fraîchement seedée (voir section 6). Lighthouse mobile, build de production en mode démo : accessibilité et bonnes pratiques 100 sur les quatre écrans, performance de 83 à 97 selon la charge de la machine, LCP de 1,7 à 2,2 s en throttling réel ; Chrome ne relève aucune erreur d'installabilité. Après le correctif de la pile, lint, typecheck, tests unitaires et les 4 parcours de l'accueil ont été repassés ; les 24 parcours complets et Lighthouse ne l'ont pas été.
 
 ## 2. Reprendre en local en dix minutes
 
@@ -102,6 +102,7 @@ La section 11 du cdc consigne les décisions d'interface prises en construisant 
 - **Actions hors ligne avec `experimental.useOffline` de Next 16** : une action lancée sans réseau attend et repart seule au retour de la connexion, tant que l'application reste ouverte. Elle n'est pas mise de côté si l'application est fermée : le bandeau demande de la garder ouverte. Une file persistante (IndexedDB) rejouerait une publication longtemps après le geste, ce qui va contre « aucune publication sans action explicite ».
 - **Notifications sans donnée client** : ni nom ni texte d'avis, car elles transitent par les services de push d'Apple et Google. Une notification « avis à traiter » par lot d'avis, jamais pour un avis de plus de 7 jours (l'import initial ne déclenche rien).
 - **Onglet À traiter rétabli** (27 octobre) : la pile de l'accueil ne propose qu'un avis ; la liste complète des avis en attente n'était plus accessible.
+- **La pile prend la hauteur de la carte visible** (27 octobre) : elle prenait celle de sa carte la plus haute, au moins 27rem, et laissait un grand vide sous les cartes courtes. Seule la carte du dessus reste dans le flux, les suivantes se calent dessus en position absolue (`app/globals.css`, `.pile`). La place libérée va au bandeau : chiffre à 96 px, libellés plus grands. Le brouillon de la carte à reconquérir est limité à quatre lignes pour que « Publier la réponse » reste au-dessus de la barre d'onglets sur iPhone 13.
 
 ## 6. Pièges connus
 
@@ -116,6 +117,7 @@ La section 11 du cdc consigne les décisions d'interface prises en construisant 
 - **Le service worker ne s'enregistre qu'en production** (`npm run build && npm run start`) : en développement, il gênerait le rechargement à chaud. Pour tester le hors ligne, utiliser le build de production.
 - **Notifications sur iPhone** : uniquement dans l'application ajoutée à l'écran d'accueil (iOS 16.4 et plus). L'écran Notifications l'explique. Chromium sans interface répond toujours « refusé » : le parcours Playwright simule une autorisation non demandée.
 - **Les tâches planifiées** se testent à la main : `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/taches/avis-a-traiter`.
+- **Hauteur de l'accueil sur iPhone** : la carte la plus longue (à reconquérir, avec brouillon) tient juste au-dessus de la barre d'onglets. Avant d'agrandir le bandeau ou d'ajouter un élément à une carte, vérifier les boutons sur un écran de 390 × 844. L'espacement sous la pile est une marge, pas un padding : un padding décalerait les cartes en position absolue.
 - **Lighthouse 12** n'a plus de catégorie PWA ; l'installabilité se vérifie dans Chrome (DevTools, Application, Manifest).
 
 ## 7. Prochaines étapes, dans l'ordre recommandé
