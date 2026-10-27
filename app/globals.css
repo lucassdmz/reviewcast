@@ -186,16 +186,19 @@ nav a {
  * Mouvement : une seule entrée par écran (les cartes montent l'une après
  * l'autre), le soleil qui se lève, les barres et les courbes qui se tracent,
  * et un léger enfoncement au toucher. Rien ne bouge sans raison.
+ * Les entrées partent d'une opacité de 0,01 et non de 0 : à l'œil c'est la
+ * même chose, mais le navigateur compte l'élément comme affiché dès la
+ * première image, ce qui avance la mesure d'affichage (LCP) sur téléphone.
  */
 @keyframes monter {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translateY(6px);
   }
 }
 @keyframes lever {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translate(14px, 28px) scale(0.88);
   }
 }
@@ -412,7 +415,7 @@ nav a {
 
 @keyframes tamponner {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: rotate(-20deg) scale(0.6);
   }
 }
@@ -422,7 +425,7 @@ nav a {
 }
 @keyframes sauter {
   from {
-    opacity: 0;
+    opacity: 0.01;
     transform: translateY(12px) scale(0.7);
   }
 }
