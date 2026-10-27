@@ -119,6 +119,9 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
       <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
         <Ligne href="/reglages/apparence" titre="Apparence" resume={LIBELLES_THEME[theme].titre} />
       </ul>
+      <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
+        <Ligne href="/reglages/notifications" titre="Notifications" resume="Avis à traiter, résumé du lundi" />
+      </ul>
 
       <h2 className="mt-9 px-1 text-xl font-bold tracking-tight">Bon à savoir</h2>
       <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">

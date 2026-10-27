@@ -137,3 +137,57 @@ self.addEventListener("message", (event) => {
     event.waitUntil(precharger(data.chemins.filter((c): c is string => (ECRANS_HORS_LIGNE as readonly unknown[]).includes(c))));
   }
 });
+
+/** Notification reçue : titre, texte, écran à ouvrir. Jamais de nom de client dedans (lib/notifications). */
+interface NotificationRecue {
+  titre: string;
+  corps: string;
+  url: string;
+  tag: string;
+}
+
+function lireNotification(donnees: unknown): NotificationRecue | null {
+  if (typeof donnees !== "object" || donnees === null) return null;
+  const { titre, corps, url, tag } = donnees as Record<string, unknown>;
+  if (typeof titre !== "string" || typeof corps !== "string" || typeof url !== "string" || !url.startsWith("/")) return null;
+  return { titre, corps, url, tag: typeof tag === "string" ? tag : "eclaircie" };
+}
+
+self.addEventListener("push", (event) => {
+  let notification: NotificationRecue | null = null;
+  try {
+    notification = lireNotification(event.data?.json());
+  } catch {
+    notification = null;
+  }
+  if (!notification) return;
+  event.waitUntil(
+    self.registration.showNotification(notification.titre, {
+      body: notification.corps,
+      icon: "/icons/icon-192.png",
+      tag: notification.tag,
+      lang: "fr",
+      data: { url: notification.url },
+    }),
+  );
+});
+
+/** Un appui ouvre l'écran annoncé, dans la fenêtre déjà ouverte s'il y en a une. */
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const data: unknown = event.notification.data;
+  const chemin = typeof data === "object" && data !== null && "url" in data && typeof data.url === "string" && data.url.startsWith("/") ? data.url : "/";
+  const url = new URL(chemin, self.location.origin).href;
+  event.waitUntil(
+    (async () => {
+      const fenetres = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      const fenetre = fenetres.find((f) => new URL(f.url).origin === self.location.origin);
+      if (fenetre) {
+        await fenetre.focus();
+        await fenetre.navigate(url).catch(() => undefined);
+        return;
+      }
+      await self.clients.openWindow(url);
+    })(),
+  );
+});

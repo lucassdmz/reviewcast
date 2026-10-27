@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { SECRET_TACHES_TEST } from "./tests/e2e/helpers/taches";
 
 /**
  * Parcours Playwright. Le serveur Next est lancé automatiquement avec des
@@ -37,6 +38,11 @@ export default defineConfig({
       // Fournisseur IA simulé : aucun appel réseau pendant les parcours.
       AI_PROVIDER: "fake",
       PUBLICATION_GOOGLE: "simulee",
+      // Clés VAPID réservées aux tests (aucun appareil réel n'y est abonné) et secret des tâches planifiées.
+      VAPID_PUBLIC_KEY: "BFkdO-30j3-E3QVyIRoZj2qOliucCYC77Ngur1YAD3PwanTePy9PabPmMvXtf4Qzn2uUqQ7HOckrl5TrzvHaklo",
+      VAPID_PRIVATE_KEY: "-uCRK-igIUIlPNX3vn2zw2xUUhPOAt6pSkcjfFE5w34",
+      VAPID_SUJET: "mailto:test@exemple.fr",
+      CRON_SECRET: SECRET_TACHES_TEST,
     },
   },
 });

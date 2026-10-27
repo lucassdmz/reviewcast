@@ -6,6 +6,8 @@ describe("protection des routes", () => {
     expect(isPublicPath("/connexion")).toBe(true);
     expect(isPublicPath("/api/auth/callback/google")).toBe(true);
     expect(isPublicPath("/api/auth")).toBe(true);
+    expect(isPublicPath("/api/taches/resume-hebdo")).toBe(true);
+    expect(isPublicPath("/hors-ligne")).toBe(true);
   });
 
   it("protège les autres chemins", () => {
