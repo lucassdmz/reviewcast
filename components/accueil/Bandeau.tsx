@@ -7,7 +7,7 @@ import type { Entete } from "@/lib/accueil/service";
  * jaune posée dans le coin. La pastille mène à Tendances.
  */
 export function Bandeau({ entete, salutation }: { entete: Entete; salutation: string }) {
-  const { contents, volume, note } = entete;
+  const { contents, volume, periode, note } = entete;
   return (
     <header className="sticker relative overflow-hidden rounded-[1.75rem] bg-matcha-vif px-5 pb-5 pt-5 text-sur-vif">
       <p className="text-base font-semibold">{salutation}</p>
@@ -18,11 +18,11 @@ export function Bandeau({ entete, salutation }: { entete: Entete; salutation: st
             <span className="titre-display block text-[22px] font-bold">
               {contents > 1 ? "clients contents" : "client content"}
             </span>
-            <span className="mt-0.5 block text-[15px] font-medium">sur {volume} ces dernières semaines</span>
+            <span className="mt-0.5 block text-[15px] font-medium">sur {volume} {periode}</span>
           </span>
         </h1>
       ) : (
-        <h1 className="titre-display mt-3 max-w-[14rem] text-[26px] font-bold leading-tight">Pas encore d’avis ces dernières semaines</h1>
+        <h1 className="titre-display mt-3 max-w-[14rem] text-[26px] font-bold leading-tight">Pas encore d’avis {periode}</h1>
       )}
       {note && (
         <Link

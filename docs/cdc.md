@@ -30,10 +30,10 @@ L'outil remet les avis Google en perspective : il montre d'abord le climat globa
 **Règles d'interface**
 
 - La home s'ouvre sur la météo des 3 derniers mois, jamais sur la liste des avis négatifs. Un sélecteur en tête de carte permet de passer à 30 jours ou à 12 mois.
-- Aucun compteur ne repart de zéro le 1er du mois : la météo et la note se lisent sur une période glissante (30 jours, 3 mois par défaut, 12 mois), la file sur 40 jours glissants. On écrit « 3 mois » plutôt que « 90 jours ». Deux avis sévères en début de mois ne doivent pas assombrir tout l'écran.
+- Aucun compteur ne repart de zéro le 1er du mois : la météo et la note se lisent sur une période glissante (30 jours, 3 mois par défaut, 12 mois), l'accueil et la file sur une fenêtre glissante calée sur le rythme de l'établissement : la plus courte parmi 6 semaines, 2 mois et 3 mois qui contient au moins 10 avis, 3 mois au plus. Un café calme n'a ainsi ni un accueil vide ni un écran assombri par un seul avis sévère. On écrit « 3 mois » plutôt que « 90 jours ». Deux avis sévères en début de mois ne doivent pas assombrir tout l'écran.
 - Pas de dette affichée : les avis anciens restés sans réponse sont rangés dans un « rattrapage » replié, sans compteur.
 - Pas de rouge vif, pas de badge de notification agressif. Les avis négatifs à traiter apparaissent comme une file de tâches, en ton neutre.
-- Le contexte rassurant est dit une fois par écran, en une phrase lisible sans calcul : « 12 clients contents sur 17 avis reçus ces 40 derniers jours ».
+- Le contexte rassurant est dit une fois par écran, en une phrase lisible sans calcul : « 12 clients contents sur 17 avis reçus ces 6 dernières semaines ».
 - Les formulations sont positives et factuelles : « 2 avis à traiter » plutôt que « 2 avis négatifs ! ».
 - Les succès sont célébrés : nouvel avis 5 étoiles, meilleure semaine du trimestre, 10 réponses publiées.
 - Lecture rapide : chaque écran livre son information principale sans scroll sur un écran de téléphone. Le reste se découvre en défilant.
@@ -51,15 +51,15 @@ Quatre écrans : Home (météo), À traiter, Tendances, Réglages. Navigation pa
 - Note moyenne sur la période choisie et sur 12 mois glissants, nombre d'avis reçus, évolution par rapport à la période précédente de même durée.
 - Phrase de synthèse générée par l'IA, une ligne, ton positif et factuel, qui commence par les clients contents : « 21 clients contents sur 23 avis. Ils citent surtout l'accueil et la rapidité. »
 - Le compliment du moment : extrait d'un avis positif récent mis en avant, rotation à chaque ouverture.
-- Carte discrète « N avis à traiter » qui mène à l'écran À traiter. Elle ne compte que les avis des 40 derniers jours. Absente s'il n'y a rien à traiter.
+- Carte discrète « N avis à traiter » qui mène à l'écran À traiter. Elle ne compte que les avis entrés dans la fenêtre de leur établissement. Absente s'il n'y a rien à traiter.
 - Mini-courbe de la note moyenne sur les 8 dernières semaines. L'établissement affiché se choisit depuis le rond de la barre d'onglets (voir la décision en section 11) : vue d'ensemble de tous les établissements par défaut, un établissement en deux taps.
 
 ### 3.2 À traiter — gestion des avis négatifs
 
-- Liste des avis 1 à 3 étoiles sans réponse publiée reçus dans les 40 derniers jours, du plus récent au plus ancien. Les avis plus anciens sans réponse sont accessibles dans un bloc « Rattrapage » replié en bas d'écran, sans compteur.
+- Liste des avis 1 à 3 étoiles sans réponse publiée reçus dans la fenêtre de leur établissement (6 semaines à 3 mois selon son rythme), du plus récent au plus ancien. Les avis plus anciens sans réponse sont accessibles dans un bloc « Rattrapage » replié en bas d'écran, sans compteur.
 - En tête de liste, une seule phrase de contexte sur le climat récent. Chaque carte montre l'auteur, la note, la date, un extrait, la gravité en jauge discrète et l'invitation « Voir le brouillon ».
 - Un avis 4 étoiles avec texte critique peut être ajouté à la file si l'IA détecte un problème (réglable).
-- Fiche avis : auteur, note, date, texte complet, thèmes détectés, gravité estimée par l'IA (faible, moyenne, forte), bandeau de contexte (« Cet avis fait partie de 17 avis reçus en 40 jours, dont 12 de clients contents »).
+- Fiche avis : auteur, note, date, texte complet, thèmes détectés, gravité estimée par l'IA (faible, moyenne, forte), bandeau de contexte (« Cet avis fait partie de 17 avis reçus en 6 semaines, dont 12 de clients contents »).
 - Brouillon de réponse pré-rédigé selon la ligne de conduite (section 4). Boutons : modifier, régénérer avec une consigne (« plus court », « propose un geste commercial »), marquer comme traité sans répondre.
 - Publication de la réponse directement sur Google via l'API, après validation explicite. Confirmation visuelle, puis l'avis sort de la file.
 - Statuts : à traiter, brouillon prêt, publié, ignoré. Historique des réponses publiées consultable.
@@ -314,7 +314,8 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 | Sujet | Version 1.0 | Décision | Raison |
 | --- | --- | --- | --- |
 | Période de la météo | Mois calendaire | Glissante, au choix : 30 jours, 3 mois (par défaut), 12 mois | Le 3 du mois, deux avis durs donnaient « pluie légère » alors que la période récente était bonne |
-| File « À traiter » | Tous les avis sans réponse | Les 40 derniers jours, le reste en « rattrapage » sans compteur | Un historique d'un an sans réponse s'affichait comme une dette de 29 tâches |
+| File « À traiter » | Tous les avis sans réponse | La fenêtre de l'établissement (6 semaines, 2 mois ou 3 mois, d'après son nombre d'avis), le reste en « rattrapage » sans compteur | Un historique d'un an sans réponse s'affichait comme une dette de 29 tâches |
+| Fenêtre de l'accueil et de la file | 40 jours pour tous | Adaptative par établissement : la plus courte parmi 6 semaines, 2 mois, 3 mois qui contient 10 avis | Un café calme reçoit quelques avis par mois : sur 40 jours, son accueil était presque vide et un seul avis sévère pesait tout l'écran |
 | Contexte rassurant | Sur chaque avis, avec la note du mois | Une phrase par écran, sans calcul à faire | Répété sur chaque carte, il n'était plus lu, et sa formulation n'était pas comprise |
 | Home sans défilement | Tout l'écran | L'information principale seulement | Tout faire tenir obligeait à des textes trop petits pour être lus |
 | Phrase de synthèse | « 23 avis, 21 enthousiastes » | « 21 clients contents sur 23 avis » | Commencer par les clients contents |

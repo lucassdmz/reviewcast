@@ -1,19 +1,19 @@
-import { FENETRE_FILE_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
+import { estRecent, type Fenetre } from "@/lib/fenetre/adaptative";
 
 /**
  * Sépare la file en deux : les avis récents, qui sont l'actualité à traiter,
  * et le rattrapage, c'est-à-dire les avis plus anciens restés sans réponse.
- * Le rattrapage reste accessible mais n'est jamais compté sur la home : on ne
+ * « Récent » se lit dans la fenêtre de l'établissement de chaque avis. Le
+ * rattrapage reste accessible mais n'est jamais compté sur la home : on ne
  * démarre pas la journée avec une dette.
  */
-export function partagerFile<T extends { dateCreation: Date }>(
+export function partagerFile<T extends { locationId: string; dateCreation: Date }>(
   file: T[],
+  fenetres: ReadonlyMap<string, Fenetre>,
   maintenant: Date,
-  jours = FENETRE_FILE_JOURS,
 ): { recents: T[]; rattrapage: T[] } {
-  const { debut } = fenetreGlissante(maintenant, jours);
   return {
-    recents: file.filter((a) => a.dateCreation >= debut),
-    rattrapage: file.filter((a) => a.dateCreation < debut),
+    recents: file.filter((a) => estRecent(a, fenetres, maintenant)),
+    rattrapage: file.filter((a) => !estRecent(a, fenetres, maintenant)),
   };
 }

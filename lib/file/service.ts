@@ -7,7 +7,9 @@ import { creerPublieur, type PublieurReponses } from "@/lib/google/publication";
 import { retenirCorrection, lireVoix } from "@/lib/voix/service";
 import { motsEvitesPresents } from "@/lib/voix/reglages";
 import { avecSignature, sansSignature } from "@/lib/voix/signature";
+import { fenetresParEtablissement } from "@/lib/fenetre/service";
 import { contexteAvis, formaterContexte, formaterContexteFile, type ContexteAvis } from "./contexte";
+import { partagerFile } from "./recence";
 import { STATUTS_FILE, verifierTransition } from "./statuts";
 
 /**
@@ -18,6 +20,7 @@ import { STATUTS_FILE, verifierTransition } from "./statuts";
 
 export interface AvisDeLaFile {
   id: string;
+  locationId: string;
   auteur: string;
   note: number;
   dateCreation: Date;
@@ -49,6 +52,18 @@ export async function contexteDeLaFile(locationId: string | null, maintenant = n
   return formaterContexteFile(contexteAvis(tous, maintenant));
 }
 
+/**
+ * L'écran « À traiter » : les avis récents, ceux du rattrapage (plus anciens
+ * que la fenêtre de leur établissement) et le climat récent à dire en tête.
+ */
+export async function lireFile(
+  locationId: string | null,
+  maintenant = new Date(),
+): Promise<{ recents: AvisDeLaFile[]; rattrapage: AvisDeLaFile[]; contexte: string | null }> {
+  const [tous, fenetres, contexte] = await Promise.all([listerFile(locationId), fenetresParEtablissement(maintenant), contexteDeLaFile(locationId, maintenant)]);
+  return { ...partagerFile(tous, fenetres, maintenant), contexte };
+}
+
 /** Liste de la file, du plus récent au plus ancien. */
 export async function listerFile(locationId: string | null): Promise<AvisDeLaFile[]> {
   const avis = await prisma.review.findMany({
@@ -58,6 +73,7 @@ export async function listerFile(locationId: string | null): Promise<AvisDeLaFil
   });
   return avis.map((a) => ({
     id: a.id,
+    locationId: a.locationId,
     auteur: a.auteur,
     note: a.note,
     dateCreation: a.dateCreation,

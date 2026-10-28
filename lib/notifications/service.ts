@@ -2,7 +2,7 @@ import webpush from "web-push";
 import { z } from "zod";
 import { prisma } from "@/lib/db/client";
 import { STATUTS_FILE } from "@/lib/file/statuts";
-import { FENETRE_FILE_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
+import { fenetresParEtablissement, filtreRecents } from "@/lib/fenetre/service";
 import { messageAvisATraiter, messagePushSchema, messageResumeHebdo, type Abonnement, type ChoixNotifications, type MessagePush } from "./messages";
 
 /**
@@ -106,11 +106,11 @@ export async function envoyerResumeHebdo(maintenant = new Date()): Promise<{ env
   const destinataires = await prisma.pushAbonnement.findMany({ where: { resumeHebdo: true } });
   if (destinataires.length === 0) return { envoyes: 0 };
   const semaine = new Date(maintenant.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const fenetreFile = fenetreGlissante(maintenant, FENETRE_FILE_JOURS).debut;
+  const fenetres = await fenetresParEtablissement(maintenant);
   const [recus, contents, aTraiter, reponses] = await Promise.all([
     prisma.review.count({ where: { retireAt: null, dateCreation: { gte: semaine } } }),
     prisma.review.count({ where: { retireAt: null, dateCreation: { gte: semaine }, note: { gte: 4 } } }),
-    prisma.review.count({ where: { retireAt: null, statut: { in: STATUTS_FILE }, dateCreation: { gte: fenetreFile } } }),
+    prisma.review.count({ where: { retireAt: null, statut: { in: STATUTS_FILE }, ...filtreRecents(fenetres) } }),
     prisma.review.count({ where: { retireAt: null, reponseGoogleDate: { gte: semaine } } }),
   ]);
   return { envoyes: await envoyer(destinataires, messageResumeHebdo({ recus, contents, aTraiter, reponses })) };

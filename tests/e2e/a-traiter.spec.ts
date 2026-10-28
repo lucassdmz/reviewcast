@@ -40,7 +40,7 @@ test.describe("file à traiter", () => {
     const auteur = await auteurDe(premiere);
     await premiere.click();
     await expect(page.getByRole("heading", { level: 1, name: auteur })).toBeVisible();
-    await expect(page.getByText(/reçus en 40 jours|seul avis reçu/)).toBeVisible();
+    await expect(page.getByText(/reçus en (6 semaines|2 mois|3 mois)|seul avis reçu/)).toBeVisible();
 
     const zone = page.getByLabel("Texte de la réponse");
     await expect(zone).not.toBeEmpty();

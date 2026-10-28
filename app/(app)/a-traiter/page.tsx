@@ -2,22 +2,21 @@ import Link from "next/link";
 import { Ecran } from "@/components/Ecran";
 import { LigneFile } from "@/components/file/LigneFile";
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
-import { partagerFile } from "@/lib/file/recence";
-import { contexteDeLaFile, listerFile } from "@/lib/file/service";
+import { lireFile } from "@/lib/file/service";
 
 export const dynamic = "force-dynamic";
 
 /**
  * L'écran À traiter : tous les avis qui attendent une réponse, en un onglet.
  * L'accueil n'en propose qu'un, le plus prioritaire ; ici la liste est complète.
- * Les avis de plus de 40 jours sont rangés à part, sans compteur.
+ * Les avis plus anciens que la fenêtre de leur établissement (six semaines à
+ * trois mois selon son rythme) sont rangés à part, sans compteur.
  */
 export default async function ATraiterPage({ searchParams }: PageProps<"/a-traiter">) {
   const params = await searchParams;
   const { actif } = await lireChoixEtablissement();
   const locationId = actif?.id ?? null;
-  const [tous, contexte] = await Promise.all([listerFile(locationId), contexteDeLaFile(locationId)]);
-  const { recents: file, rattrapage } = partagerFile(tous, new Date());
+  const { recents: file, rattrapage, contexte } = await lireFile(locationId);
   const message = params.publie ? "Réponse publiée sur Google. L'avis a quitté la file." : params.traite ? "Avis marqué comme traité." : null;
   const titre = file.length === 0 ? "Rien à traiter" : file.length === 1 ? "1 avis à traiter" : `${file.length} avis à traiter`;
 

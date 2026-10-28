@@ -1,11 +1,11 @@
 import type { Meteo } from "@/lib/db/generated/enums";
 import { prisma } from "@/lib/db/client";
+import { fenetresParEtablissement, filtreRecents } from "@/lib/fenetre/service";
 import {
   compterThemes,
   courbeHebdomadaire,
   douzeMoisGlissants,
   evolution,
-  FENETRE_FILE_JOURS,
   debutDuMois,
   fenetreGlissante,
   fenetrePrecedente,
@@ -96,7 +96,7 @@ export async function obtenirMeteoHome(
       ...filtreLocation,
       retireAt: null,
       statut: { in: ["A_TRAITER", "BROUILLON_PRET"] },
-      dateCreation: { gte: fenetreGlissante(maintenant, FENETRE_FILE_JOURS).debut },
+      ...filtreRecents(await fenetresParEtablissement(maintenant)),
     },
   });
   const ceMois = statsPeriode(avis, mois);

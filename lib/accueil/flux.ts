@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/client";
 import type { ReviewStatus } from "@/lib/db/generated/enums";
-import { FENETRE_FILE_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
+import { estRecent } from "@/lib/fenetre/adaptative";
+import { fenetresParEtablissement } from "@/lib/fenetre/service";
 import { STATUTS_FILE } from "@/lib/file/statuts";
 import { lireVoix } from "@/lib/voix/service";
 import { sansSignature } from "@/lib/voix/signature";
@@ -46,7 +47,7 @@ export async function listerFlux(locationId: string | null, maintenant = new Dat
   });
   const signatures = new Map<string, string | null>();
   for (const id of new Set(avis.map((a) => a.locationId))) signatures.set(id, (await lireVoix(id)).signature);
-  const depuis = fenetreGlissante(maintenant, FENETRE_FILE_JOURS).debut;
+  const fenetres = await fenetresParEtablissement(maintenant);
 
   const posts = avis.map((a): Post => {
     const etat = etatDe(a.statut, a.reponseGoogleTexte);
@@ -62,7 +63,7 @@ export async function listerFlux(locationId: string | null, maintenant = new Dat
       sujet: sujet ? sujet.charAt(0).toLocaleLowerCase("fr") + sujet.slice(1) : null,
       etat,
       reponse: brut ? sansSignature(brut, signature) : null,
-      aRelire: (STATUTS_FILE as readonly ReviewStatus[]).includes(a.statut) && a.dateCreation >= depuis,
+      aRelire: (STATUTS_FILE as readonly ReviewStatus[]).includes(a.statut) && estRecent(a, fenetres, maintenant),
     };
   });
   // Les avis à relire d'abord, puis le reste : l'ordre par date est conservé dans chaque groupe.

@@ -2,7 +2,8 @@ import QRCode from "qrcode";
 import { genererRemerciement } from "@/lib/ai/service";
 import { prisma } from "@/lib/db/client";
 import { STATUTS_FILE } from "@/lib/file/statuts";
-import { FENETRE_FILE_JOURS, fenetreGlissante } from "@/lib/meteo/agregation";
+import { LIBELLES_FENETRE } from "@/lib/fenetre/adaptative";
+import { fenetreDeLaVue, fenetresParEtablissement, filtreRecents } from "@/lib/fenetre/service";
 import { lireVoix } from "@/lib/voix/service";
 import { sansSignature } from "@/lib/voix/signature";
 import { prochainPalier } from "./palier";
@@ -44,9 +45,11 @@ const MERCIS_MAX = 4;
 
 export interface Entete {
   prenom: string | null;
-  /** Clients contents (4 et 5 étoiles) sur la fenêtre de 40 jours. */
+  /** Clients contents (4 et 5 étoiles) sur la fenêtre adaptative de la vue. */
   contents: number;
   volume: number;
+  /** Cette fenêtre, dite en mots : « ces 6 dernières semaines », « ces 2 derniers mois ». */
+  periode: string;
   /** Note affichée, « 4,4 », ou null sans avis. */
   note: string | null;
 }
@@ -111,7 +114,8 @@ async function qrSvg(lien: string): Promise<string | null> {
  * levier. Une carte sans contenu n'apparaît pas.
  */
 export async function preparerRituel(locationId: string | null, locationPourVoix: string | null, maintenant = new Date()): Promise<Rituel> {
-  const fenetre = fenetreGlissante(maintenant, FENETRE_FILE_JOURS);
+  // Les chiffres se lisent sur la fenêtre de la vue ; la file, sur celle de chaque établissement.
+  const [fenetre, fenetres] = await Promise.all([fenetreDeLaVue(locationId, maintenant), fenetresParEtablissement(maintenant)]);
   const depuisSujet = new Date(maintenant.getTime() - FENETRE_SUJET_JOURS * 86_400_000);
 
   const [toutes, recents, aTraiter, voix, lienAvis] = await Promise.all([
@@ -128,7 +132,7 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
       },
     }),
     prisma.review.findMany({
-      where: { ...filtre(locationId), retireAt: null, statut: { in: STATUTS_FILE }, dateCreation: { gte: fenetre.debut } },
+      where: { ...filtre(locationId), retireAt: null, statut: { in: STATUTS_FILE }, ...filtreRecents(fenetres) },
       include: {
         drafts: { orderBy: { version: "desc" }, take: 1, select: { texte: true } },
         analysis: { select: { gravite: true, resume: true, themes: { where: { polarite: "NEGATIF" }, select: { theme: { select: { libelle: true } } } } } },
@@ -144,6 +148,7 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
     prenom: prenomDepuisSignature(voix.signature),
     contents: recents.filter((a) => a.note >= 4).length,
     volume: recents.length,
+    periode: LIBELLES_FENETRE[fenetre.jours].dernieres,
     note: note === null ? null : formaterNote(note),
   };
 

@@ -26,23 +26,21 @@ export function moisPrecedent(maintenant: Date): Periode {
 }
 
 /**
- * Fenêtre de la file « À traiter » et du contexte d'un avis, en jours : ce qui
- * est récent et mérite une réponse. La météo de la home a ses propres
- * périodes, au choix de l'utilisateur (lib/meteo/periodes.ts). Dans les deux
- * cas la fenêtre est glissante : un mois calendaire repart de zéro le 1er, et
- * deux avis sévères suffisent alors à assombrir tout l'écran.
+ * Les fenêtres sont glissantes : un mois calendaire repart de zéro le 1er, et
+ * deux avis sévères suffisent alors à assombrir tout l'écran. La météo a ses
+ * périodes, au choix de l'utilisateur (lib/meteo/periodes.ts) ; l'accueil et
+ * la file, une fenêtre calée sur le rythme de l'établissement
+ * (lib/fenetre/adaptative.ts).
  */
-export const FENETRE_FILE_JOURS = 40;
-
 const JOUR_MS = 24 * 60 * 60 * 1000;
 
 /** Les `jours` derniers jours, jusqu'à maintenant inclus. */
-export function fenetreGlissante(maintenant: Date, jours = FENETRE_FILE_JOURS): Periode {
+export function fenetreGlissante(maintenant: Date, jours: number): Periode {
   return { debut: new Date(maintenant.getTime() - jours * JOUR_MS), fin: new Date(maintenant.getTime() + 1) };
 }
 
 /** La fenêtre de même durée qui précède immédiatement `fenetreGlissante`. */
-export function fenetrePrecedente(maintenant: Date, jours = FENETRE_FILE_JOURS): Periode {
+export function fenetrePrecedente(maintenant: Date, jours: number): Periode {
   return { debut: new Date(maintenant.getTime() - 2 * jours * JOUR_MS), fin: new Date(maintenant.getTime() - jours * JOUR_MS) };
 }
 
