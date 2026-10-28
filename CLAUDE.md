@@ -23,3 +23,4 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 - Travaille lot par lot (section 9 du cdc). Avant de commencer un lot, résume en 5 lignes ce que tu vas faire et demande validation.
 - Ne modifie pas docs/ligne-de-conduite.md sans demande explicite.
 - Commits en français, un commit par fonctionnalité.
+- Chaque fonctionnalité visible ajoute son entrée dans docs/changelog.md, dans le même commit : ton marketing, vouvoiement, « ce qui change pour vous », « ce à quoi on a pensé », « pas encore couvert ».
