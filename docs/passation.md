@@ -4,7 +4,7 @@ Document de reprise rédigé le 18 octobre 2026 et mis à jour le 27 octobre 202
 
 ## 1. Où en est le projet
 
-Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, partie de `claude/fervent-bell-zgldfx`, toutes deux poussées sur GitHub (`lucassdmz/reviewcast`). Rien n'est encore fusionné dans `main`. Plusieurs sessions ont contribué : lots 0, 2, 3, 4, 5 (2 octobre), lot 7, mode démo et refonte mobile (3 au 5 octobre), recherche, maquettes et accueil en pile (19 au 25 octobre), onglet À traiter et lot 6, puis correctif de hauteur de la pile et bandeau agrandi (27 octobre). Tout fonctionne sans compte Google Business grâce aux avis de démonstration, à un fournisseur IA simulé ou réel, et à une publication simulée.
+Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, partie de `claude/fervent-bell-zgldfx`, toutes deux poussées sur GitHub (`lucassdmz/reviewcast`). Elle a été fusionnée dans `main` le 28 octobre : c'est désormais `main` qu'il faut reprendre et déployer. Plusieurs sessions ont contribué : lots 0, 2, 3, 4, 5 (2 octobre), lot 7, mode démo et refonte mobile (3 au 5 octobre), recherche, maquettes et accueil en pile (19 au 25 octobre), onglet À traiter et lot 6, puis correctif de hauteur de la pile et bandeau agrandi (27 octobre). Tout fonctionne sans compte Google Business grâce aux avis de démonstration, à un fournisseur IA simulé ou réel, et à une publication simulée.
 
 | Lot | Contenu | État |
 | --- | --- | --- |
@@ -27,7 +27,7 @@ Historique complet avec `git log --oneline`, un commit par fonctionnalité, en f
 ```bash
 git clone https://github.com/lucassdmz/reviewcast.git
 cd reviewcast
-git checkout claude/admiring-maxwell-do4l4f
+git checkout main
 cp .env.example .env            # puis renseignez les valeurs, voir section 3
 docker compose up -d            # Postgres local sur le port 5432
 npm install                     # génère aussi le client Prisma
