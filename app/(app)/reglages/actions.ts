@@ -7,6 +7,7 @@ import { lienAvisSchema } from "@/lib/accueil/lien-avis";
 import { enregistrerLienAvis } from "@/lib/accueil/service";
 import { COOKIE_THEME, lireTheme } from "@/lib/apparence";
 import { auth } from "@/lib/auth/config";
+import { trouverSujetCourant } from "@/lib/voix/bibliotheque";
 import { NB_REGLES_MAX, decouperListe, voixSchema, type RegleSujet, type Voix } from "@/lib/voix/reglages";
 import { enregistrerVoix, lireVoix, retirerCorrection } from "@/lib/voix/service";
 
@@ -83,6 +84,16 @@ export async function actionAjouterRegle(sujetPropose: string, form: FormData): 
   const regles = reglesDuFormulaire(form);
   if (theme && regles.length < NB_REGLES_MAX) {
     regles.push({ sujet: theme.charAt(0).toUpperCase() + theme.slice(1), themes: [theme], dire: "", nePasDire: "" });
+  }
+  await appliquer(form, "sujets", { regles, motsEvites: decouperListe(champ(form, "motsEvites")) }, "/reglages/sujets?regle=ajoutee");
+}
+
+/** Ajoute un sujet courant de la bibliothèque, avec ses consignes de base, en gardant le reste de la saisie. */
+export async function actionAjouterSujetCourant(cle: string, form: FormData): Promise<void> {
+  const sujet = trouverSujetCourant(z.string().max(40).parse(cle));
+  const regles = reglesDuFormulaire(form);
+  if (sujet && regles.length < NB_REGLES_MAX) {
+    regles.push({ sujet: sujet.sujet, themes: sujet.themes, dire: sujet.dire, nePasDire: sujet.nePasDire });
   }
   await appliquer(form, "sujets", { regles, motsEvites: decouperListe(champ(form, "motsEvites")) }, "/reglages/sujets?regle=ajoutee");
 }

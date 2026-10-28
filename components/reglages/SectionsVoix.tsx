@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import {
   actionAjouterRegle,
+  actionAjouterSujetCourant,
   actionEnregistrerApprentissage,
   actionEnregistrerLienAvis,
   actionEnregistrerSignature,
@@ -11,6 +12,7 @@ import {
 } from "@/app/(app)/reglages/actions";
 import { BoutonAction } from "@/components/BoutonAction";
 import { NB_CORRECTIONS_UTILISEES } from "@/lib/voix/apprentissage";
+import type { SujetCourant } from "@/lib/voix/bibliotheque";
 import {
   EMOJIS_PROPOSES,
   LIBELLES_LONGUEUR,
@@ -122,7 +124,17 @@ export function FormulaireTon({ locationId, voix }: { locationId: string; voix: 
   );
 }
 
-export function FormulaireSujets({ locationId, voix, suggestions }: { locationId: string; voix: Voix; suggestions: SujetSansRegle[] }) {
+export function FormulaireSujets({
+  locationId,
+  voix,
+  suggestions,
+  courants,
+}: {
+  locationId: string;
+  voix: Voix;
+  suggestions: SujetSansRegle[];
+  courants: SujetCourant[];
+}) {
   return (
     <form action={actionEnregistrerSujets} className="space-y-3">
       <input type="hidden" name="locationId" value={locationId} />
@@ -160,6 +172,18 @@ export function FormulaireSujets({ locationId, voix, suggestions }: { locationId
             {suggestions.map((s) => (
               <BoutonAction key={s.theme} formAction={actionAjouterRegle.bind(null, s.theme)} className="pressable rounded-full bg-nuage px-3.5 py-2 text-sm font-medium">
                 + {s.theme} ({s.nombre} avis)
+              </BoutonAction>
+            ))}
+          </div>
+        </Carte>
+      )}
+
+      {courants.length > 0 && voix.regles.length < NB_REGLES_MAX && (
+        <Carte titre="Sujets courants" aide="Ils reviennent dans les avis de tous les commerces. Chacun arrive avec des consignes de base, à ajuster.">
+          <div className="mt-3 flex flex-wrap gap-2">
+            {courants.map((s) => (
+              <BoutonAction key={s.cle} formAction={actionAjouterSujetCourant.bind(null, s.cle)} className="pressable rounded-full bg-nuage px-3.5 py-2 text-sm font-medium">
+                + {s.sujet}
               </BoutonAction>
             ))}
           </div>
