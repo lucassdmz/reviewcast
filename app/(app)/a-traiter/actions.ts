@@ -9,6 +9,7 @@ import {
   enregistrerBrouillon,
   ignorerAvis,
   publierReponse,
+  reecrireSelonReglages,
   regenererBrouillon,
   rouvrirAvis,
   supprimerNote,
@@ -68,6 +69,12 @@ export async function actionRegenerer(_etat: EtatAction, form: FormData): Promis
   await utilisateurConnecte();
   const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
   return executer(reviewId, () => regenererBrouillon(reviewId, consigneSchema.parse(champ(form, "consigne"))));
+}
+
+export async function actionReecrireSelonReglages(_etat: EtatAction, form: FormData): Promise<EtatAction> {
+  await utilisateurConnecte();
+  const reviewId = identifiantSchema.parse(champ(form, "reviewId"));
+  return executer(reviewId, () => reecrireSelonReglages(reviewId));
 }
 
 export async function actionIgnorer(form: FormData): Promise<void> {

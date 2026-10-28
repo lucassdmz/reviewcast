@@ -5,8 +5,9 @@ import { prisma } from "@/lib/db/client";
 import type { Gravite, ReviewStatus } from "@/lib/db/generated/enums";
 import { creerPublieur, type PublieurReponses } from "@/lib/google/publication";
 import { retenirCorrection, lireVoix } from "@/lib/voix/service";
-import { motsEvitesPresents } from "@/lib/voix/reglages";
 import { avecSignature, sansSignature } from "@/lib/voix/signature";
+import { phraseEcarts, reglagesDe } from "@/lib/voix/fraicheur";
+import { derniereModificationReglages, etatDuBrouillon } from "@/lib/voix/reecriture";
 import { fenetresParEtablissement } from "@/lib/fenetre/service";
 import { contexteAvis, formaterContexte, formaterContexteFile, type ContexteAvis } from "./contexte";
 import { partagerFile } from "./recence";
@@ -100,8 +101,10 @@ export interface FicheAvis {
   brouillon: { id: string; texte: string; version: number; consigne: string | null } | null;
   /** Signature de l'établissement, ajoutée à la publication (null si aucune). */
   signature: string | null;
-  /** Mots que la gérante veut éviter et que le brouillon contient. */
-  motsEvitesPresents: string[];
+  /** Ce qui, dans les réglages actuels, n'était pas suivi à l'écriture du brouillon (« Écrit avant votre règle… »), ou null. */
+  brouillonDepasse: string | null;
+  /** Le brouillon a été réécrit par l'application après un changement de réglages. */
+  brouillonReecrit: boolean;
   notes: { id: string; texte: string; date: Date }[];
 }
 
@@ -118,7 +121,9 @@ export async function ficheAvis(reviewId: string): Promise<FicheAvis | null> {
   if (!a) return null;
   const contexte = contexteAvis(await avisPourContexte(a.locationId), a.dateCreation);
   const brouillon = a.drafts[0];
-  const { signature, motsEvites } = await lireVoix(a.locationId);
+  const [voix, reglagesModifiesLe] = await Promise.all([lireVoix(a.locationId), derniereModificationReglages(a.locationId)]);
+  const { signature } = voix;
+  const etat = a.reponseGoogleTexte ? null : etatDuBrouillon(a, voix, reglagesModifiesLe);
   return {
     id: a.id,
     auteur: a.auteur,
@@ -142,7 +147,8 @@ export async function ficheAvis(reviewId: string): Promise<FicheAvis | null> {
       ? { id: brouillon.id, texte: sansSignature(brouillon.texte, signature), version: brouillon.version, consigne: brouillon.consigne }
       : null,
     signature,
-    motsEvitesPresents: brouillon ? motsEvitesPresents(brouillon.texte, motsEvites) : [],
+    brouillonDepasse: etat ? phraseEcarts(etat.ecarts) : null,
+    brouillonReecrit: brouillon?.motif === "reglages",
     notes: a.notes.map((n) => ({ id: n.id, texte: n.texte, date: n.createdAt })),
   };
 }
@@ -189,8 +195,9 @@ export async function enregistrerBrouillon(reviewId: string, texte: string): Pro
   const a = await chargerStatut(reviewId);
   const precedent = await prisma.draft.findFirst({ where: { reviewId }, orderBy: { version: "desc" } });
   if (precedent?.texte === texte) return;
+  const voix = await lireVoix(a.locationId);
   await prisma.draft.create({
-    data: { reviewId, texte, version: (precedent?.version ?? 0) + 1, consigne: "modification manuelle", modele: "humain" },
+    data: { reviewId, texte, version: (precedent?.version ?? 0) + 1, consigne: "modification manuelle", reglages: reglagesDe(voix), modele: "humain" },
   });
   if (a.statut === "A_TRAITER") {
     verifierTransition(a.statut, "BROUILLON_PRET");
@@ -200,6 +207,11 @@ export async function enregistrerBrouillon(reviewId: string, texte: string): Pro
 
 export async function regenererBrouillon(reviewId: string, consigne: string | undefined): Promise<void> {
   await genererBrouillon(reviewId, consigne || undefined);
+}
+
+/** Réécrit le brouillon avec les réglages actuels, à la demande de la gérante (y compris un brouillon qu'elle avait retouché). */
+export async function reecrireSelonReglages(reviewId: string): Promise<void> {
+  await genererBrouillon(reviewId, undefined, undefined, "reglages");
 }
 
 export async function ignorerAvis(reviewId: string, userId: string): Promise<void> {

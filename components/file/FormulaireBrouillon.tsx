@@ -2,7 +2,13 @@
 
 import { useActionState, useState } from "react";
 import { useAttenteReseau } from "@/components/pwa/reseau";
-import { actionEnregistrerBrouillon, actionPreparerPublication, actionRegenerer, type EtatAction } from "@/app/(app)/a-traiter/actions";
+import {
+  actionEnregistrerBrouillon,
+  actionPreparerPublication,
+  actionReecrireSelonReglages,
+  actionRegenerer,
+  type EtatAction,
+} from "@/app/(app)/a-traiter/actions";
 import { CONSIGNES_RAPIDES } from "@/lib/file/validation";
 
 const initial: EtatAction = {};
@@ -16,20 +22,25 @@ export function FormulaireBrouillon({
   texte,
   version,
   signature,
-  motsEvites,
+  depasse,
+  reecrit,
 }: {
   reviewId: string;
   texte: string;
   version: number;
   signature: string | null;
-  motsEvites: string[];
+  /** Ce que le brouillon ne suit plus dans les réglages actuels, ou null s'il est à jour. */
+  depasse: string | null;
+  /** Réécrit par l'application après un changement de réglages. */
+  reecrit: boolean;
 }) {
   const [etatEnregistrer, enregistrer, enregistrement] = useActionState(actionEnregistrerBrouillon, initial);
   const [etatRegenerer, regenerer, regeneration] = useActionState(actionRegenerer, initial);
+  const [etatReecrire, reecrire, reecriture] = useActionState(actionReecrireSelonReglages, initial);
   const [relecture, setRelecture] = useState(false);
-  const occupe = enregistrement || regeneration;
+  const occupe = enregistrement || regeneration || reecriture;
   const enAttente = useAttenteReseau(occupe || relecture);
-  const erreur = etatEnregistrer.erreur ?? etatRegenerer.erreur;
+  const erreur = etatEnregistrer.erreur ?? etatRegenerer.erreur ?? etatReecrire.erreur;
 
   return (
     <section aria-labelledby="brouillon-titre" className="bloc">
@@ -37,7 +48,7 @@ export function FormulaireBrouillon({
         <h2 id="brouillon-titre" className="text-sm font-semibold text-encre-douce">
           Brouillon de réponse
         </h2>
-        <span className="text-xs text-encre-douce">version {version}</span>
+        <span className="text-xs text-encre-douce">{reecrit && !depasse ? `version ${version}, à jour de vos réglages` : `version ${version}`}</span>
       </div>
 
       <form id="form-brouillon" action={enregistrer} className="mt-2">
@@ -65,10 +76,16 @@ export function FormulaireBrouillon({
         </p>
       </form>
 
-      {motsEvites.length > 0 && (
-        <p className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2 text-sm">
-          Ce brouillon contient {motsEvites.length > 1 ? "des mots que vous évitez" : "un mot que vous évitez"} : {motsEvites.map((m) => `« ${m} »`).join(", ")}.
-        </p>
+      {depasse && (
+        <form action={reecrire} className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2.5 text-sm">
+          <input type="hidden" name="reviewId" value={reviewId} />
+          <p>
+            <span className="font-semibold">Ce brouillon ne suit plus vos réglages.</span> {depasse}
+          </p>
+          <button type="submit" disabled={occupe} className="pressable mt-2 rounded-full bg-surface px-3 py-1.5 text-sm font-medium disabled:opacity-50">
+            {reecriture ? (enAttente ? "En attente du réseau…" : "Réécriture…") : "Réécrire avec mes réglages"}
+          </button>
+        </form>
       )}
 
       {erreur && (

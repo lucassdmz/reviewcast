@@ -5,6 +5,7 @@ import { lireLienAvis } from "@/lib/accueil/service";
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
 import { apercuVoix } from "@/lib/voix/apercu";
 import { sujetsCourantsDisponibles } from "@/lib/voix/bibliotheque";
+import { messageReecriture } from "@/lib/voix/fraicheur";
 import { lireVoix, listerCorrections, sujetsSansRegle } from "@/lib/voix/service";
 
 export const dynamic = "force-dynamic";
@@ -42,12 +43,18 @@ export default async function SectionReglagesPage({ params, searchParams }: Page
           : query.retire
             ? "Correction retirée."
             : null;
+  const reecriture = messageReecriture(query.reecrits, query.signales);
 
   return (
     <Ecran titre={TITRES[cle]} retour={{ href: "/reglages", libelle: "Réglages" }}>
       {message && (
         <p role="status" className="mb-3 rounded-2xl bg-soleil-doux px-4 py-2.5 text-[15px]">
           {message}
+        </p>
+      )}
+      {reecriture && (
+        <p role="status" className="mb-3 rounded-2xl bg-matcha-doux px-4 py-2.5 text-[15px]">
+          {reecriture}
         </p>
       )}
       {cle === "signature" && <FormulaireSignature locationId={etablissement.id} etablissement={etablissement.nom} voix={voix} />}

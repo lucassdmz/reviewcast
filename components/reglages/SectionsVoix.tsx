@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   actionAjouterRegle,
@@ -13,6 +14,7 @@ import {
 import { BoutonAction } from "@/components/BoutonAction";
 import { NB_CORRECTIONS_UTILISEES } from "@/lib/voix/apprentissage";
 import type { SujetCourant } from "@/lib/voix/bibliotheque";
+import { conseilSignature } from "@/lib/voix/fraicheur";
 import {
   EMOJIS_PROPOSES,
   LIBELLES_LONGUEUR,
@@ -79,6 +81,7 @@ function Enregistrer() {
 }
 
 export function FormulaireSignature({ locationId, etablissement, voix }: { locationId: string; etablissement: string; voix: Voix }) {
+  const conseil = conseilSignature(voix);
   return (
     <form action={actionEnregistrerSignature} className="space-y-3">
       <input type="hidden" name="locationId" value={locationId} />
@@ -91,6 +94,14 @@ export function FormulaireSignature({ locationId, etablissement, voix }: { locat
         <p className="mt-1.5 whitespace-pre-line rounded-2xl bg-soleil-doux px-3.5 py-3 text-[15px] leading-snug">
           {avecSignature("Merci pour votre visite, au plaisir de vous revoir très vite.", voix.signature)}
         </p>
+        {conseil && (
+          <p className="mt-3 text-sm leading-snug text-encre-douce">
+            {conseil}{" "}
+            <Link href="/reglages/ton" className="font-medium text-encre underline underline-offset-4">
+              Régler le ton
+            </Link>
+          </p>
+        )}
       </Carte>
       <Carte titre="Pour poursuivre l'échange" aide="L'e-mail ou le téléphone à donner à un client. Sans coordonnées, la réponse l'invite à repasser au comptoir.">
         <label htmlFor="contact" className="sr-only">
@@ -238,6 +249,11 @@ export function FormulaireApprentissage({ locationId, voix, corrections }: { loc
                   Réponse à {c.auteurAvis}, le {formatDate.format(c.date)}
                 </p>
                 <p className="mt-2 line-clamp-5 whitespace-pre-line text-[15px] leading-snug">{c.texte}</p>
+                {c.ecartee && (
+                  <p className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2 text-sm leading-snug">
+                    Mise de côté : elle ne sert plus de modèle tant qu&apos;elle contredit vos réglages. {c.ecartee}
+                  </p>
+                )}
                 <BoutonAction formAction={actionRetirerCorrection.bind(null, c.id)} className="pressable cible mt-1 text-sm underline underline-offset-4">
                   Ne plus s&apos;en inspirer
                 </BoutonAction>

@@ -200,7 +200,9 @@ export function consignesVoix(voix: Voix): string {
     voix.emojis.length > 0
       ? `- Un emoji est permis, un seul par réponse, choisi uniquement parmi ceux-ci : ${voix.emojis.join(" ")}. Jamais sur un avis négatif ou difficile.`
       : "- Aucun emoji.",
-    "- Ne signez pas la réponse : la signature est ajoutée automatiquement après votre texte.",
+    voix.signature
+      ? `- La réponse sera signée « ${voix.signature} » : écrivez au nom de cette signature, sans la recopier. Elle est ajoutée automatiquement après votre texte.`
+      : "- Ne signez pas la réponse : la signature est ajoutée automatiquement après votre texte.",
     voix.contact
       ? `- Pour proposer de poursuivre l'échange, donnez ces coordonnées et aucune autre : ${voix.contact}`
       : "- Pour proposer de poursuivre l'échange, invitez le client à repasser et à en parler au comptoir. Ne proposez pas de « message privé » et n'inventez aucune coordonnée.",

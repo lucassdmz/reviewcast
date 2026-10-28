@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { lienAvisSchema } from "@/lib/accueil/lien-avis";
 import { enregistrerLienAvis } from "@/lib/accueil/service";
@@ -9,6 +10,7 @@ import { COOKIE_THEME, lireTheme } from "@/lib/apparence";
 import { auth } from "@/lib/auth/config";
 import { trouverSujetCourant } from "@/lib/voix/bibliotheque";
 import { NB_REGLES_MAX, decouperListe, voixSchema, type RegleSujet, type Voix } from "@/lib/voix/reglages";
+import { planReecriture, reecrireBrouillons } from "@/lib/voix/reecriture";
 import { enregistrerVoix, lireVoix, retirerCorrection } from "@/lib/voix/service";
 
 const identifiantSchema = z.string().min(1).max(64);
@@ -43,7 +45,23 @@ async function appliquer(form: FormData, section: string, changements: Record<st
     redirect(`/reglages/${section}?erreur=${encodeURIComponent(message)}`);
   }
   await enregistrerVoix(locationId, resultat.data, userId);
-  redirect(destination);
+  redirect(await reecrireApres(locationId, destination));
+}
+
+/**
+ * Les brouillons pas encore publiés qui ne suivent plus les réglages sont
+ * réécrits après la réponse, pour ne pas faire attendre l'écran. L'écran
+ * suivant dit combien sont réécrits et combien, retouchés à la main, sont
+ * seulement signalés.
+ */
+async function reecrireApres(locationId: string, destination: string): Promise<string> {
+  const { aReecrire, signales } = await planReecriture(locationId);
+  if (aReecrire.length > 0) after(() => reecrireBrouillons(locationId, aReecrire).then(() => undefined));
+  if (aReecrire.length === 0 && signales === 0) return destination;
+  const url = new URL(destination, "http://local");
+  url.searchParams.set("reecrits", String(aReecrire.length));
+  url.searchParams.set("signales", String(signales));
+  return `${url.pathname}${url.search}`;
 }
 
 export async function actionEnregistrerSignature(form: FormData): Promise<void> {

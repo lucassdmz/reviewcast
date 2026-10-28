@@ -1,5 +1,5 @@
 import QRCode from "qrcode";
-import { genererRemerciement } from "@/lib/ai/service";
+import { creerRemerciement } from "@/lib/ai/service";
 import { prisma } from "@/lib/db/client";
 import { STATUTS_FILE } from "@/lib/file/statuts";
 import { LIBELLES_FENETRE } from "@/lib/fenetre/adaptative";
@@ -80,8 +80,7 @@ async function mercisPrets(locationId: string | null, depuis: Date): Promise<Mer
     let texte = a.drafts[0]?.texte;
     if (!texte) {
       try {
-        texte = await genererRemerciement(a.id);
-        await prisma.draft.create({ data: { reviewId: a.id, texte, version: 1, consigne: "remerciement", modele: "ia" } });
+        texte = await creerRemerciement(a.id);
       } catch (error) {
         console.error("Remerciement indisponible :", error instanceof Error ? error.message : error);
         continue;

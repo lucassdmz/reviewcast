@@ -338,7 +338,7 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 
 Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
 
-1. **Signature.** Un champ libre par établissement, par exemple « Valentine, The Coffee Jacobins » ou « L'équipe The Coffee Jacobins ». Elle est ajoutée à la fin de chaque réponse et de chaque remerciement par l'application, pas par le modèle : elle est donc toujours exacte, et la changer met à jour les brouillons non publiés sans les régénérer.
+1. **Signature.** Un champ libre par établissement, par exemple « Valentine, The Coffee Jacobins » ou « L'équipe The Coffee Jacobins ». Elle est ajoutée à la fin de chaque réponse et de chaque remerciement par l'application, pas par le modèle : elle est donc toujours exacte, et retoucher son libellé met à jour les brouillons non publiés sans les régénérer. Changer de signataire (de « L'équipe » à « Valentine ») change qui parle : les brouillons sont réécrits (section 12.4). Une signature au prénom avec des réponses au « nous » fait apparaître un conseil pour passer au « je ».
 2. **Qui parle.** Deux choix : « je » (la gérante en son nom) ou « nous » (l'équipe). Dans les deux cas, jamais de renvoi à une direction.
 3. **Ton.** Trois réglages simples plutôt qu'un texte à rédiger : registre (sobre, chaleureux, complice), longueur (courte par défaut, moyenne), emojis autorisés. Pour les emojis, un tableau s'ouvre et la gérante touche ceux qu'elle autorise, six au plus. L'IA ne pioche que dans cette sélection, un seul par réponse et jamais sur un avis difficile. Aucun emoji choisi : aucun emoji dans les réponses.
 4. **Aperçu.** À chaque enregistrement, un brouillon est généré sur le dernier avis à traiter avec les nouveaux réglages, et affiché sous le formulaire. Il n'est pas stocké et ne remplace pas le brouillon de cet avis.
@@ -353,8 +353,7 @@ Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
 - Les réglages sont stockés par établissement dans `settings` : signature, personne, registre, longueur, emojis, apprentissage, puis coordonnées, règles par sujet et mots à éviter. Les corrections retenues ont leur table, `corrections`.
 - Les brouillons sont stockés sans signature.
 - La ligne de conduite envoyée au modèle est composée à chaque génération : le texte de base, puis les réglages traduits en consignes, puis toutes les règles par sujet. Ce bloc reste identique d'un avis à l'autre, ce qui permet de le mettre en cache.
-- Sur la fiche d'un avis, un message signale tout mot à éviter présent dans le brouillon, quel que soit le modèle.
-- Le modèle reçoit la consigne de ne pas signer. La signature est ajoutée ensuite, et retirée avant toute régénération.
+- Le modèle reçoit la consigne de ne pas signer, et la signature pour savoir au nom de qui il écrit. La signature est ajoutée ensuite, et retirée avant toute régénération.
 - Le fournisseur simulé applique la personne, la longueur, les coordonnées et la règle du sujet concerné, pour que la démonstration et les tests réagissent aux réglages sans clé API. Le ton, l'emoji, les mots à éviter et les corrections retenues ne prennent effet qu'avec le vrai modèle.
 - Toute modification de ces réglages est journalisée (section 7).
 
@@ -367,6 +366,20 @@ Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
 - Un avis qui parle du prix reçoit une réponse qui suit la règle « prix » de l'établissement.
 - L'écran Réglages reste utilisable d'une main sur un téléphone : pas de champ de consigne technique, aperçu visible sans quitter l'écran.
 - Les réglages sont rangés par importance en quatre sections titrées (signature, ton, sujets, apprentissage), avec un seul bouton d'enregistrement toujours visible.
+
+### 12.4 Brouillons à jour des réglages (28 octobre 2026)
+
+Un brouillon est écrit avec les réglages du moment. Quand la gérante ajoute ensuite un mot à éviter, une règle sur l'attente ou passe au « je », les brouillons déjà prêts doivent suivre, sans qu'elle ait à les rouvrir un par un.
+
+- Chaque brouillon garde les réglages qui l'ont écrit (`drafts.reglages`). À chaque enregistrement des réglages, l'application compare, brouillon par brouillon, ce qui a changé et le concerne vraiment : une règle par sujet ne concerne que les avis dont l'analyse a trouvé ce thème ; un mot à éviter ou un emoji retiré se cherche dans le texte même ; la personne, le ton, la longueur et le signataire concernent tous les brouillons ; de nouvelles coordonnées concernent les réponses, et un remerciement seulement s'il citait les anciennes. Un brouillon plus ancien que ce suivi est considéré dépassé si les réglages ont été enregistrés après lui.
+- Les brouillons de l'IA dépassés sont réécrits de zéro avec les réglages actuels, après la réponse de l'écran, sans donner l'ancien texte en modèle ; la consigne de régénération que la gérante avait donnée est reprise. L'ancienne version reste dans l'historique (`drafts.motif = 'reglages'`). Les remerciements des avis positifs suivent le même chemin.
+- Un brouillon retouché à la main n'est jamais réécrit sans la gérante : sa fiche dit pourquoi il ne suit plus les réglages et propose « Réécrire avec mes réglages ». L'écran de confirmation de publication le rappelle aussi.
+- Après l'enregistrement, l'écran dit combien de brouillons sont réécrits et combien sont seulement signalés.
+- La tâche quotidienne réécrit ce qu'une réécriture interrompue aurait laissé.
+- Une correction retenue qui contredit les réglages actuels (mot évité, emoji non choisi, l'autre personne) n'est plus donnée en modèle ; elle est marquée « mise de côté » dans la liste, avec la raison.
+- Les réponses déjà publiées sur Google ne sont jamais modifiées.
+
+Critères : passer de « nous » à « je » réécrit les brouillons de l'IA au « je » sans autre action ; ajouter un mot à éviter présent dans un brouillon retouché à la main le signale sur sa fiche sans en changer le texte ; une règle sur l'attente ne réécrit pas un brouillon qui répond à un avis sur le prix.
 
 
 ## 13. Bêta : la bulle de remarques

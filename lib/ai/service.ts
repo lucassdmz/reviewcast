@@ -7,6 +7,8 @@ import { statutApresAnalyse } from "./queue";
 import { reviewAnalysisSchema, type ReviewAnalysisOutput } from "./schemas";
 import { TAXONOMIE_INITIALE, normaliserLibelle } from "./taxonomy";
 import type { AiProvider, ReviewForAi } from "./types";
+import { reglagesDe } from "@/lib/voix/fraicheur";
+import { lireVoix } from "@/lib/voix/service";
 
 /**
  * Orchestration IA côté serveur : charge l'avis, appelle le fournisseur,
@@ -98,8 +100,17 @@ export async function enregistrerAnalyse(reviewId: string, data: ReviewAnalysisO
   });
 }
 
-/** Génère un brouillon de réponse (nouvelle version) et passe l'avis en « brouillon prêt ». */
-export async function genererBrouillon(reviewId: string, consigne?: string, provider?: AiProvider) {
+/** Consignes enregistrées par l'application elle-même, à ne pas renvoyer au modèle. */
+const CONSIGNES_INTERNES = new Set(["remerciement", "modification manuelle", "version publiée"]);
+
+/**
+ * Génère un brouillon de réponse (nouvelle version) et passe l'avis en
+ * « brouillon prêt ». Le brouillon garde les réglages qui l'ont écrit.
+ * Avec le motif « reglages », il est réécrit de zéro selon les réglages
+ * actuels : l'ancien texte n'est pas donné en modèle, seule la consigne de
+ * la gérante est reprise.
+ */
+export async function genererBrouillon(reviewId: string, consigne?: string, provider?: AiProvider, motif?: "reglages") {
   const review = await chargerAvis(reviewId);
   const ia = provider ?? (await fournisseurPour(review.locationId));
   const ligneDeConduite = await resolveLigneDeConduite(review.locationId);
@@ -117,12 +128,14 @@ export async function genererBrouillon(reviewId: string, consigne?: string, prov
       }
     : null;
 
+  const reprise = motif && precedent?.consigne && !CONSIGNES_INTERNES.has(precedent.consigne) ? precedent.consigne : undefined;
+  const consigneEnvoyee = motif ? reprise : consigne;
   const { data, usage } = await ia.draftReply({
     review: versIa(review),
     analyse,
     ligneDeConduite,
-    consigne,
-    brouillonPrecedent: precedent?.texte,
+    consigne: consigneEnvoyee,
+    brouillonPrecedent: motif ? undefined : precedent?.texte,
   });
   await enregistrerUsage("brouillon", usage);
 
@@ -131,7 +144,9 @@ export async function genererBrouillon(reviewId: string, consigne?: string, prov
       reviewId,
       texte: data.reponse,
       version: (precedent?.version ?? 0) + 1,
-      consigne: consigne ?? null,
+      consigne: consigneEnvoyee ?? null,
+      reglages: ligneDeConduite.voix ? reglagesDe(ligneDeConduite.voix) : undefined,
+      motif: motif ?? null,
       modele: usage.modele,
       tokensIn: usage.tokensIn,
       tokensOut: usage.tokensOut,
@@ -151,4 +166,15 @@ export async function genererRemerciement(reviewId: string, provider?: AiProvide
   const { data, usage } = await ia.thankYouNote({ review: versIa(review), ligneDeConduite });
   await enregistrerUsage("remerciement", usage);
   return data.message;
+}
+
+/** Rédige le mot de remerciement d'un avis positif et le garde comme brouillon, avec les réglages qui l'ont écrit. */
+export async function creerRemerciement(reviewId: string, motif?: "reglages", provider?: AiProvider): Promise<string> {
+  const voix = await lireVoix((await prisma.review.findUniqueOrThrow({ where: { id: reviewId }, select: { locationId: true } })).locationId);
+  const texte = await genererRemerciement(reviewId, provider);
+  const precedent = await prisma.draft.findFirst({ where: { reviewId }, orderBy: { version: "desc" } });
+  await prisma.draft.create({
+    data: { reviewId, texte, version: (precedent?.version ?? 0) + 1, consigne: "remerciement", reglages: reglagesDe(voix), motif: motif ?? null, modele: "ia" },
+  });
+  return texte;
 }

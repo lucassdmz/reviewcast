@@ -72,6 +72,12 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
           </h2>
           <p className="mt-1 text-xs text-encre-douce">Elle sera visible publiquement sous l&apos;avis de {fiche.auteur}.</p>
           <p className="mt-3 whitespace-pre-line rounded-2xl bg-fond p-3 text-sm leading-snug">{avecSignature(fiche.brouillon.texte, fiche.signature)}</p>
+          {fiche.brouillonDepasse && (
+            <p className="mt-2 rounded-2xl bg-soleil-doux px-3 py-2 text-sm">
+              À savoir avant de publier : {fiche.brouillonDepasse.charAt(0).toLowerCase()}
+              {fiche.brouillonDepasse.slice(1)}
+            </p>
+          )}
           <div className="mt-3 flex flex-wrap gap-2">
             <form action={actionConfirmerPublication}>
               <input type="hidden" name="reviewId" value={fiche.id} />
@@ -88,7 +94,7 @@ export default async function FicheAvisPage({ params, searchParams }: PageProps<
       ) : (
         dansLaFile && (
           <>
-            <FormulaireBrouillon reviewId={fiche.id} texte={fiche.brouillon?.texte ?? ""} version={fiche.brouillon?.version ?? 0} signature={fiche.signature} motsEvites={fiche.motsEvitesPresents} />
+            <FormulaireBrouillon reviewId={fiche.id} texte={fiche.brouillon?.texte ?? ""} version={fiche.brouillon?.version ?? 0} signature={fiche.signature} depasse={fiche.brouillonDepasse} reecrit={fiche.brouillonReecrit} />
             <form action={actionIgnorer} className="text-center">
               <input type="hidden" name="reviewId" value={fiche.id} />
               <BoutonAction className="pressable cible text-sm text-encre-douce underline underline-offset-4">Marquer comme traité sans répondre</BoutonAction>

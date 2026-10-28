@@ -2,6 +2,7 @@ import { logAudit } from "@/lib/audit/log";
 import { prisma } from "@/lib/db/client";
 import { NB_CORRECTIONS_UTILISEES, correctionSignificative } from "./apprentissage";
 import { REGLES_PAR_DEFAUT, VOIX_PAR_DEFAUT, lireRegles, type RegleSujet, type Voix } from "./reglages";
+import { raisonCorrectionEcartee } from "./fraicheur";
 import { sansSignature } from "./signature";
 
 /**
@@ -89,28 +90,40 @@ export interface CorrectionRetenue {
   auteurAvis: string;
   texte: string;
   date: Date;
+  /** Pourquoi elle ne sert plus de modèle (elle contredit les réglages actuels), ou null. */
+  ecartee: string | null;
 }
 
 /** Corrections retenues pour un établissement, les plus récentes d'abord. */
 export async function listerCorrections(locationId: string): Promise<CorrectionRetenue[]> {
-  const lignes = await prisma.correction.findMany({
-    where: { locationId },
-    orderBy: { createdAt: "desc" },
-    include: { review: { select: { auteur: true } } },
-  });
-  return lignes.map((c) => ({ id: c.id, auteurAvis: c.review.auteur, texte: c.texte, date: c.createdAt }));
+  const [voix, lignes] = await Promise.all([
+    lireVoix(locationId),
+    prisma.correction.findMany({
+      where: { locationId },
+      orderBy: { createdAt: "desc" },
+      include: { review: { select: { auteur: true } } },
+    }),
+  ]);
+  return lignes.map((c) => ({ id: c.id, auteurAvis: c.review.auteur, texte: c.texte, date: c.createdAt, ecartee: raisonCorrectionEcartee(c.texte, voix) }));
 }
 
-/** Les dernières corrections, données au modèle comme réponses de référence (vide si l'apprentissage est coupé). */
+/**
+ * Les dernières corrections, données au modèle comme réponses de référence
+ * (vide si l'apprentissage est coupé). Celles qui contredisent les réglages
+ * actuels sont laissées de côté.
+ */
 export async function exemplesAppris(locationId: string | null, voix: Voix): Promise<string[]> {
   if (!locationId || !voix.apprendreCorrections) return [];
   const lignes = await prisma.correction.findMany({
     where: { locationId },
     orderBy: { createdAt: "desc" },
-    take: NB_CORRECTIONS_UTILISEES,
+    take: NB_CORRECTIONS_UTILISEES * 4,
     select: { texte: true },
   });
-  return lignes.map((l) => l.texte);
+  return lignes
+    .map((l) => l.texte)
+    .filter((texte) => raisonCorrectionEcartee(texte, voix) === null)
+    .slice(0, NB_CORRECTIONS_UTILISEES);
 }
 
 /**

@@ -11,6 +11,7 @@ import { LogoEtablissement } from "@/components/etablissements/LogoEtablissement
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
 import { actionChoisirEtablissement } from "../actions";
 import { LIBELLES_LONGUEUR, LIBELLES_PERSONNE, LIBELLES_REGISTRE, type Voix } from "@/lib/voix/reglages";
+import { messageReecriture } from "@/lib/voix/fraicheur";
 import { lireVoix, listerCorrections } from "@/lib/voix/service";
 
 const formatNombre = new Intl.NumberFormat("fr-FR");
@@ -58,12 +59,13 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
     : [null, [], null];
   const r = voix ? resumes(voix, corrections.length) : null;
   const theme = lireTheme((await cookies()).get(COOKIE_THEME)?.value);
+  const reecriture = messageReecriture(params.reecrits, params.signales);
 
   return (
     <Ecran titre="Réglages">
       {params.enregistre && (
         <p role="status" className="mb-4 rounded-2xl bg-soleil-doux px-4 py-2.5 text-[15px]">
-          Réglages enregistrés.
+          Réglages enregistrés.{reecriture && <span className="mt-1 block">{reecriture}</span>}
         </p>
       )}
 

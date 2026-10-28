@@ -279,6 +279,10 @@ model Draft {
   texte      String
   version    Int
   consigne   String?
+  /// Réglages de la voix au moment de l'écriture, pour savoir si le brouillon les suit encore. Null avant ce suivi.
+  reglages   Json?
+  /// « reglages » quand l'application l'a réécrit après un changement de réglages.
+  motif      String?
   modele     String
   tokensIn   Int      @default(0) @map("tokens_in")
   tokensOut  Int      @default(0) @map("tokens_out")
