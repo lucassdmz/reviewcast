@@ -48,7 +48,7 @@ describe("prompts", () => {
       consigne: "plus court",
       brouillonPrecedent: "Bonjour, merci.",
     });
-    expect(prompt).toContain("Consigne du gérant pour cette version : plus court");
+    expect(prompt).toContain("Consigne du gérant pour cette version (elle l'emporte sur la longueur) : plus court");
     expect(prompt).toContain("<brouillon_precedent>\nBonjour, merci.\n</brouillon_precedent>");
   });
 

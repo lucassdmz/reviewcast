@@ -393,7 +393,7 @@ model Settings {
   signature              String?
   personne               Personne      @default(NOUS)
   registre               Registre      @default(CHALEUREUX)
-  longueur               Longueur      @default(MOYENNE)
+  longueur               Longueur      @default(COURTE)
   /// Ancien réglage oui / non, remplacé par `emojisAutorises`. Colonne conservée : sa suppression est laissée à une migration lancée à la main.
   emojis                 Boolean       @default(false)
   /// Emojis que l'IA a le droit d'utiliser (6 au plus). Vide : aucun emoji.

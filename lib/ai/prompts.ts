@@ -104,14 +104,16 @@ function consigneSalutation(auteur: string): string {
 export function draftPrompt(input: DraftReplyInput): string {
   const lignes = [
     "Rédigez une réponse publique à l'avis ci-dessous, en suivant la ligne de conduite et la structure imposée.",
-    "Respectez la longueur demandée par la ligne de conduite (à défaut, 40 à 90 mots). Ne contestez pas les faits publiquement, ne nommez personne, ne promettez pas de remboursement.",
+    "Respectez la longueur demandée par les réglages (à défaut, 25 à 50 mots) et restez plus court que l'avis : un avis d'une ligne ou sans texte reçoit une ou deux phrases.",
+    "Soyez factuel. Une seule phrase d'excuse au plus, et seulement pour un vrai raté (accueil, erreur, attente) ; jamais pour un prix, une règle de la maison ou un goût.",
+    "N'écrivez aucun montant ni prix chiffré. Ne contestez pas les faits publiquement, ne nommez personne, ne promettez pas de remboursement.",
     "Ne signez pas : la signature est ajoutée automatiquement après votre texte.",
     consigneSalutation(input.review.auteur),
     "Si l'avis est manifestement faux ou hors sujet, rédigez une réponse courte et neutre.",
     "Renvoyez un JSON : { \"reponse\": \"...\" }.",
   ];
   if (input.consigne) {
-    lignes.push("", `Consigne du gérant pour cette version : ${neutraliserTexte(input.consigne)}`);
+    lignes.push("", `Consigne du gérant pour cette version (elle l'emporte sur la longueur) : ${neutraliserTexte(input.consigne)}`);
   }
   if (input.brouillonPrecedent) {
     lignes.push("", "<brouillon_precedent>", neutraliserTexte(input.brouillonPrecedent), "</brouillon_precedent>");

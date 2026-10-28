@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NB_EXCUSES_MAX, compterExcuses, contientMontant } from "./controles";
 
 /**
  * Schémas des sorties IA (section 4.1 du cdc). Les contraintes de longueur
@@ -34,7 +35,9 @@ export type ReviewAnalysisOutput = z.infer<typeof reviewAnalysisSchema>;
 export const draftReplySchema = z.object({
   reponse: z
     .string()
-    .refine((s) => compterMots(s) >= 25 && compterMots(s) <= 140, "réponse entre 40 et 120 mots"),
+    .refine((s) => compterMots(s) >= 8 && compterMots(s) <= 110, "réponse entre 8 et 110 mots")
+    .refine((s) => compterExcuses(s) <= NB_EXCUSES_MAX, "une seule formule d'excuse au plus (désolé, navré, excuses, pardon, regretter)")
+    .refine((s) => !contientMontant(s), "aucun montant ni prix chiffré dans la réponse"),
 });
 export type DraftReplyOutput = z.infer<typeof draftReplySchema>;
 

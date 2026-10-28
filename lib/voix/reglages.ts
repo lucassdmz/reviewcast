@@ -43,14 +43,14 @@ export const REGLES_PAR_DEFAUT: RegleSujet[] = [
   {
     sujet: "Le prix",
     themes: ["prix"],
-    dire: "Le prix compte, surtout quand on vient souvent. Chaque boisson est préparée à la commande, avec des produits choisis avec soin.",
-    nePasDire: "Que les prix sont affichés. Les fournisseurs, les charges, le loyer. Une promesse sur les tarifs.",
+    dire: "Le prix compte, on le comprend. Il paie une boisson préparée à la commande, avec un café de spécialité et des produits choisis avec soin.",
+    nePasDire: "Un montant. Une excuse pour le prix. Que les prix sont affichés. Les fournisseurs, les charges, le loyer, une comparaison avec un autre commerce. Une promesse sur les tarifs.",
   },
   {
     sujet: "L'accueil",
     themes: ["accueil"],
     dire: "Ce n'est pas l'accueil voulu ici, et ce serait un plaisir de vous montrer un autre visage.",
-    nePasDire: "Qui était là ce jour-là. Une explication ou une excuse pour l'équipe. Une promesse de sanction.",
+    nePasDire: "Plus d'une excuse. Qui était là ce jour-là. Une explication pour l'équipe. Une promesse de sanction.",
   },
   {
     sujet: "Les places et l'ordinateur",
@@ -70,7 +70,7 @@ export const VOIX_PAR_DEFAUT: Voix = {
   signature: null,
   personne: "NOUS",
   registre: "CHALEUREUX",
-  longueur: "MOYENNE",
+  longueur: "COURTE",
   emojis: [],
   apprendreCorrections: true,
   contact: null,
@@ -103,7 +103,7 @@ export const LIBELLES_REGISTRE: Record<Registre, { titre: string; description: s
 
 export const LIBELLES_LONGUEUR: Record<Longueur, { titre: string; description: string }> = {
   COURTE: { titre: "Courte", description: "Deux ou trois phrases." },
-  MOYENNE: { titre: "Moyenne", description: "Quatre ou cinq phrases." },
+  MOYENNE: { titre: "Moyenne", description: "Trois ou quatre phrases." },
 };
 
 const ligne = (max: number, message: string) =>
@@ -170,8 +170,8 @@ const CONSIGNE_REGISTRE: Record<Registre, string> = {
 };
 
 const CONSIGNE_LONGUEUR: Record<Longueur, string> = {
-  COURTE: "Longueur : courte, 25 à 50 mots, deux ou trois phrases.",
-  MOYENNE: "Longueur : moyenne, 40 à 90 mots, quatre ou cinq phrases.",
+  COURTE: "Longueur : courte, 25 à 50 mots au plus, deux ou trois phrases.",
+  MOYENNE: "Longueur : moyenne, 40 à 70 mots au plus, trois ou quatre phrases.",
 };
 
 /** Règles qui concernent un avis, d'après les thèmes que l'analyse y a trouvés. */
@@ -210,7 +210,7 @@ export function consignesVoix(voix: Voix): string {
   }
   const regles = voix.regles.filter((r) => r.dire || r.nePasDire);
   if (regles.length > 0) {
-    lignes.push("", "## Règles par sujet (prioritaires)", "", "Quand l'avis aborde l'un de ces sujets, suivez la règle de l'établissement.");
+    lignes.push("", "## Règles par sujet (prioritaires)", "", "Quand l'avis aborde l'un de ces sujets, suivez la règle de l'établissement. Reprenez son idée en une phrase, avec vos mots, sans la recopier. N'évoquez une offre plus simple ou moins chère que si la règle en nomme une.");
     for (const r of regles) {
       lignes.push("", `### ${r.sujet}`);
       if (r.dire) lignes.push(`- Ce que nous voulons dire : ${r.dire}`);

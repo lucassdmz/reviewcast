@@ -138,15 +138,16 @@ describe("fournisseur simulé et voix", () => {
   });
 
   it("suit la règle du sujet, donne les coordonnées et ne signe pas", async () => {
-    const { data } = await new FakeProvider().draftReply(entree(voix({ contact: "bonjour@cafe.fr" })));
-    expect(data.reponse).toContain("Le prix compte, surtout quand on vient souvent");
+    const { data } = await new FakeProvider().draftReply(entree(voix({ contact: "bonjour@cafe.fr", longueur: "MOYENNE" })));
+    expect(data.reponse).toContain("Le prix compte, on le comprend");
+    expect(data.reponse).not.toMatch(/désolé|regrette/i);
     expect(data.reponse).toContain("bonjour@cafe.fr");
     expect(data.reponse).not.toMatch(/l'équipe\.?$/i);
     expect(data.reponse).not.toContain("la direction");
   });
 
   it("raccourcit la réponse en longueur courte", async () => {
-    const longue = (await new FakeProvider().draftReply(entree(voix()))).data.reponse;
+    const longue = (await new FakeProvider().draftReply(entree(voix({ longueur: "MOYENNE" })))).data.reponse;
     const courte = (await new FakeProvider().draftReply(entree(voix({ longueur: "COURTE" })))).data.reponse;
     expect(courte.length).toBeLessThan(longue.length);
   });

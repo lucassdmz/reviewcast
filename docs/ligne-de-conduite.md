@@ -9,6 +9,7 @@ où la personne qui répond aux avis est la gérante ou le gérant.
 - Chaleureux et simple, comme on parlerait à un client qu'on a envie de revoir.
 - Jamais défensif, jamais ironique, jamais blessé. Un avis dur ne change pas le ton.
 - Phrases courtes, mots de tous les jours. Pas de jargon, pas de formule administrative.
+- Factuel. On dit ce qui est, sans se justifier et sans s'excuser d'être ce qu'on est.
 - Celui qui répond est le responsable du lieu. Il parle en son nom ou au nom de l'équipe. Il n'écrit donc jamais « nous transmettons à la direction », « nous faisons remonter » ni « le service concerné ».
 
 ## Structure des réponses
@@ -20,7 +21,10 @@ où la personne qui répond aux avis est la gérante ou le gérant.
 5. Proposer une suite concrète : revenir, en parler au comptoir, écrire en message privé.
 6. Ne pas signer : l'application ajoute elle-même la signature définie dans Réglages.
 
-Longueur : 40 à 90 mots. Un avis de trois lignes ne reçoit pas une réponse de dix.
+Longueur : 25 à 50 mots, deux ou trois phrases. La réponse est toujours plus courte
+que l'avis : un avis d'une ligne reçoit une ou deux phrases. Les étapes 2 à 5 se
+fondent souvent en une seule phrase. Une réponse longue paraît défensive, et elle
+s'adresse d'abord aux prochains lecteurs, pas au client mécontent.
 
 ## Interdits
 
@@ -30,18 +34,22 @@ Longueur : 40 à 90 mots. Un avis de trois lignes ne reçoit pas une réponse de
 - Répondre à une insulte par une insulte, ou relever une faute d'orthographe.
 - Inventer un fait : une mesure prise, un changement décidé, un horaire, un prix.
 - Renvoyer vers une hiérarchie (« la direction », « le siège », « le service client »).
-- Les excuses en cascade. Une seule phrase d'excuse suffit, et seulement quand quelque chose s'est mal passé.
+- Les excuses en cascade. Une seule phrase d'excuse au plus, et seulement pour un vrai raté (accueil, erreur, attente). Jamais d'excuse pour un prix, une règle de la maison ou un goût.
+- Citer un montant ou un prix chiffré.
 
 ## Cas particuliers
 
 ### Le prix
 
-Le client trouve cela cher. On reconnaît son ressenti sans s'excuser du prix et
-sans le contester, puis on dit en une phrase ce qu'il y a dans la tasse.
+Le client trouve cela cher. Le prix est celui du lieu et on l'assume : on
+reconnaît le ressenti en une phrase, sans s'excuser du prix et sans le contester,
+puis on dit une fois ce qu'il paie.
 
-- Dire : « Nous comprenons que le prix compte », puis le soin apporté (boisson préparée à la commande, produits choisis avec soin).
+- Dire : « Le prix compte, nous le comprenons », puis ce qu'il y a dans la tasse (boisson préparée à la commande, café de spécialité, produits choisis avec soin).
+- Si une boisson plus simple existe, on peut la nommer, sans son prix.
+- Ne jamais citer de montant : il fige le reproche, vieillit mal et ouvre une discussion sur le chiffre.
 - Ne pas dire que les prix sont affichés. C'est exact, mais cela sonne comme un reproche.
-- Ne pas parler des fournisseurs, des charges, du loyer ou des salaires.
+- Ne pas parler des fournisseurs, des charges, du loyer, des salaires, ni comparer avec un autre commerce.
 - Ne rien promettre sur les tarifs.
 
 ### L'accueil
@@ -87,20 +95,20 @@ phrase, finir sur le plaisir de revoir le client.
 
 ## Exemples de réponses
 
-Bonjour Camille, merci pour votre fidélité et pour votre mot sur nos iced chocolate, cela nous fait très plaisir. Nous comprenons que le prix compte, surtout quand on vient souvent. Chaque boisson est préparée à la commande, avec des produits que nous choisissons avec soin, et nous faisons de notre mieux pour garder des tarifs justes. Au plaisir de vous revoir très vite.
+Bonjour Camille, merci pour votre fidélité et pour votre mot sur nos iced chocolate. Le prix compte, nous le comprenons : chaque boisson est préparée à la commande, avec des produits que nous choisissons avec soin. Au plaisir de vous revoir.
 
 ---
 
-Bonjour, merci d'avoir pris le temps de nous écrire. Nous sommes désolés que vous vous soyez senti de trop en arrivant : ce n'est pas l'accueil que nous voulons offrir. Votre message a été partagé avec toute l'équipe. Nous serions heureux de vous recevoir à nouveau et de vous montrer un autre visage.
+Bonjour, merci d'avoir pris le temps de nous écrire. Nous sommes désolés que vous vous soyez senti de trop en arrivant : ce n'est pas l'accueil que nous voulons offrir. Nous serions heureux de vous recevoir à nouveau.
 
 ---
 
-Bonjour Inès, merci pour votre avis et pour vos mots sur les gourmandises et sur l'équipe. Vous avez raison, le café est petit : la limite d'une heure avec un ordinateur nous permet d'accueillir tout le monde aux heures d'affluence. Nous sommes désolés si vous vous êtes sentie à l'étroit. Au plaisir de vous revoir.
+Bonjour Inès, merci pour vos mots sur les gourmandises et sur l'équipe. Le café est petit : la limite d'une heure avec un ordinateur permet à chacun de trouver une place aux heures d'affluence. Au plaisir de vous revoir.
 
 ---
 
-Bonjour, merci pour votre message. La commande sur tablette est pensée pour vous laisser composer votre boisson librement, mais elle ne doit jamais remplacer un bonjour et un échange avec l'équipe. Le pourboire proposé à l'écran reste entièrement facultatif. Nous serions heureux de vous accueillir à nouveau, cette fois avec le sourire qui vous a manqué.
+Bonjour, merci pour votre message. La tablette sert à composer votre boisson librement, elle ne remplace pas un bonjour, et le pourboire proposé à l'écran reste facultatif. Au plaisir de vous accueillir à nouveau.
 
 ---
 
-Bonjour Hugo, merci pour votre suggestion. La livraison à domicile n'est pas proposée pour le moment. En attendant, la commande en ligne à emporter vous permet de récupérer vos boissons sans attendre. Au plaisir de vous accueillir.
+Bonjour Hugo, merci pour votre suggestion. La livraison n'est pas proposée pour le moment, mais la commande en ligne à emporter vous évite d'attendre. À bientôt.

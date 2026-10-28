@@ -94,19 +94,19 @@ export class FakeProvider implements AiProvider {
       je
         ? [
             `${salutation(auteur)} merci d'avoir pris le temps de m'écrire.`,
-            `Je regrette sincèrement que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
+            regle ? "" : `Je regrette sincèrement que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
             regle ? regle.dire : court ? "" : "Vos remarques me sont précieuses et j'en ai parlé avec l'équipe pour que cela ne se reproduise pas.",
             geste
-              ? "J'aurais plaisir à vous accueillir à nouveau et à vous offrir un geste pour me faire pardonner."
+              ? "J'aurais plaisir à vous accueillir à nouveau et à vous offrir votre prochaine boisson."
               : "J'aimerais en discuter directement avec vous afin de trouver ensemble une solution.",
             court ? "" : suite,
           ]
         : [
             `${salutation(auteur)} merci d'avoir pris le temps de nous écrire.`,
-            `Nous sommes sincèrement désolés que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
+            regle ? "" : `Nous sommes sincèrement désolés que ${theme} n'ait pas été à la hauteur de vos attentes lors de votre passage chez ${etablissement}.`,
             regle ? regle.dire : court ? "" : "Vos remarques sont précieuses et nous les avons partagées avec l'équipe pour que cela ne se reproduise pas.",
             geste
-              ? "Nous serions heureux de vous accueillir à nouveau et de vous offrir un geste pour nous faire pardonner."
+              ? "Nous serions heureux de vous accueillir à nouveau et de vous offrir votre prochaine boisson."
               : "Nous aimerions en discuter directement avec vous afin de trouver ensemble une solution.",
             court ? "" : suite,
           ]

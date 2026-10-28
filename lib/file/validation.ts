@@ -25,6 +25,7 @@ export const noteInterneSchema = z
 /** Raccourcis de régénération proposés dans la fiche. */
 export const CONSIGNES_RAPIDES = [
   { libelle: "Plus court", consigne: "Plus court : deux ou trois phrases maximum." },
+  { libelle: "Plus développé", consigne: "Plus développé : quatre ou cinq phrases, sans ajouter d'excuse." },
   { libelle: "Plus chaleureux", consigne: "Plus chaleureux et personnel, sans formule toute faite." },
   { libelle: "Proposer un geste", consigne: "Propose un geste commercial, sans promettre de remboursement." },
 ] as const;

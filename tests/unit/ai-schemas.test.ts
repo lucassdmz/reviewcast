@@ -30,9 +30,17 @@ describe("schémas des sorties IA", () => {
 
   it("borne la longueur des brouillons", () => {
     const mots = (n: number) => Array.from({ length: n }, () => "mot").join(" ");
-    expect(draftReplySchema.safeParse({ reponse: mots(10) }).success).toBe(false);
+    expect(draftReplySchema.safeParse({ reponse: mots(5) }).success).toBe(false);
+    expect(draftReplySchema.safeParse({ reponse: mots(10) }).success).toBe(true);
     expect(draftReplySchema.safeParse({ reponse: mots(80) }).success).toBe(true);
-    expect(draftReplySchema.safeParse({ reponse: mots(200) }).success).toBe(false);
+    expect(draftReplySchema.safeParse({ reponse: mots(130) }).success).toBe(false);
+  });
+
+  it("refuse un brouillon qui s'excuse deux fois ou cite un montant", () => {
+    const base = "Bonjour Camille, merci pour votre retour et pour votre fidélité.";
+    expect(draftReplySchema.safeParse({ reponse: `${base} Nous sommes désolés pour l'attente.` }).success).toBe(true);
+    expect(draftReplySchema.safeParse({ reponse: `${base} Nous sommes désolés pour l'attente, toutes nos excuses.` }).success).toBe(false);
+    expect(draftReplySchema.safeParse({ reponse: `${base} Notre latte est à 6 €, préparé à la commande.` }).success).toBe(false);
   });
 
   it("rend la synthèse mensuelle en 5 lignes maximum", () => {
