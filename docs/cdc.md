@@ -388,7 +388,7 @@ Critères : passer de « nous » à « je » réécrit les brouillons de l'IA au
 
 ### 13.1 Ce que voit le testeur
 
-- Une pastille jaune sur tous les écrans de l'application. Elle se glisse du côté et à la hauteur où elle gêne le moins ; relâchée contre un bord, elle s'y range en une fine languette, et tirée hors du bord, elle redevient pastille. Sa place et son état sont gardés sur l'appareil.
+- Au départ, une fine languette jaune contre le bord droit de chaque écran : elle ne cache rien. Touchée, elle ouvre la bulle ; réduite, la bulle devient une pastille. Celle-ci se glisse du côté et à la hauteur où elle gêne le moins ; relâchée contre un bord, elle s'y range en une fine languette, et tirée hors du bord, elle redevient pastille. Sa place et son état sont gardés sur l'appareil.
 - Ouverte, la bulle dit sur quel écran on se trouve, propose d'écrire la remarque (le brouillon est gardé écran par écran), de **montrer l'élément** en cause du doigt et de joindre une capture de l'écran (cochée par défaut).
 - Montrer l'élément : un voile couvre l'écran, l'élément sous le doigt s'entoure de vert, un appui le retient, « Valider » le confirme. Rien de la page ne se déclenche pendant ce temps. Le bandeau d'aide descend en bas quand l'élément visé est en haut.
 - Sous le formulaire, les remarques déjà laissées sur ce type d'écran, avec leur suite : « Noté », « Corrigé » (et ce qui a été fait) ou « Laissé de côté ». Le testeur peut retirer une remarque à lui tant qu'elle n'est pas traitée.

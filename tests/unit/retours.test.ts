@@ -109,10 +109,14 @@ describe("élément montré du doigt", () => {
 });
 
 describe("préférences de la bulle", () => {
+  it("démarre rangée contre le bord, pour ne rien cacher", () => {
+    expect(PREFERENCES_PAR_DEFAUT.etat).toBe("rangee");
+  });
+
   it("retombe sur les valeurs par défaut si le stockage est vide ou abîmé", () => {
     expect(lirePreferences(null)).toEqual(PREFERENCES_PAR_DEFAUT);
     expect(lirePreferences("{pas du json")).toEqual(PREFERENCES_PAR_DEFAUT);
-    expect(lirePreferences(JSON.stringify({ etat: "volante", cote: "gauche", hauteur: 3 }))).toEqual({ etat: "reduite", cote: "gauche", hauteur: 0.62 });
+    expect(lirePreferences(JSON.stringify({ etat: "volante", cote: "gauche", hauteur: 3 }))).toEqual({ etat: "rangee", cote: "gauche", hauteur: 0.62 });
   });
 
   it("range la pastille du côté le plus proche, sans sortir de l'écran", () => {

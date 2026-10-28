@@ -27,9 +27,11 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ### Une bulle pour dire ce qui ne va pas
 
-**Ce qui change pour vous.** Pendant la bêta, une petite pastille vous suit sur chaque écran. Vous écrivez ce qui vous gêne, vous pouvez montrer du doigt l'élément en cause, et votre remarque nous arrive avec une capture de l'écran.
+**Ce qui change pour vous.** Pendant la bêta, une fine languette jaune attend sur le bord de chaque écran. Touchez-la quand quelque chose vous gêne. Vous écrivez ce qui vous gêne, vous pouvez montrer du doigt l'élément en cause, et votre remarque nous arrive avec une capture de l'écran.
 
-**Ce à quoi on a pensé.** Votre brouillon de remarque est gardé écran par écran. Vous voyez vos remarques passées et leur suite : « Noté », « Corrigé » ou « Laissé de côté ». La pastille se range contre le bord pour ne pas gêner.
+**Ce à quoi on a pensé.** Votre brouillon de remarque est gardé écran par écran. Vous voyez vos remarques passées et leur suite : « Noté », « Corrigé » ou « Laissé de côté ». Au départ, la bulle reste rangée contre le bord : elle ne cache rien et ne s'ouvre jamais d'elle-même. Vous pouvez la sortir en pastille, la glisser à gauche ou à droite, à la hauteur qui vous gêne le moins, et elle garde cette place.
+
+**Pas encore couvert.** La bulle n'existe que pendant la bêta : elle disparaîtra de votre version définitive.
 
 ### Des sujets courants à ajouter en un clic
 

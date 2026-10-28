@@ -40,7 +40,7 @@ test.describe("remarques de bêta", () => {
     const titre = page.getByRole("heading", { level: 1, name: "Tendances" });
     await expect(titre).toBeVisible();
 
-    await page.getByRole("button", { name: /^Remarques de bêta/ }).click();
+    await page.getByRole("button", { name: "Afficher les remarques de bêta" }).click();
     const bulle = page.getByRole("dialog", { name: "Remarques de bêta" });
     await expect(bulle.getByText("Tendances", { exact: true })).toBeVisible();
     await bulle.getByLabel("Votre remarque").fill(`Le titre est trop gros ${marque}`);
@@ -68,7 +68,7 @@ test.describe("remarques de bêta", () => {
 
   test("la remarque reste rattachée à la fiche, et le testeur peut la retirer", async ({ page }) => {
     await page.goto("/reglages/apparence");
-    await page.getByRole("button", { name: /^Remarques de bêta/ }).click();
+    await page.getByRole("button", { name: "Afficher les remarques de bêta" }).click();
     const bulle = page.getByRole("dialog", { name: "Remarques de bêta" });
     await expect(bulle.getByText("Réglages › Apparence")).toBeVisible();
     await bulle.getByLabel("Joindre une capture de l’écran").uncheck();
@@ -84,16 +84,20 @@ test.describe("remarques de bêta", () => {
     expect(await sql(`SELECT 1 FROM retours_beta WHERE texte LIKE $1`, [`%${marque}%`])).toHaveLength(0);
   });
 
-  test("rangée sur le côté, la bulle le reste d'un écran à l'autre", async ({ page }) => {
+  test("au départ rangée contre le bord, la bulle garde ensuite la place choisie", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: /^Remarques de bêta/ }).click();
-    await page.getByRole("button", { name: "Ranger sur le côté" }).click();
-    await expect(page.getByRole("button", { name: "Afficher les remarques de bêta" })).toBeVisible();
+    // Première visite : une simple languette, rien de l'écran n'est caché.
+    await expect(page.getByRole("button", { name: /^Remarques de bêta/ })).toHaveCount(0);
+    await page.getByRole("button", { name: "Afficher les remarques de bêta" }).click();
+    await page.getByRole("button", { name: "Réduire" }).click();
+    await expect(page.getByRole("button", { name: /^Remarques de bêta/ })).toBeVisible();
 
     await page.goto("/reglages");
-    const languette = page.getByRole("button", { name: "Afficher les remarques de bêta" });
-    await expect(languette).toBeVisible();
-    await languette.click();
-    await expect(page.getByRole("dialog", { name: "Remarques de bêta" }).getByText("Réglages", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: /^Remarques de bêta/ }).click();
+    const bulle = page.getByRole("dialog", { name: "Remarques de bêta" });
+    await expect(bulle.getByText("Réglages", { exact: true })).toBeVisible();
+    await bulle.getByRole("button", { name: "Ranger sur le côté" }).click();
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Afficher les remarques de bêta" })).toBeVisible();
   });
 });

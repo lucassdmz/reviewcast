@@ -10,14 +10,15 @@ export type EtatBulle = (typeof ETATS_BULLE)[number];
 export type Cote = "gauche" | "droite";
 
 const preferencesSchema = z.object({
-  etat: z.enum(ETATS_BULLE).catch("reduite"),
+  etat: z.enum(ETATS_BULLE).catch("rangee"),
   cote: z.enum(["gauche", "droite"]).catch("droite"),
   /** Hauteur du centre de la pastille, en fraction de l'écran (0 en haut, 1 en bas). */
   hauteur: z.number().min(0).max(1).catch(0.62),
 });
 export type PreferencesBulle = z.infer<typeof preferencesSchema>;
 
-export const PREFERENCES_PAR_DEFAUT: PreferencesBulle = { etat: "reduite", cote: "droite", hauteur: 0.62 };
+/** Au départ, la bulle est rangée contre le bord droit : une fine languette, qui ne cache rien de l'écran. */
+export const PREFERENCES_PAR_DEFAUT: PreferencesBulle = { etat: "rangee", cote: "droite", hauteur: 0.62 };
 
 /** Lit les préférences enregistrées ; une valeur absente ou abîmée retombe sur la valeur par défaut. */
 export function lirePreferences(brut: string | null): PreferencesBulle {
