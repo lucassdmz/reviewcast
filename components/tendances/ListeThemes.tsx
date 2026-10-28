@@ -37,7 +37,7 @@ export function ListeThemes({ titre, themes, requete, teinte }: { titre: string;
             const ev = evolution(t.evolution);
             return (
               <li key={t.themeId}>
-                <Link href={`/tendances/theme/${t.themeId}?${requete}`} prefetch={false} className="pressable group block">
+                <Link href={`/tendances/theme/${t.themeId}?${requete}&sens=${positif ? "plait" : "probleme"}`} prefetch={false} className="pressable group block">
                   <span className="flex items-baseline gap-2">
                     <span className="min-w-0 flex-1 truncate text-[15px] font-semibold first-letter:uppercase group-hover:underline">{t.libelle}</span>
                     {ev && <span className="whitespace-nowrap text-xs font-medium text-encre-douce">{ev}</span>}

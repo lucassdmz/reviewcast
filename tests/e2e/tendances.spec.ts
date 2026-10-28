@@ -43,8 +43,12 @@ test.describe("tendances", () => {
     const premier = page.getByRole("region", { name: "Ce qui plaît" }).getByRole("link").first();
     // Le lien porte le nom du thème puis son nombre d'avis : le nom est la première ligne.
     const libelle = ((await premier.innerText()).split("\n")[0] ?? "").trim();
+    // Le nombre d'avis est dit en toutes lettres pour les lecteurs d'écran (« 28 avis »).
+    const nombre = Number((await premier.locator(".sr-only").innerText()).match(/\d+/)?.[0]);
     await premier.click();
-    await expect(page).toHaveURL(/\/tendances\/theme\//);
+    await expect(page).toHaveURL(/\/tendances\/theme\/.*sens=plait/);
+    // Seules les mentions positives : autant d'avis que le nombre de la ligne cliquée.
+    await expect(page.locator("main li.bloc")).toHaveCount(nombre);
     await expect(page.getByRole("heading", { name: `Thème : ${libelle}` })).toBeVisible();
     expect(await page.locator("mark").count()).toBeGreaterThan(0);
   });

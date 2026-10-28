@@ -12,6 +12,7 @@ import {
   type ThemeClasse,
 } from "./agregation";
 import { type PeriodeTendances } from "./periodes";
+import { polariteDuSens, type SensTheme } from "./requete";
 
 /** Vue complète de la page Tendances, lue uniquement dans les tables précalculées. */
 export interface Tendances {
@@ -77,7 +78,11 @@ export async function obtenirTendances(locationId: string | null, periode: Perio
   };
 }
 
-/** Avis d'un thème sur la période, avec le passage à surligner (détail, lecture des avis). */
+/**
+ * Avis d'un thème sur la période, avec le passage à surligner (détail, lecture des avis).
+ * Avec un sens, seules les mentions de cette polarité sont gardées : c'est ce que
+ * compte la ligne de Tendances qui y mène. Sans sens, toutes les mentions.
+ */
 export interface AvisDuTheme {
   id: string;
   auteur: string;
@@ -89,12 +94,13 @@ export interface AvisDuTheme {
   etablissement: string;
 }
 
-export async function avisParTheme(themeId: string, locationId: string | null, periode: PeriodeTendances): Promise<{ libelle: string; avis: AvisDuTheme[] } | null> {
+export async function avisParTheme(themeId: string, locationId: string | null, periode: PeriodeTendances, sens: SensTheme | null = null): Promise<{ libelle: string; avis: AvisDuTheme[] } | null> {
   const theme = await prisma.theme.findUnique({ where: { id: themeId }, select: { libelle: true } });
   if (!theme) return null;
   const liens = await prisma.reviewAnalysisTheme.findMany({
     where: {
       themeId,
+      ...(sens ? { polarite: polariteDuSens(sens) } : {}),
       analysis: { review: { ...(locationId ? { locationId } : {}), retireAt: null, dateCreation: { gte: periode.debut, lt: periode.fin } } },
     },
     include: { analysis: { include: { review: { include: { location: { select: { nom: true } } } } } } },

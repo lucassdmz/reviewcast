@@ -1,5 +1,20 @@
 import { parserDate, parserSelection, periodeTendances, type PeriodeTendances } from "./periodes";
 
+/**
+ * Côté d'un thème ouvert depuis Tendances : « Ce qui plaît » ne montre que les
+ * mentions positives, « Ce qui revient comme problème » que les négatives,
+ * pour que la liste corresponde au nombre affiché sur la ligne cliquée.
+ */
+export type SensTheme = "plait" | "probleme";
+
+export function parserSens(valeur: string | string[] | undefined): SensTheme | null {
+  return valeur === "plait" || valeur === "probleme" ? valeur : null;
+}
+
+export function polariteDuSens(sens: SensTheme): "POSITIF" | "NEGATIF" {
+  return sens === "plait" ? "POSITIF" : "NEGATIF";
+}
+
 /** Lit les paramètres d'URL de la page Tendances et en déduit la période. L'établissement, lui, vient du choix global. */
 export interface ParametresTendances {
   periode: PeriodeTendances;

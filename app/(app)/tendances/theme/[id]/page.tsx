@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Ecran } from "@/components/Ecran";
 import { Etoiles, formatDate } from "@/components/file/Etoiles";
 import { TexteSurligne } from "@/components/tendances/TexteSurligne";
-import { lireParametres } from "@/lib/analytics/requete";
+import { lireParametres, parserSens } from "@/lib/analytics/requete";
 import { avisParTheme } from "@/lib/analytics/tendances";
 import { idEtablissementActif } from "@/lib/etablissements/service";
 
@@ -13,12 +13,16 @@ export default async function ThemePage({ params, searchParams }: PageProps<"/te
   const { id } = await params;
   const query = await searchParams;
   const { periode, requete } = lireParametres(query);
-  const resultat = await avisParTheme(id, await idEtablissementActif(), periode);
+  const sens = parserSens(query.sens);
+  const resultat = await avisParTheme(id, await idEtablissementActif(), periode, sens);
   if (!resultat) notFound();
 
   return (
     <Ecran titre={`Thème : ${resultat.libelle}`} retour={{ href: `/tendances?${requete}`, libelle: "Tendances" }}>
-      <p className="-mt-3 mb-4 px-1 text-sm text-encre-douce">{periode.libelle}</p>
+      <p className="-mt-3 mb-4 px-1 text-sm text-encre-douce">
+        {sens === "plait" ? "Ce qui plaît · " : sens === "probleme" ? "Ce qui revient comme problème · " : ""}
+        {periode.libelle}
+      </p>
       {resultat.avis.length === 0 ? (
         <p className="bloc text-sm text-encre-douce">Aucun avis sur ce thème pour la période.</p>
       ) : (
