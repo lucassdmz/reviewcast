@@ -43,6 +43,8 @@ export default defineConfig({
       VAPID_PRIVATE_KEY: "-uCRK-igIUIlPNX3vn2zw2xUUhPOAt6pSkcjfFE5w34",
       VAPID_SUJET: "mailto:test@exemple.fr",
       CRON_SECRET: SECRET_TACHES_TEST,
+      // Bulle de remarques de la bêta, visible sur tous les écrans.
+      RETOURS_BETA: "1",
     },
   },
 });

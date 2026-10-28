@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     // Sans réseau, une navigation ou une action (enregistrer, publier) attend
     // le retour de la connexion au lieu d'échouer, puis repart d'elle-même.
     useOffline: true,
+    // Une remarque de bêta part avec sa capture d'écran (1,5 Mo au plus).
+    serverActions: { bodySizeLimit: "2mb" },
   },
   async headers() {
     // Le service worker est toujours revérifié : une mise en ligne le remplace aussitôt.

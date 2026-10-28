@@ -495,3 +495,38 @@ model PushAbonnement {
   @@index([userId])
   @@map("push_subscriptions")
 }
+
+/// Remarque laissée par un testeur de la bêta depuis la bulle de retours,
+/// rattachée à l'écran où elle a été écrite. Lue par l'équipe avec `npm run retours`.
+model RetourBeta {
+  id            String    @id @default(cuid())
+  /// Adresse exacte de l'écran (chemin et paramètres).
+  chemin        String
+  /// Gabarit de l'écran (`/a-traiter/[id]`) : regroupe les remarques d'un même écran.
+  gabarit       String
+  /// Nom lisible de l'écran (« Fiche d'un avis »).
+  ecran         String
+  texte         String
+  /// Identifiant aléatoire de l'appareil du testeur : regroupe ses remarques sans le nommer.
+  appareil      String
+  /// Établissement affiché au moment de la remarque (nom figé).
+  etablissement String?
+  /// Élément montré du doigt : sélecteur, texte, rôle, position.
+  element       Json?
+  /// Taille d'écran, thème, version déployée, navigateur.
+  contexte      Json
+  capture       Bytes?
+  captureType   String?   @map("capture_type")
+  /// ouvert, traite ou ecarte.
+  statut        String    @default("ouvert")
+  /// Ce qui a été fait, montré au testeur dans la bulle.
+  reponse       String?
+  /// Commit qui corrige la remarque.
+  commit        String?
+  traiteLe      DateTime? @map("traite_le")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([statut, gabarit])
+  @@index([chemin])
+  @@map("retours_beta")
+}

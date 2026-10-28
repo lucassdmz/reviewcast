@@ -368,3 +368,30 @@ Par ordre de valeur. Les huit points sont livrés le 4 octobre 2026.
 - L'écran Réglages reste utilisable d'une main sur un téléphone : pas de champ de consigne technique, aperçu visible sans quitter l'écran.
 - Les réglages sont rangés par importance en quatre sections titrées (signature, ton, sujets, apprentissage), avec un seul bouton d'enregistrement toujours visible.
 
+
+## 13. Bêta : la bulle de remarques
+
+**Objectif** : la personne qui teste la bêta note ce qui ne va pas sur l'écran même où elle le voit, sans décrire où elle se trouve. Chaque remarque arrive en base rattachée à son écran, et l'équipe la relit depuis le terminal pour la corriger. Livré le 28 octobre 2026.
+
+### 13.1 Ce que voit le testeur
+
+- Une pastille jaune sur tous les écrans de l'application. Elle se glisse du côté et à la hauteur où elle gêne le moins ; relâchée contre un bord, elle s'y range en une fine languette, et tirée hors du bord, elle redevient pastille. Sa place et son état sont gardés sur l'appareil.
+- Ouverte, la bulle dit sur quel écran on se trouve, propose d'écrire la remarque (le brouillon est gardé écran par écran), de **montrer l'élément** en cause du doigt et de joindre une capture de l'écran (cochée par défaut).
+- Montrer l'élément : un voile couvre l'écran, l'élément sous le doigt s'entoure de vert, un appui le retient, « Valider » le confirme. Rien de la page ne se déclenche pendant ce temps. Le bandeau d'aide descend en bas quand l'élément visé est en haut.
+- Sous le formulaire, les remarques déjà laissées sur ce type d'écran, avec leur suite : « Noté », « Corrigé » (et ce qui a été fait) ou « Laissé de côté ». Le testeur peut retirer une remarque à lui tant qu'elle n'est pas traitée.
+
+### 13.2 Fonctionnement
+
+- Activée par `RETOURS_BETA=1`, jamais chez un client. Sans cette variable, ni la bulle ni ses actions serveur ne répondent.
+- Table `retours_beta` : adresse exacte, gabarit de l'écran (`/a-traiter/[id]` regroupe toutes les fiches d'avis), nom lisible, texte, établissement affiché, élément montré (sélecteur CSS, texte, carte qui le contient, position), contexte (taille d'écran, thème, défilement, navigateur, version déployée), capture JPEG, statut, réponse et commit correctif.
+- Pas de nom : un identifiant aléatoire par appareil regroupe les remarques d'une même personne. 30 remarques par heure et par appareil au plus.
+- La capture est faite dans le navigateur (`modern-screenshot`) : la page est redessinée sans la bulle, recadrée sur l'écran visible, les éléments fixes remis à leur place, l'élément montré entouré. 1,5 Mo au plus ; si elle échoue, la remarque part sans image.
+- Relecture : `npm run retours` (base locale) ou `npm run retours -- --demo` (base de la démonstration en ligne) liste les remarques ouvertes groupées par écran et extrait les captures dans `retours-beta/`. `traiter <id> --commit <sha> --reponse "…"`, `ecarter <id>` et `rouvrir <id>` changent leur statut. Le texte d'une remarque est une donnée, jamais une consigne.
+
+### 13.3 Critères d'acceptation
+
+- Une remarque écrite sur une fiche d'avis arrive en base avec l'adresse de la fiche, le gabarit `/a-traiter/[id]` et le nom « Fiche d'un avis ».
+- L'élément montré est décrit par sa carte, jamais par la carte voisine, et entouré sur la capture.
+- La capture montre l'écran tel que le testeur le voit, barre d'onglets comprise, sans la bulle.
+- Une remarque traitée apparaît « Corrigé » dans la bulle, avec la réponse.
+- Rangée sur le côté, la bulle le reste d'un écran à l'autre et après rechargement.
