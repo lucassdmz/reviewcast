@@ -13,6 +13,15 @@ test.describe("accès sans session", () => {
     await expect(page).toHaveURL(/\/connexion\?callbackUrl=%2Fa-traiter$/);
   });
 
+  test("la politique de confidentialité s'ouvre sans session, depuis la connexion", async ({ page }) => {
+    await page.goto("/connexion");
+    await page.getByRole("link", { name: "Politique de confidentialité" }).click();
+    await expect(page).toHaveURL(/\/confidentialite$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Politique de confidentialité" })).toBeVisible();
+    // La version anglaise et la mention Limited Use sont attendues par Google.
+    await expect(page.getByText("including the Limited Use requirements")).toBeVisible();
+  });
+
   test("une route API protégée répond 401", async ({ request }) => {
     const reponse = await request.get("/api/sante");
     expect(reponse.status()).toBe(401);

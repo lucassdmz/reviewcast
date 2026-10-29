@@ -8,6 +8,7 @@ describe("protection des routes", () => {
     expect(isPublicPath("/api/auth")).toBe(true);
     expect(isPublicPath("/api/taches/resume-hebdo")).toBe(true);
     expect(isPublicPath("/hors-ligne")).toBe(true);
+    expect(isPublicPath("/confidentialite")).toBe(true);
   });
 
   it("protège les autres chemins", () => {

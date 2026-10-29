@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Marque } from "@/components/marque/Marque";
 import { OubliHorsLigne } from "@/components/pwa/OubliHorsLigne";
@@ -48,6 +49,9 @@ export default async function ConnexionPage({ searchParams }: PageProps<"/connex
           Se connecter avec Google
         </button>
       </form>
+      <p className="mt-6 text-center text-sm text-encre-douce">
+        <Link href="/confidentialite" className="underline">Politique de confidentialité</Link>
+      </p>
     </main>
   );
 }

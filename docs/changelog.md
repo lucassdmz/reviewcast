@@ -6,6 +6,22 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+## 29 octobre 2026
+
+### Une politique de confidentialité claire, en français et en anglais
+
+**Ce qui change pour vous.** Un lien « Politique de confidentialité » attend sous le bouton de connexion. Il dit en termes simples ce qu'Éclaircie lit sur votre fiche Google, ce qu'il en fait, avec qui, et comment tout reprendre ou tout supprimer.
+
+**Ce à quoi on a pensé.**
+- La page s'ouvre sans être connecté : vous pouvez la lire avant d'accorder quoi que ce soit.
+- Elle redit la règle de fond : aucune réponse ne part sur Google sans votre validation.
+- Vos données Google ne sont ni vendues, ni utilisées pour la publicité, ni pour entraîner une IA.
+- Une version anglaise suit, pour l'équipe Google qui examine l'application avant d'ouvrir la connexion à tous.
+
+**Pas encore couvert.** L'export et la suppression de vos données se demandent pour l'instant par e-mail ; un bouton dans Réglages viendra plus tard.
+
+---
+
 ## 28 octobre 2026
 
 ### Vos brouillons suivent vos nouveaux réglages
