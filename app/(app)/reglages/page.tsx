@@ -9,6 +9,7 @@ import { auth, signOut } from "@/lib/auth/config";
 import { estModeDemo } from "@/lib/auth/demo";
 import { LogoEtablissement } from "@/components/etablissements/LogoEtablissement";
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
+import { lireConnexion } from "@/lib/google/connexion";
 import { actionChoisirEtablissement } from "../actions";
 import { LIBELLES_LONGUEUR, LIBELLES_PERSONNE, LIBELLES_REGISTRE, type Voix } from "@/lib/voix/reglages";
 import { messageReecriture } from "@/lib/voix/fraicheur";
@@ -60,6 +61,7 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
   const r = voix ? resumes(voix, corrections.length) : null;
   const theme = lireTheme((await cookies()).get(COOKIE_THEME)?.value);
   const reecriture = messageReecriture(params.reecrits, params.signales);
+  const connexion = !estModeDemo() && session?.user?.id ? await lireConnexion(session.user.id) : null;
 
   return (
     <Ecran titre="Réglages">
@@ -67,6 +69,31 @@ export default async function ReglagesPage({ searchParams }: PageProps<"/reglage
         <p role="status" className="mb-4 rounded-2xl bg-soleil-doux px-4 py-2.5 text-[15px]">
           Réglages enregistrés.{reecriture && <span className="mt-1 block">{reecriture}</span>}
         </p>
+      )}
+
+      {!estModeDemo() && (
+        <section aria-labelledby="fiche-titre" className="mb-9">
+          <h2 id="fiche-titre" className="px-1 text-xl font-bold tracking-tight">
+            Votre fiche Google
+          </h2>
+          {connexion ? (
+            <ul className="mt-3 overflow-hidden rounded-3xl bg-surface">
+              <Ligne
+                href="/reglages/fiche-google"
+                titre="Fiche Google"
+                resume={connexion.aReconnecterAt ? "À reconnecter" : connexion.locations.length > 0 ? pluriel(connexion.locations.length, "établissement connecté", "établissements connectés") : "Établissement à choisir"}
+              />
+            </ul>
+          ) : (
+            <div className="bloc mt-3">
+              <p className="text-[15px] leading-snug text-encre-douce">Retrouvez ici vos vrais avis. Rien n&apos;est publié sans votre validation.</p>
+              {/* Un vrai lien, sans préchargement : il part vers l'écran de consentement de Google. */}
+              <a href="/api/google/connexion" className="bouton-principal mt-4 block text-center">
+                Connecter ma fiche Google
+              </a>
+            </div>
+          )}
+        </section>
       )}
 
       {etablissement && r && (

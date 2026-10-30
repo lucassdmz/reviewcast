@@ -6,6 +6,26 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+## 30 octobre 2026
+
+### Vos vrais avis, dès que votre fiche Google est connectée
+
+**Ce qui change pour vous.** Dans Réglages, « Connecter ma fiche Google » vous emmène sur la page d'autorisation de Google. Vous choisissez ensuite votre établissement dans la liste de ceux que vous gérez, et tout votre historique d'avis arrive dans Éclaircie. Ensuite, l'application reste à jour toute seule : un nouvel avis, un avis modifié, une réponse donnée directement sur Google, un avis retiré.
+
+**Ce à quoi on a pensé.**
+- Se connecter à Éclaircie et lui ouvrir votre fiche sont deux gestes séparés : l'accès à vos avis n'est demandé que si vous le décidez.
+- Aucune réponse ne part sur Google sans votre validation. La mise à jour lit vos avis, elle n'écrit jamais.
+- Un avis retiré de Google disparaît de vos écrans mais reste conservé, pour que vos chiffres gardent leur histoire.
+- Si vous répondez directement sur Google, Éclaircie le voit et l'avis quitte votre liste à traiter.
+- L'import d'un long historique ne vous envoie aucune notification, et seuls les avis récents reçoivent un brouillon d'office, pour ne pas dépenser ce que vous ne lirez pas.
+- Si un avis change alors qu'un brouillon l'attendait, un nouveau brouillon est préparé. L'ancien reste dans l'historique.
+- Si Google retire l'accès, vos avis restent là et Réglages vous propose de reconnecter la fiche.
+- Vos fiches ne sont visibles que de vous, à chaque écran et à chaque action.
+
+**Pas encore couvert.** La connexion attend encore l'ouverture de l'API par Google : elle a été éprouvée sur un serveur d'essai fidèle à la documentation, pas sur votre vraie fiche. Déconnecter une fiche depuis l'application viendra plus tard. Un très long historique se lit par étapes : quand l'application reste ouverte, c'est rapide, sinon il se termine au fil des jours.
+
+---
+
 ## 29 octobre 2026
 
 ### Une politique de confidentialité claire, en français et en anglais
