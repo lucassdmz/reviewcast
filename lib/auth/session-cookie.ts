@@ -10,8 +10,9 @@ export function hasSessionCookie(getCookie: (name: string) => boolean): boolean 
 }
 
 /** Chemins accessibles sans session. */
-// Les tâches planifiées vérifient elles-mêmes leur secret (lib/taches/autorisation.ts).
-const PUBLIC_PATHS = ["/connexion", "/api/auth", "/api/taches", "/hors-ligne", "/confidentialite"];
+// Les tâches planifiées vérifient elles-mêmes leur secret (lib/taches/autorisation.ts),
+// et les notifications Google leur jeton signé (lib/google/pubsub.ts).
+const PUBLIC_PATHS = ["/connexion", "/api/auth", "/api/taches", "/api/google/notifications", "/hors-ligne", "/confidentialite"];
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((base) => pathname === base || pathname.startsWith(`${base}/`));

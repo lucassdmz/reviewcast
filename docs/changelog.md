@@ -26,6 +26,20 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+### Vos nouveaux avis arrivent dès que Google les reçoit
+
+**Ce qui change pour vous.** Dès qu'un client laisse ou modifie un avis, Google prévient Éclaircie. Le brouillon de réponse est prêt, et votre notification part, sans attendre que vous ouvriez l'application.
+
+**Ce à quoi on a pensé.**
+- Chaque alerte est authentifiée : une alerte qui ne porte pas la signature de Google est rejetée.
+- Une rafale d'avis ne déclenche pas une rafale de requêtes : les alertes se regroupent, aucune ne se perd.
+- Si un autre outil reçoit déjà les alertes de votre compte, Éclaircie ne prend pas sa place et vous le dit.
+- Si les alertes se taisent, l'ouverture de l'application et un passage quotidien rattrapent tout.
+
+**Pas encore couvert.** Le temps réel demande une configuration côté Google, pas encore faite, et n'a pas encore été essayé sur de vraies alertes.
+
+---
+
 ## 29 octobre 2026
 
 ### Une politique de confidentialité claire, en français et en anglais

@@ -7,6 +7,7 @@ describe("protection des routes", () => {
     expect(isPublicPath("/api/auth/callback/google")).toBe(true);
     expect(isPublicPath("/api/auth")).toBe(true);
     expect(isPublicPath("/api/taches/resume-hebdo")).toBe(true);
+    expect(isPublicPath("/api/google/notifications")).toBe(true);
     expect(isPublicPath("/hors-ligne")).toBe(true);
     expect(isPublicPath("/confidentialite")).toBe(true);
   });
@@ -15,6 +16,8 @@ describe("protection des routes", () => {
     expect(isPublicPath("/")).toBe(false);
     expect(isPublicPath("/a-traiter")).toBe(false);
     expect(isPublicPath("/api/sante")).toBe(false);
+    expect(isPublicPath("/api/google/connexion")).toBe(false);
+    expect(isPublicPath("/api/google/callback")).toBe(false);
     expect(isPublicPath("/connexion-bis")).toBe(false);
   });
 
