@@ -26,6 +26,20 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+### Votre historique analysé à moitié prix
+
+**Ce qui change pour vous.** À la connexion d'une fiche, tous vos anciens avis sont lus d'un seul coup, en lot, ce qui divise par deux le coût de l'analyse. Vos avis s'affichent aussitôt ; thèmes, tendances et brouillons des avis récents suivent quand le lot est revenu, en général en moins d'une heure, 24 heures au plus. L'écran Fiche Google vous dit où cela en est.
+
+**Ce à quoi on a pensé.**
+- Rien ne se perd si l'application se ferme : le lot continue chez le fournisseur, ses résultats sont repris au passage suivant.
+- Un avis modifié pendant ce temps sort du lot et il est relu avec son nouveau texte.
+- Un avis que le lot n'a pas pu traiter est repris individuellement.
+- Les avis qui arrivent après l'import restent analysés tout de suite.
+
+**Pas encore couvert.** Pendant l'analyse du lot, un avis récent à traiter reste visible dans votre liste mais n'a pas encore son brouillon. Sans ouverture de l'application, les résultats sont repris lors du passage quotidien.
+
+---
+
 ### Vos nouveaux avis arrivent dès que Google les reçoit
 
 **Ce qui change pour vous.** Dès qu'un client laisse ou modifie un avis, Google prévient Éclaircie. Le brouillon de réponse est prêt, et votre notification part, sans attendre que vous ouvriez l'application.

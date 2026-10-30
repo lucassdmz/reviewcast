@@ -99,16 +99,37 @@ test.describe("connexion de la fiche Google", () => {
     expect(compteurs.reglage["accounts/101"].notificationTypes).toEqual(["NEW_REVIEW", "UPDATED_REVIEW"]);
   });
 
-  test("les analyses en attente avancent, et l'ouverture respecte les 15 minutes", async ({ page, request }) => {
+  test("l'historique part en lot, repris au passage suivant, sans relire Google", async ({ page, request }) => {
     const avant = (await (await controle(request, "compteurs")).json()).listes;
+    const lot = async () =>
+      (await base((c) => c.query<{ statut: string; nb_avis: number; fournisseur: boolean }>(`SELECT b.statut, b.nb_avis, b.id_fournisseur IS NOT NULL AS fournisseur FROM lots_analyse b JOIN locations l ON l.id = b.location_id WHERE l.google_location_id = 'locations/9001'`))).rows;
+
+    // L'ouverture de l'écran soumet le lot : un seul, pour tout l'historique.
+    await page.goto("/reglages/fiche-google");
+    await expect.poll(async () => (await lot())[0]?.statut, { timeout: 30_000 }).toBe("EN_COURS");
+    expect(await lot()).toEqual([{ statut: "EN_COURS", nb_avis: 59, fournisseur: true }]);
+    await expect(page.getByText(/peut prendre jusqu'à 24 heures/)).toBeVisible();
+
+    // Le passage suivant relève le lot, une fois l'intervalle écoulé.
+    await base((c) => c.query(`UPDATE lots_analyse SET releve_le = NULL`));
     await page.goto("/avis");
+    await expect.poll(async () => (await lot())[0]?.statut, { timeout: 30_000 }).toBe("TERMINE");
     await expect
-      .poll(async () => (await base((c) => c.query<{ n: string }>(`SELECT count(*) AS n FROM reviews r JOIN locations l ON l.id = r.location_id WHERE l.google_location_id = 'locations/9001' AND r.analyse_a_faire`))).rows[0].n, { timeout: 60_000 })
+      .poll(async () => (await base((c) => c.query<{ n: string }>(`SELECT count(*) AS n FROM reviews r JOIN locations l ON l.id = r.location_id WHERE l.google_location_id = 'locations/9001' AND r.analyse_a_faire`))).rows[0].n, { timeout: 30_000 })
       .toBe("0");
+    await page.goto("/avis");
     expect((await (await controle(request, "compteurs")).json()).listes).toBe(avant);
     // Un avis récent à traiter a reçu son brouillon, rien n'est parti sur Google.
     await page.goto("/a-traiter");
-    await expect(page.getByRole("list", { name: "Avis à traiter" }).getByRole("link").filter({ hasText: "Camille Lefort" }).filter({ hasText: "Brouillon prêt à relire" })).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await page.goto("/a-traiter");
+          return page.getByRole("list", { name: "Avis à traiter" }).getByRole("link").filter({ hasText: "Camille Lefort" }).filter({ hasText: "Brouillon prêt à relire" }).count();
+        },
+        { timeout: 30_000 },
+      )
+      .toBe(1);
     expect((await (await controle(request, "compteurs")).json()).reponses).toEqual([]);
   });
 

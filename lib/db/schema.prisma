@@ -211,6 +211,7 @@ model Location {
   dailyStats       DailyStat[]
   themeStats       ThemeStat[]
   corrections      Correction[]
+  lotsAnalyse      LotAnalyse[]
 
   @@map("locations")
 }
@@ -235,10 +236,14 @@ model Review {
   analyseAFaire      Boolean      @default(false) @map("analyse_a_faire")
   /// Réservation de l'analyse par un passage, pour ne jamais payer deux fois le même appel.
   analyseReserveeAt  DateTime?    @map("analyse_reservee_at")
+  /// Avis de l'import initial : son analyse passe par la Batch API, pas par un appel unitaire.
+  analyseEnLot       Boolean      @default(false) @map("analyse_en_lot")
+  lotAnalyseId       String?      @map("lot_analyse_id")
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime     @updatedAt @map("updated_at")
 
   location Location        @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  lotAnalyse LotAnalyse?     @relation(fields: [lotAnalyseId], references: [id], onDelete: SetNull)
   analysis ReviewAnalysis?
   drafts   Draft[]
   notes    Note[]
@@ -247,7 +252,37 @@ model Review {
   @@index([locationId, dateCreation])
   @@index([locationId, statut])
   @@index([locationId, analyseAFaire])
+  @@index([lotAnalyseId])
   @@map("reviews")
+}
+
+enum StatutLot {
+  PREPARATION
+  EN_COURS
+  TERMINE
+  ABANDONNE
+
+  @@map("statut_lot")
+}
+
+/// Lot d'analyses soumis à la Batch API pendant l'import initial d'une fiche.
+model LotAnalyse {
+  id            String    @id @default(cuid())
+  locationId    String    @map("location_id")
+  /// Identifiant chez le fournisseur. Null tant que la soumission n'a pas abouti.
+  idFournisseur String?   @map("id_fournisseur")
+  statut        StatutLot @default(PREPARATION)
+  nbAvis        Int       @map("nb_avis")
+  /// Dernier relevé, qui sert aussi de verrou entre passages simultanés.
+  releveLe      DateTime? @map("releve_le")
+  termineLe     DateTime? @map("termine_le")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  avis     Review[]
+
+  @@index([locationId, statut])
+  @@map("lots_analyse")
 }
 
 /// Résultat de l'analyse IA d'un avis (sortie JSON validée par zod).

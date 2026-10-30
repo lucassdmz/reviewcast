@@ -82,6 +82,7 @@ export default async function FicheGooglePage({ searchParams }: PageProps<"/regl
                 <p className="text-[17px] font-bold leading-tight">{e.nom}</p>
                 <p className="mt-0.5 text-[15px] text-encre-douce">{e.lastSyncAt ? `Mise à jour le ${formatDate.format(e.lastSyncAt)}` : "Première mise à jour à venir"}</p>
                 {e.enAttente > 0 && <p className="mt-0.5 text-[15px] text-encre-douce">{e.enAttente > 1 ? `${e.enAttente} avis en cours de lecture` : "1 avis en cours de lecture"}</p>}
+                {e.historiqueEnCours && <p className="mt-0.5 text-[15px] text-encre-douce">Vos avis sont déjà là. L&apos;analyse de votre historique peut prendre jusqu&apos;à 24 heures : les tendances se rempliront d&apos;elles-mêmes.</p>}
                 <p className="mt-0.5 text-[15px] text-encre-douce">
                   {e.notificationsGoogle === "actives"
                     ? "Les nouveaux avis arrivent en temps réel."

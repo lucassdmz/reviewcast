@@ -31,6 +31,7 @@ import type {
   ThankYouInput,
   WeatherSentenceInput,
 } from "../types";
+import { LotIntrouvable, type FournisseurLots } from "../lots";
 import { AiOutputError, AiProviderError, validerAvecNouvelEssai } from "../validate";
 
 /** Ligne de conduite neutre pour les tâches qui n'en dépendent pas (analyse, météo, synthèse). */
@@ -40,7 +41,7 @@ const LIGNE_NEUTRE: LigneDeConduite = { texte: "", exemples: [] };
  * Fournisseur Anthropic (section 4.1) : sorties structurées validées par zod,
  * prompt système mis en cache, nouvel essai unique en cas de sortie invalide.
  */
-export class AnthropicProvider implements AiProvider {
+export class AnthropicProvider implements AiProvider, FournisseurLots {
   readonly nom = "ANTHROPIC" as const;
   private readonly client: Anthropic;
 
@@ -89,7 +90,13 @@ export class AnthropicProvider implements AiProvider {
     termine: boolean;
     resultats: Map<string, AiResult<ReviewAnalysisOutput> | AiOutputError | AiProviderError>;
   }> {
-    const batch = await this.client.messages.batches.retrieve(batchId);
+    let batch: Anthropic.Messages.MessageBatch;
+    try {
+      batch = await this.client.messages.batches.retrieve(batchId);
+    } catch (error) {
+      if (error instanceof Anthropic.NotFoundError) throw new LotIntrouvable(batchId);
+      throw new AiProviderError(decrireErreurApi(error), error);
+    }
     const resultats = new Map<string, AiResult<ReviewAnalysisOutput> | AiOutputError | AiProviderError>();
     if (batch.processing_status !== "ended") return { termine: false, resultats };
 

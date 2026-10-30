@@ -123,7 +123,8 @@ La section 11 du cdc consigne les décisions d'interface prises en construisant 
 
 - **Une fiche appartient à son utilisateur** (lot 1) : toutes les lectures passent par `lib/etablissements/perimetre.ts`. Hors mode démo, une base déjà seedée n'est visible que du propriétaire de la connexion de démonstration : relancez `npm run db:seed`, qui la rattache à la première adresse de `ALLOWED_EMAILS`. Ne pas lancer les parcours avec un `ALLOWED_EMAILS` différent de celui du seed.
 - **Faux serveur Google** : `tests/fake-google/`, lancé par Playwright sur le port 4599, piloté par ses routes `/__controle/*`. Les parcours de la fiche utilisent un utilisateur à part, pour ne pas se mêler à la démonstration.
-- **Import volumineux** : les avis apparaissent tout de suite, leur analyse IA avance par tours, tant que l'écran reste ouvert (`SynchroOuverture`), puis une fois par jour. L'analyse utilise les appels unitaires, pas la Batch API à −50 % qu'expose `AnthropicProvider` : un gros historique coûte donc le plein tarif.
+- **Import volumineux** : les avis apparaissent tout de suite. Leur analyse part en Batch API (`lib/ai/lots.ts`, `lib/google/import-lots.ts`, table `lots_analyse`) et se relève à l'ouverture de l'app, à chaque notification ou au cron quotidien, au plus une fois par minute par lot. Tout l'état est en base : un passage coupé est repris au suivant. Les avis arrivés ensuite restent en appels unitaires (`reprendreAnalyses`). Si un passage s'arrête entre l'envoi au fournisseur et l'enregistrement de l'identifiant, le lot est réservé puis libéré après 10 minutes et soumis de nouveau : le lot orphelin serait alors payé en plus.
+- **Parcours Playwright en série** (`workers: 1`) : ils partagent les données de démonstration. En parallèle, `reglages-brouillons` et `a-traiter` pouvaient viser le même avis.
 
 ## 7. Prochaines étapes, dans l'ordre recommandé
 

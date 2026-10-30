@@ -6,7 +6,7 @@ import { enregistrerUsage } from "./ledger";
 import { statutApresAnalyse } from "./queue";
 import { reviewAnalysisSchema, type ReviewAnalysisOutput } from "./schemas";
 import { TAXONOMIE_INITIALE, normaliserLibelle } from "./taxonomy";
-import type { AiProvider, ReviewForAi } from "./types";
+import type { AiProvider, AnalyzeReviewInput, ReviewForAi } from "./types";
 import { reglagesDe } from "@/lib/voix/fraicheur";
 import { lireVoix } from "@/lib/voix/service";
 
@@ -34,7 +34,7 @@ function versIa(review: { auteur: string; note: number; texte: string | null; da
   };
 }
 
-async function fournisseurPour(locationId: string): Promise<AiProvider> {
+export async function fournisseurPour(locationId: string): Promise<AiProvider> {
   return createProvider(await resolveAiConfig(locationId));
 }
 
@@ -54,18 +54,28 @@ export async function initialiserTaxonomie(): Promise<void> {
 export async function analyserAvis(reviewId: string, provider?: AiProvider): Promise<ReviewAnalysisOutput> {
   const review = await chargerAvis(reviewId);
   const ia = provider ?? (await fournisseurPour(review.locationId));
-  const themesConnus = (await prisma.theme.findMany({ select: { libelle: true }, orderBy: { libelle: "asc" } })).map((t) => t.libelle);
-
-  const { data, usage } = await ia.analyzeReview({ review: versIa(review), themesConnus });
+  const { data, usage } = await ia.analyzeReview(await entreeAnalyse(reviewId));
   await enregistrerUsage("analyse", usage);
-  await enregistrerAnalyse(reviewId, data, usage.modele);
+  await appliquerAnalyse(reviewId, data, usage.modele);
+  await recalculerPourAvis(reviewId);
+  return data;
+}
 
+/** Ce que le modèle reçoit pour analyser un avis, en appel unitaire comme dans un lot. */
+export async function entreeAnalyse(reviewId: string): Promise<AnalyzeReviewInput> {
+  const review = await chargerAvis(reviewId);
+  const themesConnus = (await prisma.theme.findMany({ select: { libelle: true }, orderBy: { libelle: "asc" } })).map((t) => t.libelle);
+  return { review: versIa(review), themesConnus };
+}
+
+/** Enregistre une analyse validée et met à jour le statut de l'avis dans la file. Rejouable sans effet de bord. */
+export async function appliquerAnalyse(reviewId: string, data: ReviewAnalysisOutput, modele: string): Promise<void> {
+  const review = await chargerAvis(reviewId);
+  await enregistrerAnalyse(reviewId, data, modele);
   const statut = statutApresAnalyse(review, data, {
     inclureQuatreEtoiles: review.location.settings?.inclureQuatreEtoiles ?? true,
   });
   await prisma.review.update({ where: { id: reviewId }, data: { statut } });
-  await recalculerPourAvis(reviewId);
-  return data;
 }
 
 /** Stocke une analyse validée (appel direct ou résultat d'un lot). */

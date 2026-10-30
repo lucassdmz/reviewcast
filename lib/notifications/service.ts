@@ -86,10 +86,10 @@ export async function envoyerEssai(userId: string, endpoint: string): Promise<bo
  * seule notification, puis les marque comme notifiés. À appeler après chaque
  * synchronisation (lot 1) et par la tâche planifiée.
  */
-export async function notifierAvisATraiter(maintenant = new Date()): Promise<{ avis: number; envoyes: number }> {
+export async function notifierAvisATraiter(maintenant = new Date(), locationIds?: string[]): Promise<{ avis: number; envoyes: number }> {
   const depuis = new Date(maintenant.getTime() - FRAICHEUR_NOTIFICATION_JOURS * 24 * 60 * 60 * 1000);
   const nouveaux = await prisma.review.findMany({
-    where: { statut: { in: STATUTS_FILE }, retireAt: null, notifieAt: null, dateCreation: { gte: depuis } },
+    where: { ...(locationIds ? { locationId: { in: locationIds } } : {}), statut: { in: STATUTS_FILE }, retireAt: null, notifieAt: null, dateCreation: { gte: depuis } },
     select: { id: true, statut: true },
   });
   if (nouveaux.length === 0) return { avis: 0, envoyes: 0 };

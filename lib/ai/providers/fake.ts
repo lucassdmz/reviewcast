@@ -1,4 +1,6 @@
+import { randomUUID } from "node:crypto";
 import type { Polarite } from "@/lib/db/generated/enums";
+import { LotIntrouvable, type FournisseurLots, type ResultatLot } from "../lots";
 import {
   draftReplySchema,
   monthlySummarySchema,
@@ -57,8 +59,30 @@ function usage(modele: string) {
   return { modele, tokensIn: 0, tokensOut: 0, cacheRead: 0, cacheWrite: 0 };
 }
 
-export class FakeProvider implements AiProvider {
+/**
+ * Lots du fournisseur simulé, gardés hors de l'instance : chaque requête crée
+ * son fournisseur. Comme chez le vrai, un lot n'est terminé qu'au relevé suivant
+ * sa soumission ; ils disparaissent au redémarrage, ce qui simule un lot perdu.
+ */
+const memoire = globalThis as typeof globalThis & { __lotsSimules?: Map<string, { id: string; input: AnalyzeReviewInput }[]> };
+const lotsSimules = (memoire.__lotsSimules ??= new Map());
+
+export class FakeProvider implements AiProvider, FournisseurLots {
   readonly nom = "FAKE" as const;
+
+  async soumettreLotAnalyses(items: { id: string; input: AnalyzeReviewInput }[]): Promise<string> {
+    const id = `lot-simule-${randomUUID()}`;
+    lotsSimules.set(id, items);
+    return id;
+  }
+
+  async recupererLotAnalyses(idLot: string): Promise<{ termine: boolean; resultats: Map<string, ResultatLot> }> {
+    const items = lotsSimules.get(idLot);
+    if (!items) throw new LotIntrouvable(idLot);
+    const resultats = new Map<string, ResultatLot>();
+    for (const { id, input } of items) resultats.set(id, await this.analyzeReview(input));
+    return { termine: true, resultats };
+  }
 
   async analyzeReview(input: AnalyzeReviewInput): Promise<AiResult<ReviewAnalysisOutput>> {
     const { note, texte } = input.review;

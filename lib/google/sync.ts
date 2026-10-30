@@ -3,12 +3,13 @@ import { statutApresAnalyse } from "@/lib/ai/queue";
 import { recalculerJour, recalculerStatistiques } from "@/lib/analytics/recalcul";
 import { prisma } from "@/lib/db/client";
 import type { ReviewStatus } from "@/lib/db/generated/enums";
-import { estRecent } from "@/lib/fenetre/adaptative";
+import { debutLecture, estRecent } from "@/lib/fenetre/adaptative";
 import { fenetresParEtablissement } from "@/lib/fenetre/service";
 import { notifierAvisATraiter } from "@/lib/notifications/service";
 import { GoogleApiError } from "./client";
 import { cheminFiche, comparerAvis, versAvisDistant, type AvisDistant, type Comparaison, type MiseAJour } from "./comparaison";
 import { activerNotifications, clientDeLaConnexion } from "./connexion";
+import { avancerLots } from "./import-lots";
 import { limitePourLister, type Declencheur } from "./limites";
 import { AccesRetire } from "./oauth";
 
@@ -77,6 +78,8 @@ async function appliquer(locationId: string, comparaison: Comparaison, importIni
         reponseGoogleDate: d.reponse?.date ?? null,
         statut: statutProvisoire(d),
         analyseAFaire: true,
+        // L'historique part en lot, à moitié prix ; les avis suivants sont analysés dès leur arrivée.
+        analyseEnLot: importInitial,
         // L'import de l'historique ne déclenche aucune notification.
         notifieAt: importInitial ? maintenant : null,
       })),
@@ -98,7 +101,8 @@ async function appliquer(locationId: string, comparaison: Comparaison, importIni
         statut: statutApresMiseAJour(actuel.statut, m),
         ...(m.reponseDetectee ? { reponseGoogleTexte: d.reponse?.texte ?? null, reponseGoogleDate: d.reponse?.date ?? maintenant } : {}),
         ...(m.reponseDisparue ? { reponseGoogleTexte: null, reponseGoogleDate: null } : {}),
-        ...(m.contenuChange ? { analyseAFaire: true, analyseReserveeAt: null } : {}),
+        // Un avis modifié quitte son lot éventuel : le résultat attendu porterait sur l'ancien texte.
+        ...(m.contenuChange ? { analyseAFaire: true, analyseReserveeAt: null, analyseEnLot: false, lotAnalyseId: null } : {}),
       },
     });
     noter(d.dateCreation);
@@ -171,7 +175,7 @@ async function traiterAvis(reviewId: string, fenetres: Awaited<ReturnType<typeof
  */
 export async function reprendreAnalyses(locationIds: string[], budgetMs: number, debut = Date.now()): Promise<{ analyses: number; restants: number }> {
   const maintenant = new Date();
-  const enAttente = { locationId: { in: locationIds }, analyseAFaire: true, retireAt: null };
+  const enAttente = { locationId: { in: locationIds }, analyseAFaire: true, analyseEnLot: false, retireAt: null };
   let analyses = 0;
   let echecs = 0;
 
@@ -215,6 +219,39 @@ export async function reprendreAnalyses(locationIds: string[], budgetMs: number,
   return { analyses, restants };
 }
 
+/** Brouillons des avis récents arrivés par un lot : l'analyse était en lot, la rédaction reste en appel direct. */
+async function brouillonsApresLots(locationIds: string[], echeance: number, maintenant: Date): Promise<number> {
+  const candidats = await prisma.review.findMany({
+    where: { locationId: { in: locationIds }, analyseEnLot: true, analyseAFaire: false, statut: "A_TRAITER", retireAt: null, drafts: { none: {} }, dateCreation: { gte: debutLecture(maintenant) } },
+    orderBy: { dateCreation: "desc" },
+    select: { id: true, locationId: true, dateCreation: true },
+  });
+  if (candidats.length === 0) return 0;
+  const fenetres = await fenetresParEtablissement(maintenant);
+  let ecrits = 0;
+  for (const a of candidats) {
+    if (Date.now() >= echeance) break;
+    if (!estRecent(a, fenetres, maintenant)) continue;
+    try {
+      await genererBrouillon(a.id);
+      ecrits += 1;
+    } catch (error) {
+      console.error("Brouillon reporté", error instanceof Error ? error.name : "erreur inconnue");
+      break;
+    }
+  }
+  return ecrits;
+}
+
+/** Tout ce qu'un passage fait avancer après la lecture de Google : lots de l'import, puis avis arrivés ensuite. */
+async function avancerAnalyses(locationIds: string[], budgetMs: number, debut: number, maintenant: Date): Promise<{ analyses: number; restants: number }> {
+  const echeance = debut + budgetMs;
+  const enLot = await avancerLots(locationIds, echeance, maintenant);
+  const ecrits = await brouillonsApresLots(locationIds, echeance, maintenant);
+  const { analyses, restants } = await reprendreAnalyses(locationIds, budgetMs, debut);
+  return { analyses: enLot + ecrits + analyses, restants };
+}
+
 /** Passage de fond (cron) : synchronise et analyse toutes les fiches réellement connectées. */
 export async function synchroniserToutesLesFiches(budgetMs: number): Promise<{ fiches: number; faites: number; analyses: number; restants: number; notifies: number }> {
   const debut = Date.now();
@@ -228,20 +265,21 @@ export async function synchroniserToutesLesFiches(budgetMs: number): Promise<{ f
       await activerNotifications(f.id).catch((error: unknown) => console.error("Notifications Google non enregistrées", error instanceof Error ? error.message : "erreur inconnue"));
     }
   }
-  const { analyses, restants } = await reprendreAnalyses(
+  const { analyses, restants } = await avancerAnalyses(
     fiches.map((f) => f.id),
     budgetMs,
     debut,
+    new Date(),
   );
-  const { avis } = await notifierAvisATraiter();
+  const { avis } = await notifierAvisATraiter(new Date(), fiches.map((f) => f.id));
   return { fiches: fiches.length, faites, analyses, restants, notifies: avis };
 }
 
 /** Après une notification : la liste a été réservée par la route, on lit, on analyse, on prévient. */
 export async function apresNotification(locationId: string): Promise<void> {
   await executerListe(locationId);
-  await reprendreAnalyses([locationId], BUDGET_NOTIFICATION_MS);
-  await notifierAvisATraiter();
+  await avancerAnalyses([locationId], BUDGET_NOTIFICATION_MS, Date.now(), new Date());
+  await notifierAvisATraiter(new Date(), [locationId]);
 }
 
 const BUDGET_NOTIFICATION_MS = 120_000;
@@ -257,12 +295,9 @@ export async function synchroniserMesFiches(userId: string): Promise<{ changemen
     const r = await synchroniserFiche(f.id, "ouverture");
     changements += r.nouveaux + r.modifies + r.retires;
   }
-  const { analyses, restants } = await reprendreAnalyses(
-    fiches.map((f) => f.id),
-    BUDGET_OUVERTURE_MS,
-    debut,
-  );
-  if (analyses > 0) await notifierAvisATraiter();
+  const ids = fiches.map((f) => f.id);
+  const { analyses, restants } = await avancerAnalyses(ids, BUDGET_OUVERTURE_MS, debut, new Date());
+  if (analyses > 0) await notifierAvisATraiter(new Date(), ids);
   return { changements: changements + analyses, restants };
 }
 
@@ -276,5 +311,7 @@ export async function etatDesFiches(userId: string) {
     orderBy: { nom: "asc" },
     select: { id: true, nom: true, lastSyncAt: true, notificationsGoogle: true, _count: { select: { reviews: { where: { analyseAFaire: true, retireAt: null } } } } },
   });
-  return fiches.map(({ _count, ...f }) => ({ ...f, enAttente: _count.reviews }));
+  const enLot = await prisma.review.groupBy({ by: ["locationId"], where: { locationId: { in: fiches.map((f) => f.id) }, analyseAFaire: true, analyseEnLot: true, retireAt: null }, _count: { _all: true } });
+  const parFiche = new Map(enLot.map((l) => [l.locationId, l._count._all]));
+  return fiches.map(({ _count, ...f }) => ({ ...f, enAttente: _count.reviews, historiqueEnCours: (parFiche.get(f.id) ?? 0) > 0 }));
 }
