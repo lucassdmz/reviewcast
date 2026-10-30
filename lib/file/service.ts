@@ -9,6 +9,7 @@ import { avecSignature, sansSignature } from "@/lib/voix/signature";
 import { phraseEcarts, reglagesDe } from "@/lib/voix/fraicheur";
 import { derniereModificationReglages, etatDuBrouillon } from "@/lib/voix/reecriture";
 import { fenetresParEtablissement } from "@/lib/fenetre/service";
+import { filtreFiches } from "@/lib/etablissements/perimetre";
 import { contexteAvis, formaterContexte, formaterContexteFile, type ContexteAvis } from "./contexte";
 import { partagerFile } from "./recence";
 import { STATUTS_FILE, verifierTransition } from "./statuts";
@@ -38,18 +39,13 @@ function extrait(texte: string | null, max = 120): string {
   return t.length <= max ? t : `${t.slice(0, max - 1).trimEnd()}…`;
 }
 
-/** Filtre sur l'établissement affiché ; `null` : tous les établissements. */
-function filtre(locationId: string | null): { locationId?: string } {
-  return locationId ? { locationId } : {};
-}
-
 async function avisPourContexte(locationId: string) {
   return prisma.review.findMany({ where: { locationId, retireAt: null }, select: { note: true, dateCreation: true } });
 }
 
 /** Climat récent, affiché une fois en tête de la file (null s'il n'y a rien d'encourageant à dire). */
 export async function contexteDeLaFile(locationId: string | null, maintenant = new Date()): Promise<string | null> {
-  const tous = await prisma.review.findMany({ where: { ...filtre(locationId), retireAt: null }, select: { note: true, dateCreation: true } });
+  const tous = await prisma.review.findMany({ where: { ...(await filtreFiches(locationId)), retireAt: null }, select: { note: true, dateCreation: true } });
   return formaterContexteFile(contexteAvis(tous, maintenant));
 }
 
@@ -68,7 +64,7 @@ export async function lireFile(
 /** Liste de la file, du plus récent au plus ancien. */
 export async function listerFile(locationId: string | null): Promise<AvisDeLaFile[]> {
   const avis = await prisma.review.findMany({
-    where: { ...filtre(locationId), statut: { in: STATUTS_FILE }, retireAt: null },
+    where: { ...(await filtreFiches(locationId)), statut: { in: STATUTS_FILE }, retireAt: null },
     orderBy: { dateCreation: "desc" },
     include: { location: { select: { id: true, nom: true } }, analysis: { select: { gravite: true, resume: true } } },
   });
@@ -167,7 +163,7 @@ export interface ReponsePubliee {
 /** Historique des réponses publiées, les plus récentes d'abord. */
 export async function historiquePublies(locationId: string | null, limite = 50): Promise<ReponsePubliee[]> {
   const avis = await prisma.review.findMany({
-    where: { ...filtre(locationId), statut: "PUBLIE", reponseGoogleTexte: { not: null } },
+    where: { ...(await filtreFiches(locationId)), statut: "PUBLIE", reponseGoogleTexte: { not: null } },
     orderBy: [{ reponseGoogleDate: "desc" }, { dateCreation: "desc" }],
     take: limite,
     include: { location: { select: { nom: true } } },

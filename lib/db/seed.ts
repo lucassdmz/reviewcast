@@ -31,14 +31,17 @@ async function main() {
   const brut = await readFile(path.join(process.cwd(), "tests", "fixtures", "reviews.json"), "utf8");
   const avis = fixtureSchema.parse(JSON.parse(brut));
 
+  // Une fiche appartient à un utilisateur : hors mode démo, la démonstration est rattachée à la première adresse autorisée.
+  const proprietaire = process.env.MODE_DEMO === "1" ? null : process.env.ALLOWED_EMAILS?.split(",")[0]?.trim();
+  const email = proprietaire || "demo@eclaircie.local";
   const utilisateur = await prisma.user.upsert({
-    where: { email: "demo@eclaircie.local" },
+    where: { email },
     update: {},
-    create: { email: "demo@eclaircie.local", name: "Démo" },
+    create: { email, name: "Démo" },
   });
   const connexion = await prisma.googleConnection.upsert({
     where: { googleAccountId: "accounts/demo" },
-    update: {},
+    update: { userId: utilisateur.id },
     create: {
       userId: utilisateur.id,
       googleAccountId: "accounts/demo",

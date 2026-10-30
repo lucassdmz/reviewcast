@@ -1,3 +1,4 @@
+import { filtreFiches } from "@/lib/etablissements/perimetre";
 import QRCode from "qrcode";
 import { creerRemerciement } from "@/lib/ai/service";
 import { prisma } from "@/lib/db/client";
@@ -59,9 +60,6 @@ export interface Rituel {
   cartes: Carte[];
 }
 
-function filtre(locationId: string | null): { locationId?: string } {
-  return locationId ? { locationId } : {};
-}
 
 function enMinuscule(libelle: string): string {
   return libelle.charAt(0).toLocaleLowerCase("fr") + libelle.slice(1);
@@ -70,7 +68,7 @@ function enMinuscule(libelle: string): string {
 /** Remerciements prêts pour les avis positifs récents sans réponse ; rédigés à la demande s'il n'y en a pas. */
 async function mercisPrets(locationId: string | null, depuis: Date): Promise<MerciPret[]> {
   const avis = await prisma.review.findMany({
-    where: { ...filtre(locationId), note: { gte: 4 }, statut: "HORS_FILE", reponseGoogleTexte: null, retireAt: null, dateCreation: { gte: depuis }, NOT: { texte: null } },
+    where: { ...(await filtreFiches(locationId)), note: { gte: 4 }, statut: "HORS_FILE", reponseGoogleTexte: null, retireAt: null, dateCreation: { gte: depuis }, NOT: { texte: null } },
     orderBy: { dateCreation: "desc" },
     take: MERCIS_MAX,
     include: { drafts: { orderBy: { version: "desc" }, take: 1 } },
@@ -118,9 +116,9 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
   const depuisSujet = new Date(maintenant.getTime() - FENETRE_SUJET_JOURS * 86_400_000);
 
   const [toutes, recents, aTraiter, voix, lienAvis] = await Promise.all([
-    prisma.review.findMany({ where: { ...filtre(locationId), retireAt: null }, select: { note: true, dateCreation: true } }),
+    prisma.review.findMany({ where: { ...(await filtreFiches(locationId)), retireAt: null }, select: { note: true, dateCreation: true } }),
     prisma.review.findMany({
-      where: { ...filtre(locationId), retireAt: null, dateCreation: { gte: fenetre.debut } },
+      where: { ...(await filtreFiches(locationId)), retireAt: null, dateCreation: { gte: fenetre.debut } },
       select: {
         id: true,
         auteur: true,
@@ -131,7 +129,7 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
       },
     }),
     prisma.review.findMany({
-      where: { ...filtre(locationId), retireAt: null, statut: { in: STATUTS_FILE }, ...filtreRecents(fenetres) },
+      where: { ...(await filtreFiches(locationId)), retireAt: null, statut: { in: STATUTS_FILE }, ...filtreRecents(fenetres) },
       include: {
         drafts: { orderBy: { version: "desc" }, take: 1, select: { texte: true } },
         analysis: { select: { gravite: true, resume: true, themes: { where: { polarite: "NEGATIF" }, select: { theme: { select: { libelle: true } } } } } },

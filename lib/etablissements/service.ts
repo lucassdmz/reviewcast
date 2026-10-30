@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/db/client";
+import { filtreEtablissements } from "./perimetre";
 import { COOKIE_ETABLISSEMENT, choisirActif, type Etablissement } from "./actif";
 
 export interface ChoixEtablissement {
@@ -15,6 +16,7 @@ export interface ChoixEtablissement {
  */
 export const lireChoixEtablissement = cache(async (): Promise<ChoixEtablissement> => {
   const lignes = await prisma.location.findMany({
+    where: await filtreEtablissements(),
     select: { id: true, nom: true, adresse: true, logoType: true, updatedAt: true },
     orderBy: { nom: "asc" },
   });
@@ -35,6 +37,6 @@ export async function idEtablissementActif(): Promise<string | null> {
 }
 
 export async function lireLogo(locationId: string): Promise<{ octets: Uint8Array; type: string } | null> {
-  const l = await prisma.location.findUnique({ where: { id: locationId }, select: { logo: true, logoType: true } });
+  const l = await prisma.location.findFirst({ where: { id: locationId, ...(await filtreEtablissements()) }, select: { logo: true, logoType: true } });
   return l?.logo && l.logoType ? { octets: l.logo, type: l.logoType } : null;
 }

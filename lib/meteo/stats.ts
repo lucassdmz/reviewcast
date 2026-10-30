@@ -1,3 +1,4 @@
+import { filtreEtablissements, filtreFiches } from "@/lib/etablissements/perimetre";
 import type { Meteo } from "@/lib/db/generated/enums";
 import { prisma } from "@/lib/db/client";
 import { fenetresParEtablissement, filtreRecents } from "@/lib/fenetre/service";
@@ -69,11 +70,12 @@ export async function obtenirMeteoHome(
   tirage = Math.random(),
 ): Promise<MeteoHome> {
   const etablissements = await prisma.location.findMany({
+    where: await filtreEtablissements(),
     select: { id: true, nom: true, settings: true },
     orderBy: { nom: "asc" },
   });
   const actif = locationId ? (etablissements.find((e) => e.id === locationId) ?? null) : null;
-  const filtreLocation = actif ? { locationId: actif.id } : {};
+  const filtreLocation = await filtreFiches(actif?.id ?? null);
   const periode12 = douzeMoisGlissants(maintenant);
 
   const avis = await prisma.review.findMany({

@@ -1,3 +1,4 @@
+import { filtreEtablissements, filtreFiches } from "@/lib/etablissements/perimetre";
 import { prisma } from "@/lib/db/client";
 import {
   classerThemes,
@@ -28,7 +29,7 @@ export interface Tendances {
 }
 
 async function lignesJour(locationId: string | null, debut: Date, fin: Date): Promise<LigneJour[]> {
-  const rows = await prisma.dailyStat.findMany({ where: { ...(locationId ? { locationId } : {}), jour: { gte: debut, lt: fin } } });
+  const rows = await prisma.dailyStat.findMany({ where: { ...(await filtreFiches(locationId)), jour: { gte: debut, lt: fin } } });
   return rows.map((r) => ({
     jour: r.jour,
     volume: r.volume,
@@ -46,14 +47,14 @@ async function lignesJour(locationId: string | null, debut: Date, fin: Date): Pr
 
 async function lignesTheme(locationId: string | null, debut: Date, fin: Date): Promise<LigneTheme[]> {
   const rows = await prisma.themeStat.findMany({
-    where: { ...(locationId ? { locationId } : {}), jour: { gte: debut, lt: fin } },
+    where: { ...(await filtreFiches(locationId)), jour: { gte: debut, lt: fin } },
     include: { theme: { select: { libelle: true } } },
   });
   return rows.map((r) => ({ themeId: r.themeId, libelle: r.theme.libelle, polarite: r.polarite, nombre: r.nombre }));
 }
 
 export async function obtenirTendances(locationId: string | null, periode: PeriodeTendances): Promise<Tendances> {
-  const etablissements = await prisma.location.findMany({ select: { id: true, nom: true }, orderBy: { nom: "asc" } });
+  const etablissements = await prisma.location.findMany({ where: await filtreEtablissements(), select: { id: true, nom: true }, orderBy: { nom: "asc" } });
   const etablissement = locationId ? (etablissements.find((e) => e.id === locationId) ?? null) : null;
   const id = etablissement?.id ?? null;
 
@@ -101,7 +102,7 @@ export async function avisParTheme(themeId: string, locationId: string | null, p
     where: {
       themeId,
       ...(sens ? { polarite: polariteDuSens(sens) } : {}),
-      analysis: { review: { ...(locationId ? { locationId } : {}), retireAt: null, dateCreation: { gte: periode.debut, lt: periode.fin } } },
+      analysis: { review: { ...(await filtreFiches(locationId)), retireAt: null, dateCreation: { gte: periode.debut, lt: periode.fin } } },
     },
     include: { analysis: { include: { review: { include: { location: { select: { nom: true } } } } } } },
   });

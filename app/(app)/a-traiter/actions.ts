@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { auth } from "@/lib/auth/config";
+import { exigerAvisDeLUtilisateur } from "@/lib/etablissements/perimetre";
 import {
   ajouterNote,
   enregistrerBrouillon,
@@ -51,6 +52,7 @@ function rafraichir(reviewId: string) {
 
 async function executer(reviewId: string, action: () => Promise<void>): Promise<EtatAction> {
   try {
+    await exigerAvisDeLUtilisateur(reviewId);
     await action();
     rafraichir(reviewId);
     return {};
@@ -132,6 +134,7 @@ export async function actionPublierDepuisPile(reviewId: string, texte: string): 
   const userId = await utilisateurConnecte();
   try {
     const id = identifiantSchema.parse(reviewId);
+    await exigerAvisDeLUtilisateur(id);
     await publierReponse(id, texteReponseSchema.parse(texte), userId);
     revalidatePath("/a-traiter");
     revalidatePath("/avis");
@@ -146,7 +149,9 @@ export async function actionPublierMercis(mercis: { reviewId: string; texte: str
   let publies = 0;
   try {
     for (const m of mercis.slice(0, 10)) {
-      await publierReponse(identifiantSchema.parse(m.reviewId), texteReponseSchema.parse(m.texte), userId);
+      const id = identifiantSchema.parse(m.reviewId);
+      await exigerAvisDeLUtilisateur(id);
+      await publierReponse(id, texteReponseSchema.parse(m.texte), userId);
       publies += 1;
     }
     revalidatePath("/avis");

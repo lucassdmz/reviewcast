@@ -1,5 +1,6 @@
 "use server";
 
+import { exigerFicheDeLUtilisateur } from "@/lib/etablissements/perimetre";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
@@ -33,6 +34,7 @@ function champ(form: FormData, nom: string): string {
 async function appliquer(form: FormData, section: string, changements: Record<string, unknown>, destination: string): Promise<never> {
   const userId = await utilisateurConnecte();
   const locationId = identifiantSchema.parse(champ(form, "locationId"));
+  await exigerFicheDeLUtilisateur(locationId);
   const actuelle: Voix = await lireVoix(locationId);
   const resultat = voixSchema.safeParse({
     ...actuelle,
@@ -149,6 +151,7 @@ export async function actionRetirerCorrection(correctionId: string): Promise<voi
 export async function actionEnregistrerLienAvis(form: FormData): Promise<void> {
   await utilisateurConnecte();
   const locationId = identifiantSchema.parse(champ(form, "locationId"));
+  await exigerFicheDeLUtilisateur(locationId);
   const resultat = lienAvisSchema.safeParse(champ(form, "lienAvis"));
   if (!resultat.success) redirect(`/reglages/avis?erreur=${encodeURIComponent(resultat.error.issues[0]?.message ?? "Lien invalide.")}`);
   await enregistrerLienAvis(locationId, resultat.data);

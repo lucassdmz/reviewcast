@@ -1,3 +1,4 @@
+import { filtreFiches } from "@/lib/etablissements/perimetre";
 import { prisma } from "@/lib/db/client";
 import type { ReviewStatus } from "@/lib/db/generated/enums";
 import { estRecent } from "@/lib/fenetre/adaptative";
@@ -37,7 +38,7 @@ function etatDe(statut: ReviewStatus, reponsePubliee: string | null): EtatPost {
 
 export async function listerFlux(locationId: string | null, maintenant = new Date(), limite = 40): Promise<Post[]> {
   const avis = await prisma.review.findMany({
-    where: { ...(locationId ? { locationId } : {}), retireAt: null },
+    where: { ...(await filtreFiches(locationId)), retireAt: null },
     orderBy: { dateCreation: "desc" },
     take: limite,
     include: {

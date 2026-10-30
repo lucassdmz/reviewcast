@@ -85,6 +85,8 @@ model GoogleConnection {
   googleAccountName     String?  @map("google_account_name")
   refreshTokenEncrypted String   @map("refresh_token_encrypted")
   scope                 String
+  /// Google a refusé le renouvellement du jeton (accès retiré) : la gérante doit reconnecter sa fiche.
+  aReconnecterAt        DateTime? @map("a_reconnecter_at")
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 
@@ -191,7 +193,14 @@ model Location {
   /// Logo affiché dans la barre d'onglets et dans la liste des établissements.
   logo               Bytes?
   logoType           String?  @map("logo_type")
+  /// Compte Google par lequel lire la fiche (accounts/{id}). Null pour les données de démonstration.
+  googleCompte       String?  @map("google_compte")
+  /// Dernière synchronisation terminée.
   lastSyncAt         DateTime? @map("last_sync_at")
+  /// Dernière requête de liste réservée : sert de verrou pour la limite de 15 minutes.
+  derniereListeAt    DateTime? @map("derniere_liste_at")
+  /// Notifications en temps réel : « actives », « autre_sujet » (le compte publie déjà vers un autre sujet), ou null.
+  notificationsGoogle String?  @map("notifications_google")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
 
@@ -222,6 +231,10 @@ model Review {
   retireAt           DateTime?    @map("retire_at")
   // Notification « avis à traiter » déjà envoyée pour cet avis (lot 6).
   notifieAt          DateTime?    @map("notifie_at")
+  /// Avis nouveau ou modifié, pas encore passé par l'IA : l'import reprend là où il s'est arrêté.
+  analyseAFaire      Boolean      @default(false) @map("analyse_a_faire")
+  /// Réservation de l'analyse par un passage, pour ne jamais payer deux fois le même appel.
+  analyseReserveeAt  DateTime?    @map("analyse_reservee_at")
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime     @updatedAt @map("updated_at")
 
@@ -233,6 +246,7 @@ model Review {
 
   @@index([locationId, dateCreation])
   @@index([locationId, statut])
+  @@index([locationId, analyseAFaire])
   @@map("reviews")
 }
 

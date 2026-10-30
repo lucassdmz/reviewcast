@@ -6,6 +6,7 @@ import { Etoiles, formatDate } from "@/components/file/Etoiles";
 import { FormulaireBrouillon } from "@/components/file/FormulaireBrouillon";
 import { Gravite } from "@/components/file/Gravite";
 import { NotesInternes } from "@/components/file/NotesInternes";
+import { avisAppartientALUtilisateur } from "@/lib/etablissements/perimetre";
 import { ficheAvis } from "@/lib/file/service";
 import { avecSignature } from "@/lib/voix/signature";
 import { LIBELLES_STATUT } from "@/lib/file/statuts";
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function FicheAvisPage({ params, searchParams }: PageProps<"/a-traiter/[id]">) {
   const { id } = await params;
   const query = await searchParams;
-  const fiche = await ficheAvis(id);
+  const fiche = (await avisAppartientALUtilisateur(id)) ? await ficheAvis(id) : null;
   if (!fiche) notFound();
 
   const erreur = typeof query.erreur === "string" ? query.erreur : null;

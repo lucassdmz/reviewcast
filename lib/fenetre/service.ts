@@ -1,3 +1,4 @@
+import { filtreFiches } from "@/lib/etablissements/perimetre";
 import { prisma } from "@/lib/db/client";
 import type { Prisma } from "@/lib/db/generated/client";
 import { debutLecture, fenetreAdaptative, type Fenetre } from "./adaptative";
@@ -10,7 +11,7 @@ import { debutLecture, fenetreAdaptative, type Fenetre } from "./adaptative";
 /** Fenêtre d'une vue : un établissement, ou l'ensemble (`null`), pour les chiffres du climat récent. */
 export async function fenetreDeLaVue(locationId: string | null, maintenant = new Date()): Promise<Fenetre> {
   const avis = await prisma.review.findMany({
-    where: { ...(locationId ? { locationId } : {}), retireAt: null, dateCreation: { gte: debutLecture(maintenant) } },
+    where: { ...(await filtreFiches(locationId)), retireAt: null, dateCreation: { gte: debutLecture(maintenant) } },
     select: { dateCreation: true },
   });
   return fenetreAdaptative(
