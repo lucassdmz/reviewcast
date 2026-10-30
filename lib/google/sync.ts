@@ -3,11 +3,11 @@ import { statutApresAnalyse } from "@/lib/ai/queue";
 import { recalculerJour, recalculerStatistiques } from "@/lib/analytics/recalcul";
 import { prisma } from "@/lib/db/client";
 import type { ReviewStatus } from "@/lib/db/generated/enums";
-import { debutLecture, estRecent } from "@/lib/fenetre/adaptative";
+import { estRecent } from "@/lib/fenetre/adaptative";
 import { fenetresParEtablissement } from "@/lib/fenetre/service";
 import { notifierAvisATraiter } from "@/lib/notifications/service";
 import { GoogleApiError } from "./client";
-import { cheminFiche, comparerAvis, versAvisDistant, type AvisDistant, type Comparaison, type MiseAJour } from "./comparaison";
+import { cheminFiche, comparerAvis, partagerImport, versAvisDistant, type AvisDistant, type Comparaison, type MiseAJour } from "./comparaison";
 import { activerNotifications, clientDeLaConnexion } from "./connexion";
 import { avancerLots } from "./import-lots";
 import { limitePourLister, type Declencheur } from "./limites";
@@ -58,12 +58,14 @@ function statutApresMiseAJour(actuel: ReviewStatus, m: MiseAJour): ReviewStatus 
   return actuel;
 }
 
-async function appliquer(locationId: string, comparaison: Comparaison, importInitial: boolean, maintenant: Date): Promise<void> {
+async function appliquer(locationId: string, comparaison: Comparaison, distants: AvisDistant[], importInitial: boolean, maintenant: Date): Promise<void> {
   const { aCreer, aMettreAJour, aRetirer } = comparaison;
   const jours = new Map<number, Date>();
   const noter = (d: Date) => jours.set(d.getTime(), d);
 
   if (aCreer.length > 0) {
+    // Sur tous les avis lus : un import repris après une coupure garde la même fenêtre.
+    const historique = new Set(importInitial ? partagerImport(distants, maintenant).historique.map((d) => d.googleReviewId) : []);
     await prisma.review.createMany({
       skipDuplicates: true,
       data: aCreer.map((d) => ({
@@ -78,8 +80,8 @@ async function appliquer(locationId: string, comparaison: Comparaison, importIni
         reponseGoogleDate: d.reponse?.date ?? null,
         statut: statutProvisoire(d),
         analyseAFaire: true,
-        // L'historique part en lot, à moitié prix ; les avis suivants sont analysés dès leur arrivée.
-        analyseEnLot: importInitial,
+        // L'ancien historique part en lot, à moitié prix ; les avis récents et les suivants sont analysés tout de suite.
+        analyseEnLot: historique.has(d.googleReviewId),
         // L'import de l'historique ne déclenche aucune notification.
         notifieAt: importInitial ? maintenant : null,
       })),
@@ -134,12 +136,13 @@ export async function executerListe(locationId: string, maintenant = new Date())
       where: { locationId },
       select: { id: true, googleReviewId: true, note: true, texte: true, auteur: true, dateMaj: true, reponseGoogleTexte: true, reponseGoogleDate: true, retireAt: true },
     });
-    const comparaison = comparerAvis(liste.avis.map(versAvisDistant), locaux, {
+    const distants = liste.avis.map(versAvisDistant);
+    const comparaison = comparerAvis(distants, locaux, {
       listeComplete: liste.complete,
       publicationSimulee: process.env.PUBLICATION_GOOGLE === "simulee",
     });
     await initialiserTaxonomie();
-    await appliquer(locationId, comparaison, location.lastSyncAt === null, maintenant);
+    await appliquer(locationId, comparaison, distants, location.lastSyncAt === null, maintenant);
     await prisma.location.update({ where: { id: locationId }, data: { lastSyncAt: maintenant } });
     return { etat: "faite", nouveaux: comparaison.aCreer.length, modifies: comparaison.aMettreAJour.length, retires: comparaison.aRetirer.length };
   } catch (error) {
@@ -219,37 +222,17 @@ export async function reprendreAnalyses(locationIds: string[], budgetMs: number,
   return { analyses, restants };
 }
 
-/** Brouillons des avis récents arrivés par un lot : l'analyse était en lot, la rédaction reste en appel direct. */
-async function brouillonsApresLots(locationIds: string[], echeance: number, maintenant: Date): Promise<number> {
-  const candidats = await prisma.review.findMany({
-    where: { locationId: { in: locationIds }, analyseEnLot: true, analyseAFaire: false, statut: "A_TRAITER", retireAt: null, drafts: { none: {} }, dateCreation: { gte: debutLecture(maintenant) } },
-    orderBy: { dateCreation: "desc" },
-    select: { id: true, locationId: true, dateCreation: true },
-  });
-  if (candidats.length === 0) return 0;
-  const fenetres = await fenetresParEtablissement(maintenant);
-  let ecrits = 0;
-  for (const a of candidats) {
-    if (Date.now() >= echeance) break;
-    if (!estRecent(a, fenetres, maintenant)) continue;
-    try {
-      await genererBrouillon(a.id);
-      ecrits += 1;
-    } catch (error) {
-      console.error("Brouillon reporté", error instanceof Error ? error.name : "erreur inconnue");
-      break;
-    }
-  }
-  return ecrits;
-}
-
-/** Tout ce qu'un passage fait avancer après la lecture de Google : lots de l'import, puis avis arrivés ensuite. */
+/**
+ * Tout ce qu'un passage fait avancer après la lecture de Google : d'abord les
+ * avis à analyser tout de suite, qui attendent leur brouillon, puis les lots de
+ * l'ancien historique avec le temps qui reste. `restants` compte aussi ce qui
+ * n'a pas encore été soumis, pour que l'écran ouvert relance un passage.
+ */
 async function avancerAnalyses(locationIds: string[], budgetMs: number, debut: number, maintenant: Date): Promise<{ analyses: number; restants: number }> {
-  const echeance = debut + budgetMs;
-  const enLot = await avancerLots(locationIds, echeance, maintenant);
-  const ecrits = await brouillonsApresLots(locationIds, echeance, maintenant);
   const { analyses, restants } = await reprendreAnalyses(locationIds, budgetMs, debut);
-  return { analyses: enLot + ecrits + analyses, restants };
+  const enLot = await avancerLots(locationIds, debut + budgetMs, maintenant);
+  const aSoumettre = await prisma.review.count({ where: { locationId: { in: locationIds }, analyseEnLot: true, analyseAFaire: true, lotAnalyseId: null, retireAt: null } });
+  return { analyses: analyses + enLot, restants: restants + aSoumettre };
 }
 
 /** Passage de fond (cron) : synchronise et analyse toutes les fiches réellement connectées. */
@@ -314,4 +297,9 @@ export async function etatDesFiches(userId: string) {
   const enLot = await prisma.review.groupBy({ by: ["locationId"], where: { locationId: { in: fiches.map((f) => f.id) }, analyseAFaire: true, analyseEnLot: true, retireAt: null }, _count: { _all: true } });
   const parFiche = new Map(enLot.map((l) => [l.locationId, l._count._all]));
   return fiches.map(({ _count, ...f }) => ({ ...f, enAttente: _count.reviews, historiqueEnCours: (parFiche.get(f.id) ?? 0) > 0 }));
+}
+
+/** Fin de l'import d'une fiche : ses avis récents et leurs brouillons, dans la limite d'un budget. Le reste repart au passage suivant. */
+export async function preparerAvisRecents(locationId: string): Promise<void> {
+  await reprendreAnalyses([locationId], BUDGET_OUVERTURE_MS);
 }

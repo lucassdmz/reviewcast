@@ -80,8 +80,9 @@ test.describe("connexion de la fiche Google", () => {
     await expect(page.getByRole("link", { name: /Camille Lefort/ })).toBeVisible();
     await expect(page.getByRole("link", { name: /Noé Garnier.*Accueil adorable, je reviendrai\./ })).toBeVisible();
 
+    // Dès la fin de l'import, l'avis récent a son analyse et son brouillon, sans attendre le lot.
     await page.goto("/a-traiter");
-    await expect(page.getByRole("list", { name: "Avis à traiter" }).getByText("Camille Lefort")).toBeVisible();
+    await expect(page.getByRole("list", { name: "Avis à traiter" }).getByRole("link").filter({ hasText: "Camille Lefort" }).filter({ hasText: "Brouillon prêt à relire" })).toBeVisible();
     // Une réponse déjà donnée sur Google : l'avis n'est pas à traiter.
     await expect(page.getByText("Inès Marchand")).toHaveCount(0);
 
@@ -99,16 +100,18 @@ test.describe("connexion de la fiche Google", () => {
     expect(compteurs.reglage["accounts/101"].notificationTypes).toEqual(["NEW_REVIEW", "UPDATED_REVIEW"]);
   });
 
-  test("l'historique part en lot, repris au passage suivant, sans relire Google", async ({ page, request }) => {
+  test("seul l'ancien historique part en lot, repris au passage suivant, sans relire Google", async ({ page, request }) => {
     const avant = (await (await controle(request, "compteurs")).json()).listes;
     const lot = async () =>
       (await base((c) => c.query<{ statut: string; nb_avis: number; fournisseur: boolean }>(`SELECT b.statut, b.nb_avis, b.id_fournisseur IS NOT NULL AS fournisseur FROM lots_analyse b JOIN locations l ON l.id = b.location_id WHERE l.google_location_id = 'locations/9001'`))).rows;
 
-    // L'ouverture de l'écran soumet le lot : un seul, pour tout l'historique.
+    // L'ouverture de l'écran soumet le lot : un seul, pour les 55 avis anciens. Les 4 récents n'y sont pas.
     await page.goto("/reglages/fiche-google");
     await expect.poll(async () => (await lot())[0]?.statut, { timeout: 30_000 }).toBe("EN_COURS");
-    expect(await lot()).toEqual([{ statut: "EN_COURS", nb_avis: 59, fournisseur: true }]);
-    await expect(page.getByText(/peut prendre jusqu'à 24 heures/)).toBeVisible();
+    expect(await lot()).toEqual([{ statut: "EN_COURS", nb_avis: 55, fournisseur: true }]);
+    const recentsEnLot = await base((c) => c.query(`SELECT 1 FROM reviews r JOIN locations l ON l.id = r.location_id WHERE l.google_location_id = 'locations/9001' AND r.analyse_en_lot AND r.date_creation > now() - interval '90 days'`));
+    expect(recentsEnLot.rows).toEqual([]);
+    await expect(page.getByText(/Vos avis récents sont prêts à traiter.*ancien historique peut prendre jusqu'à 24 heures/)).toBeVisible();
 
     // Le passage suivant relève le lot, une fois l'intervalle écoulé.
     await base((c) => c.query(`UPDATE lots_analyse SET releve_le = NULL`));
@@ -131,6 +134,33 @@ test.describe("connexion de la fiche Google", () => {
       )
       .toBe(1);
     expect((await (await controle(request, "compteurs")).json()).reponses).toEqual([]);
+  });
+
+  test("l'ancien avis négatif arrivé par le lot attend sans brouillon d'office", async () => {
+    const { rows } = await base((c) =>
+      c.query<{ statut: string; brouillons: string }>(`SELECT r.statut, (SELECT count(*) FROM drafts d WHERE d.review_id = r.id) AS brouillons FROM reviews r WHERE r.google_review_id = $1`, [`${AVIS}/r-ancien-0`]),
+    );
+    expect(rows).toEqual([{ statut: "A_TRAITER", brouillons: "0" }]);
+  });
+
+  test("un brouillon récent interrompu est repris au passage suivant", async ({ page, request }) => {
+    const avant = (await (await controle(request, "compteurs")).json()).listes;
+    // Ce qu'un budget de temps épuisé laisse derrière lui : l'avis récent encore à analyser, sans brouillon.
+    await base(async (c) => {
+      await c.query(`DELETE FROM drafts WHERE review_id = (SELECT id FROM reviews WHERE google_review_id = $1)`, [`${AVIS}/r-negatif`]);
+      await c.query(`UPDATE reviews SET statut = 'A_TRAITER', analyse_a_faire = true, analyse_reservee_at = NULL WHERE google_review_id = $1`, [`${AVIS}/r-negatif`]);
+    });
+    await page.goto("/a-traiter");
+    await expect
+      .poll(
+        async () => {
+          await page.goto("/a-traiter");
+          return page.getByRole("list", { name: "Avis à traiter" }).getByRole("link").filter({ hasText: "Camille Lefort" }).filter({ hasText: "Brouillon prêt à relire" }).count();
+        },
+        { timeout: 30_000 },
+      )
+      .toBe(1);
+    expect((await (await controle(request, "compteurs")).json()).listes).toBe(avant);
   });
 
   test("une notification sans jeton valide est rejetée", async ({ request }) => {

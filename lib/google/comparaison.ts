@@ -1,3 +1,4 @@
+import { estRecent, fenetreAdaptative } from "@/lib/fenetre/adaptative";
 import type { AvisGoogle } from "./schemas";
 
 /**
@@ -125,4 +126,19 @@ export function cheminFiche(compte: string, googleLocationId: string): string {
 /** Extrait locations/{id} d'un nom de ressource Google (fiche ou avis). */
 export function locationDepuisRessource(ressource: string): string | null {
   return /(?:^|\/)(locations\/[^/]+)(?:\/|$)/.exec(ressource)?.[1] ?? null;
+}
+
+/**
+ * À l'import initial, seul l'ancien historique part en lot. « Récent » est la
+ * fenêtre de la file (lib/fenetre/adaptative.ts), lue sur tous les avis de la
+ * fiche : ces avis-là sont analysés tout de suite et reçoivent leur brouillon.
+ */
+export function partagerImport<T extends { dateCreation: Date }>(avis: T[], maintenant: Date): { recents: T[]; historique: T[] } {
+  const fenetre = fenetreAdaptative(
+    avis.map((a) => a.dateCreation),
+    maintenant,
+  );
+  const fenetres = new Map([["fiche", fenetre]]);
+  const recent = (a: T) => estRecent({ locationId: "fiche", dateCreation: a.dateCreation }, fenetres, maintenant);
+  return { recents: avis.filter(recent), historique: avis.filter((a) => !recent(a)) };
 }

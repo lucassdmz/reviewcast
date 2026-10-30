@@ -8,7 +8,7 @@ import { auth } from "@/lib/auth/config";
 import { estModeDemo } from "@/lib/auth/demo";
 import { COOKIE_ETABLISSEMENT } from "@/lib/etablissements/actif";
 import { codeErreurConnexion, rattacherFiche } from "@/lib/google/connexion";
-import { synchroniserFiche } from "@/lib/google/sync";
+import { preparerAvisRecents, synchroniserFiche } from "@/lib/google/sync";
 
 const ficheSchema = z.string().regex(/^locations\/[^/]+$/);
 
@@ -28,6 +28,7 @@ export async function actionChoisirFiche(form: FormData): Promise<void> {
     redirect(`/reglages/fiche-google?erreur=${codeErreurConnexion(error)}`);
   }
   const { etat } = await synchroniserFiche(locationId, "connexion");
+  if (etat === "faite") await preparerAvisRecents(locationId);
   (await cookies()).set(COOKIE_ETABLISSEMENT, locationId, { path: "/", maxAge: 365 * 24 * 60 * 60, sameSite: "lax" });
   revalidatePath("/", "layout");
   redirect(etat === "faite" ? "/avis" : "/reglages/fiche-google?erreur=google-indisponible");

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { AUTEUR_ANONYME, cheminFiche, comparerAvis, locationDepuisRessource, noteDepuisGoogle, versAvisDistant, type AvisDistant, type AvisLocal } from "@/lib/google/comparaison";
+import { estRecent, fenetreAdaptative } from "@/lib/fenetre/adaptative";
+import { AUTEUR_ANONYME, cheminFiche, comparerAvis, locationDepuisRessource, noteDepuisGoogle, partagerImport, versAvisDistant, type AvisDistant, type AvisLocal } from "@/lib/google/comparaison";
 
 const ID = "accounts/1/locations/2/reviews/";
 const D = new Date("2026-10-01T10:00:00Z");
@@ -95,5 +96,37 @@ describe("noms de ressources", () => {
     expect(locationDepuisRessource("locations/2")).toBe("locations/2");
     expect(locationDepuisRessource("accounts/1")).toBeNull();
     expect(cheminFiche("accounts/1", "locations/2")).toBe("accounts/1/locations/2");
+  });
+});
+
+describe("partage de l'import initial", () => {
+  const MAINTENANT = new Date("2026-10-30T12:00:00Z");
+  const ilYA = (jours: number) => ({ dateCreation: new Date(MAINTENANT.getTime() - jours * 86_400_000) });
+
+  it("envoie en lot ce qui est hors de la fenêtre la plus large, quand les avis sont rares", () => {
+    const { recents, historique } = partagerImport([ilYA(2), ilYA(80), ilYA(100), ilYA(400)], MAINTENANT);
+    expect(recents).toHaveLength(2);
+    expect(historique).toHaveLength(2);
+  });
+
+  it("resserre la fenêtre avec le rythme de la fiche, comme la file", () => {
+    const avis = [...Array.from({ length: 10 }, (_, i) => ilYA(i + 1)), ilYA(50)];
+    const { recents, historique } = partagerImport(avis, MAINTENANT);
+    expect(recents).toHaveLength(10);
+    expect(historique).toEqual([ilYA(50)]);
+  });
+
+  it("reprend exactement la définition de la file", () => {
+    const avis = [ilYA(1), ilYA(41), ilYA(43), ilYA(59), ilYA(61), ilYA(89), ilYA(91), ...Array.from({ length: 12 }, (_, i) => ilYA(i + 2))];
+    const fenetres = new Map([["f", fenetreAdaptative(avis.map((a) => a.dateCreation), MAINTENANT)]]);
+    const attendu = avis.filter((a) => estRecent({ locationId: "f", ...a }, fenetres, MAINTENANT));
+    expect(partagerImport(avis, MAINTENANT).recents).toEqual(attendu);
+  });
+
+  it("ne perd aucun avis et tolère une fiche vide", () => {
+    const avis = [ilYA(1), ilYA(500)];
+    const { recents, historique } = partagerImport(avis, MAINTENANT);
+    expect(recents.length + historique.length).toBe(2);
+    expect(partagerImport([], MAINTENANT)).toEqual({ recents: [], historique: [] });
   });
 });

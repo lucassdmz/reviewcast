@@ -26,17 +26,19 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
-### Votre historique analysé à moitié prix
+### Vos avis récents prêts tout de suite, votre historique analysé à moitié prix
 
-**Ce qui change pour vous.** À la connexion d'une fiche, tous vos anciens avis sont lus d'un seul coup, en lot, ce qui divise par deux le coût de l'analyse. Vos avis s'affichent aussitôt ; thèmes, tendances et brouillons des avis récents suivent quand le lot est revenu, en général en moins d'une heure, 24 heures au plus. L'écran Fiche Google vous dit où cela en est.
+**Ce qui change pour vous.** Dès la connexion d'une fiche, vos avis récents sont analysés et ceux qui attendent une réponse ont leur brouillon. Votre ancien historique est lu à part, en lot, ce qui divise par deux le coût de son analyse : tous vos avis s'affichent aussitôt, et vos tendances se complètent quand le lot revient, en général en moins d'une heure, 24 heures au plus. L'écran Fiche Google vous dit où cela en est.
 
 **Ce à quoi on a pensé.**
+- « Récent » veut dire la même chose qu'ailleurs dans l'application : ce sont les avis de votre liste à traiter, selon le rythme de votre établissement.
+- Si vos avis récents sont nombreux, le travail se poursuit par étapes, sans rien perdre, là où il s'était arrêté.
 - Rien ne se perd si l'application se ferme : le lot continue chez le fournisseur, ses résultats sont repris au passage suivant.
 - Un avis modifié pendant ce temps sort du lot et il est relu avec son nouveau texte.
 - Un avis que le lot n'a pas pu traiter est repris individuellement.
 - Les avis qui arrivent après l'import restent analysés tout de suite.
 
-**Pas encore couvert.** Pendant l'analyse du lot, un avis récent à traiter reste visible dans votre liste mais n'a pas encore son brouillon. Sans ouverture de l'application, les résultats sont repris lors du passage quotidien.
+**Pas encore couvert.** Les avis anciens restés sans réponse n'ont pas de brouillon d'office : il se demande depuis leur fiche. Sans ouverture de l'application, les résultats du lot sont repris lors du passage quotidien.
 
 ---
 

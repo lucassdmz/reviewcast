@@ -12,9 +12,9 @@ import { appliquerAnalyse, fournisseurPour, entreeAnalyse } from "@/lib/ai/servi
 import { prisma } from "@/lib/db/client";
 
 /**
- * Import initial d'une fiche : l'analyse de l'historique passe par la Batch
- * API. Les avis restent visibles dès l'import, avec leur statut provisoire.
- * Les avis arrivés après l'import ne passent pas par ici (reprendreAnalyses).
+ * Import initial d'une fiche : l'analyse de l'ancien historique passe par la
+ * Batch API. Ces avis restent visibles dès l'import, avec leur statut provisoire.
+ * Les avis récents et ceux arrivés ensuite ne passent pas par ici (reprendreAnalyses).
  */
 
 const depotPrisma: DepotLot = {

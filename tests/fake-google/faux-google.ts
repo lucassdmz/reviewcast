@@ -59,7 +59,7 @@ export function avisDeDepart(): FauxAvis[] {
   ];
   // Plus d'une page : la pagination de reviews.list est exercée à chaque import.
   for (let i = 0; i < 55; i++) {
-    avis.push({ name: `${base}/r-ancien-${i}`, reviewer: { displayName: `Client ${i}` }, starRating: "FIVE", comment: `Très bien, visite ${i}.`, createTime: ilYA(100 + i), updateTime: ilYA(100 + i) });
+    avis.push({ name: `${base}/r-ancien-${i}`, reviewer: { displayName: `Client ${i}` }, starRating: i === 0 ? "TWO" : "FIVE", comment: `Très bien, visite ${i}.`, createTime: ilYA(100 + i), updateTime: ilYA(100 + i) });
   }
   return avis;
 }
