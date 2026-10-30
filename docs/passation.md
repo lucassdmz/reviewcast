@@ -9,7 +9,7 @@ Le travail le plus récent vit sur la branche `claude/admiring-maxwell-do4l4f`, 
 | Lot | Contenu | État |
 | --- | --- | --- |
 | 0. Socle | Next.js 16, TypeScript strict, Tailwind 4, Prisma 7 sur Postgres, Auth.js avec Google Sign-In, CI GitHub Actions | Livré |
-| 1. Connexion Google | OAuth Business Profile, import des avis, synchronisation horaire, publication réelle | **Non commencé**, en attente de l'accès API Google |
+| 1. Connexion Google | OAuth de la fiche, choix de l'établissement, import et synchronisation, notifications Pub/Sub, publication réelle | Livré et testé contre un faux serveur Google ; **jamais essayé sur le vrai Google**, l'accès à l'API n'est pas encore accordé (voir 7.3) |
 | 2. Couche IA | Contrat `AiProvider`, implémentation Anthropic, fournisseur simulé, prompts, validation zod, 20 avis fictifs, compteur de tokens | Livré |
 | 3. Home météo | Météo glissante (30 jours, 3 mois, 12 mois), phrase IA, compliment, mini-courbe, carte « à traiter » | Livré |
 | 4. À traiter | Onglet « À traiter » : file des 40 derniers jours, avis plus anciens à part, fiche avis, brouillon, régénération, publication avec confirmation, notes internes, historique, remerciement en un geste | Livré (publication simulée) |
@@ -121,6 +121,10 @@ La section 11 du cdc consigne les décisions d'interface prises en construisant 
 - **Hauteur de l'accueil sur iPhone** : la carte la plus longue (à reconquérir, avec brouillon) tient juste au-dessus de la barre d'onglets. Avant d'agrandir le bandeau ou d'ajouter un élément à une carte, vérifier les boutons sur un écran de 390 × 844. L'espacement sous la pile est une marge, pas un padding : un padding décalerait les cartes en position absolue.
 - **Lighthouse 12** n'a plus de catégorie PWA ; l'installabilité se vérifie dans Chrome (DevTools, Application, Manifest).
 
+- **Une fiche appartient à son utilisateur** (lot 1) : toutes les lectures passent par `lib/etablissements/perimetre.ts`. Hors mode démo, une base déjà seedée n'est visible que du propriétaire de la connexion de démonstration : relancez `npm run db:seed`, qui la rattache à la première adresse de `ALLOWED_EMAILS`. Ne pas lancer les parcours avec un `ALLOWED_EMAILS` différent de celui du seed.
+- **Faux serveur Google** : `tests/fake-google/`, lancé par Playwright sur le port 4599, piloté par ses routes `/__controle/*`. Les parcours de la fiche utilisent un utilisateur à part, pour ne pas se mêler à la démonstration.
+- **Import volumineux** : les avis apparaissent tout de suite, leur analyse IA avance par tours, tant que l'écran reste ouvert (`SynchroOuverture`), puis une fois par jour. L'analyse utilise les appels unitaires, pas la Batch API à −50 % qu'expose `AnthropicProvider` : un gros historique coûte donc le plein tarif.
+
 ## 7. Prochaines étapes, dans l'ordre recommandé
 
 ### 7.1 Mettre la démo en ligne
@@ -131,9 +135,15 @@ Vercel avec la base Supabase gratuite, variables de la section 3 avec `MODE_DEMO
 
 Générer les clés VAPID et un `CRON_SECRET`, les ajouter aux variables de Vercel. Installer l'application sur un iPhone et un Android, activer les notifications dans Réglages et envoyer une notification d'essai.
 
-### 7.3 Lot 1 quand Google aura accordé l'accès
+### 7.3 Lot 1 : ce qui reste à faire quand Google aura accordé l'accès
 
-Écran OAuth avec le scope `business.manage`, refresh token chiffré via `lib/crypto` dans `google_connections`, choix de la fiche, import initial, synchronisation horaire dans `jobs/`, détection des réponses publiées depuis Google, puis brancher `PublieurGoogle` avec un fournisseur de jeton. Appeler `notifierAvisATraiter()` (`lib/notifications/service.ts`) à la fin de chaque synchronisation, une fois les brouillons générés. L'interface `PublieurReponses` et le champ `googleReviewId` (nom de ressource `accounts/…/locations/…/reviews/…`) sont prêts. Le publieur réel refuse les identifiants qui ne sont pas des noms de ressource Google, ce qui protège les avis fictifs.
+Le code est livré (`lib/google/`, `app/api/google/`, `app/(app)/reglages/fiche-google/`). À configurer, dans le projet Cloud `eclaircie-513015` et sur Vercel :
+
+1. Sur le client OAuth existant, ajouter l'URI de redirection `{AUTH_URL}/api/google/callback`. Ajouter le scope `business.manage` à l'écran de consentement.
+2. Activer les API « My Business Account Management », « My Business Business Information », « Google My Business API » et « My Business Notifications ».
+3. Créer un sujet Pub/Sub, donner le rôle d'éditeur Pub/Sub sur ce sujet à `mybusiness-api-pubsub@system.gserviceaccount.com`. Créer un abonnement push vers `{AUTH_URL}/api/google/notifications` avec authentification (compte de service et audience) et une politique de nouvelle tentative à backoff exponentiel : la route répond 429 quand une liste vient de partir, pour que le message revienne plus tard.
+4. Sur Vercel : `GOOGLE_PUBSUB_TOPIC`, `GOOGLE_PUBSUB_AUDIENCE`, `GOOGLE_PUBSUB_SERVICE_ACCOUNT`, et retirer `PUBLICATION_GOOGLE=simulee` et `MODE_DEMO` le moment venu.
+5. `npm run db:deploy`, puis un essai réel : connexion, un avis de test, une réponse. Points à vérifier en premier : le contenu exact des messages Pub/Sub (`lib/google/pubsub.ts`, la documentation ne publie aucun exemple complet), le masque `updateMask` de `updateNotificationSetting` (la référence et le guide se contredisent), les avis traduits par Google dans `comment`, le comportement du quota de `reviews.list` sur plusieurs pages.
 
 ### 7.4 Backlog
 

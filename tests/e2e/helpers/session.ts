@@ -4,7 +4,7 @@ import type { BrowserContext } from "@playwright/test";
 import { Client } from "pg";
 
 const EMAIL = process.env.ALLOWED_EMAILS?.split(",")[0]?.trim() || "test@exemple.fr";
-const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/eclaircie";
+export const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/eclaircie";
 
 async function avecBase<T>(action: (client: Client) => Promise<T>): Promise<T> {
   const client = new Client({ connectionString: DATABASE_URL });
@@ -21,7 +21,7 @@ async function avecBase<T>(action: (client: Client) => Promise<T>): Promise<T> {
  * qui n'est pas chargeable depuis Playwright) pour l'utilisateur de test, et
  * pose le cookie correspondant : les parcours protégés se jouent sans Google.
  */
-export async function ouvrirSession(context: BrowserContext): Promise<string> {
+export async function ouvrirSession(context: BrowserContext, email: string = EMAIL): Promise<string> {
   const sessionToken = randomBytes(32).toString("hex");
   await avecBase(async (db) => {
     const { rows } = await db.query<{ id: string }>(
@@ -29,7 +29,7 @@ export async function ouvrirSession(context: BrowserContext): Promise<string> {
        VALUES ($1, $2, 'Testeuse Playwright', now(), now())
        ON CONFLICT (email) DO UPDATE SET updated_at = now()
        RETURNING id`,
-      [`e2e_${randomBytes(8).toString("hex")}`, EMAIL],
+      [`e2e_${randomBytes(8).toString("hex")}`, email],
     );
     await db.query(
       `INSERT INTO sessions (id, session_token, user_id, expires) VALUES ($1, $2, $3, now() + interval '1 hour')`,

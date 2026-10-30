@@ -1,10 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
+import { ENV_FAUX_GOOGLE, PORT_FAUX_GOOGLE, URL_FAUX_GOOGLE } from "./tests/e2e/helpers/faux-google";
 import { SECRET_TACHES_TEST } from "./tests/e2e/helpers/taches";
 
 /**
  * Parcours Playwright. Le serveur Next est lancé automatiquement avec des
- * variables d'environnement factices : les parcours du lot 0 ne font pas
- * d'appel réel à Google.
+ * variables d'environnement factices, à côté du faux serveur Google
+ * (tests/fake-google) : aucun parcours ne fait d'appel réel à Google.
  */
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -21,7 +22,14 @@ export default defineConfig({
   },
   // Gabarit iPhone 13 émulé dans Chromium (seul navigateur installé en CI).
   projects: [{ name: "mobile", use: { ...devices["iPhone 13"], browserName: "chromium" } }],
-  webServer: {
+  webServer: [
+    {
+      command: "npx tsx tests/fake-google/serveur.ts",
+      url: `${URL_FAUX_GOOGLE}/__controle/sante`,
+      reuseExistingServer: !process.env.CI,
+      env: { PORT_FAUX_GOOGLE: String(PORT_FAUX_GOOGLE) },
+    },
+    {
     command: "npm run build && npm run start",
     url: "http://localhost:3000/connexion",
     reuseExistingServer: !process.env.CI,
@@ -45,6 +53,8 @@ export default defineConfig({
       CRON_SECRET: SECRET_TACHES_TEST,
       // Bulle de remarques de la bêta, visible sur tous les écrans.
       RETOURS_BETA: "1",
+      ...ENV_FAUX_GOOGLE,
     },
-  },
+    },
+  ],
 });

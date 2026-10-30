@@ -142,7 +142,7 @@ La source unique est la Google Business Profile API, en lecture (avis) et en éc
 
 ### 5.3 Synchronisation
 
-- Tâche planifiée toutes les heures en journée, et au lancement de l'app si la dernière synchro date de plus de 15 minutes.
+- Notifications Google en temps réel (Cloud Pub/Sub, `NEW_REVIEW` et `UPDATED_REVIEW`), au plus une liste par minute et par fiche. En renfort : au lancement de l'app si la dernière synchro date de plus de 15 minutes, et une tâche planifiée quotidienne (le plan Hobby de Vercel n'autorise pas mieux).
 - Un avis nouveau ou modifié déclenche l'analyse IA, puis la génération de brouillon s'il entre dans la file.
 - Les réponses publiées depuis Google directement sont détectées et l'avis passe en statut publié.
 - Import initial : tout l'historique disponible, analysé par lots pour alimenter la page Tendances dès le premier jour.
