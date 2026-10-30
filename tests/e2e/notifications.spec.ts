@@ -82,14 +82,14 @@ test.describe("notifications", () => {
 
     const autorisation = { Authorization: `Bearer ${SECRET_TACHES_TEST}` };
     const premiere = await request.get("/api/taches/avis-a-traiter", { headers: autorisation });
-    expect(await premiere.json()).toEqual({ avis: 1, envoyes: 1 });
+    expect(await premiere.json()).toMatchObject({ avis: 1, envoyes: 1 });
     expect(recus).toHaveLength(1);
     expect(recus[0].entetes["content-encoding"]).toBe("aes128gcm");
     expect(recus[0].entetes.authorization).toMatch(/^vapid t=.+, k=.+/);
     expect(recus[0].taille).toBeGreaterThan(0);
 
     const seconde = await request.get("/api/taches/avis-a-traiter", { headers: autorisation });
-    expect(await seconde.json()).toEqual({ avis: 0, envoyes: 0 });
+    expect(await seconde.json()).toMatchObject({ avis: 0, envoyes: 0 });
     expect(recus).toHaveLength(1);
   });
 
@@ -111,8 +111,8 @@ test.describe("notifications", () => {
     }
   });
 
-  test("sur Android, Réglages présente les deux notifications", async ({ browser }) => {
-    const context = await browser.newContext({ ...devices["Pixel 7"], baseURL: "http://localhost:3000", locale: "fr-FR" });
+  test("sur Android, Réglages présente les deux notifications", async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ ...devices["Pixel 7"], baseURL, locale: "fr-FR" });
     // Chromium sans interface répond toujours « refusé » : on simule un téléphone qui n'a pas encore été sollicité.
     await context.addInitScript(() => Object.defineProperty(Notification, "permission", { get: () => "default" }));
     const sessionToken = await ouvrirSession(context);

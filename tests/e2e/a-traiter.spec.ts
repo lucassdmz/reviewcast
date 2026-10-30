@@ -66,7 +66,8 @@ test.describe("file à traiter", () => {
     const zone = page.getByLabel("Texte de la réponse");
     const avant = await zone.inputValue();
     const version = await page.getByText(/version \d+/).textContent();
-    await page.getByRole("button", { name: "Plus court" }).click();
+    // Les réponses sont courtes par défaut depuis le 28 octobre : « Plus court » ne change plus rien au texte du fournisseur simulé.
+    await page.getByRole("button", { name: "Proposer un geste" }).click();
     await expect(page.getByText(/version \d+/)).not.toHaveText(version ?? "");
     await expect(zone).toBeEnabled();
     await expect(zone).not.toHaveValue(avant);

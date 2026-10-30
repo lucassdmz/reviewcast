@@ -9,7 +9,8 @@ import { SECRET_TACHES_TEST } from "./tests/e2e/helpers/taches";
  */
 export default defineConfig({
   testDir: "./tests/e2e",
-  fullyParallel: true,
+  // Les parcours lisent et modifient les mêmes données de démonstration (file, réglages, notifications) : ils passent l'un après l'autre.
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
