@@ -42,7 +42,9 @@ describe("publication des réponses", () => {
     vi.stubEnv("PUBLICATION_GOOGLE", "simulee");
     expect(creerPublieur().simule).toBe(true);
     vi.stubEnv("PUBLICATION_GOOGLE", "");
-    const reel = creerPublieur();
+    const reel = creerPublieur(async () => {
+      throw new PublicationError("Compte Google non connecté : connectez votre fiche dans Réglages.");
+    });
     expect(reel.simule).toBe(false);
     await expect(reel.publier({ googleReviewId: "accounts/1/locations/2/reviews/3", texte: "Merci" })).rejects.toThrow(/non connecté/);
   });
