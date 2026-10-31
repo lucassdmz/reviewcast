@@ -19,7 +19,8 @@
     "postinstall": "prisma generate",
     "db:seed": "tsx lib/db/seed.ts",
     "retours": "tsx lib/retours/cli.ts",
-    "test:integration": "vitest run --config vitest.integration.config.mts"
+    "test:integration": "vitest run --config vitest.integration.config.mts",
+    "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate deploy; fi && npm run build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
