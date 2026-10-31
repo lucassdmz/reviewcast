@@ -6,6 +6,18 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+## 31 octobre 2026
+
+### Votre établissement en haut de l'accueil
+
+**Ce qui change pour vous.** L'accueil s'ouvre sur le logo de votre établissement, son nom et son adresse : vous savez d'un coup d'œil sur quelle boutique vous travaillez. Si vous en avez plusieurs, un tap sur cet en-tête ouvre la liste pour changer. La carte du jour prend désormais toute la place disponible : l'écran est équilibré, sans vide en bas.
+
+**Ce à quoi on a pensé.** Le rond de la barre d'onglets reste là, pour changer d'établissement depuis tous les écrans. En vue d'ensemble, l'en-tête indique le nombre d'établissements. Sans logo, vos initiales le remplacent. Une carte plus longue que l'écran garde sa hauteur et se fait défiler.
+
+**Pas encore couvert.** Sur une très grande fenêtre, comme un ordinateur, la carte garde la hauteur de son contenu.
+
+---
+
 ## 30 octobre 2026
 
 ### Vos vrais avis, dès que votre fiche Google est connectée

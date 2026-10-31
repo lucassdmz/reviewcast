@@ -17,3 +17,17 @@ export function LogoEtablissement({ etablissement, className = "" }: { etablisse
     </span>
   );
 }
+
+/** Vue d'ensemble : un rond d'encre avec quatre points, pour ne privilégier aucun logo. */
+export function RondEnsemble({ className = "" }: { className?: string }) {
+  return (
+    <span aria-hidden="true" className={`grid shrink-0 place-items-center rounded-full bg-encre text-fond ${className}`}>
+      <svg viewBox="0 0 24 24" className="h-[46%] w-[46%]" fill="currentColor">
+        <circle cx="7" cy="7" r="3.2" />
+        <circle cx="17" cy="7" r="3.2" />
+        <circle cx="7" cy="17" r="3.2" />
+        <circle cx="17" cy="17" r="3.2" />
+      </svg>
+    </span>
+  );
+}

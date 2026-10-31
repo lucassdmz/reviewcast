@@ -370,8 +370,17 @@ nav a {
 .pile {
   position: relative;
   display: grid;
+  /* La pile occupe la hauteur libre de l'écran : la carte s'étire jusqu'aux points, ou grandit avec son contenu. */
+  flex: 1;
+  grid-template-rows: 1fr;
   /* Une marge, pas un padding : les cartes en position absolue s'alignent ainsi sur la carte du dessus. */
   margin-bottom: 2.75rem;
+}
+/* Sur une grande fenêtre, une carte étirée serait surtout vide : elle garde la hauteur de son contenu. */
+@media (min-height: 1000px) {
+  .pile {
+    flex: none;
+  }
 }
 .pile > * {
   grid-area: 1 / 1;

@@ -26,6 +26,12 @@ export function choisirActif<T extends { id: string }>(etablissements: T[], vale
   return etablissements.find((e) => e.id === valeur) ?? null;
 }
 
+/** Ce que dit l'en-tête de l'accueil : l'établissement et son adresse, ou le nombre d'établissements en vue d'ensemble. */
+export function presenterEtablissement(actif: Pick<Etablissement, "nom" | "adresse"> | null, nombre: number): { titre: string; detail: string | null } {
+  if (actif) return { titre: actif.nom, detail: actif.adresse };
+  return { titre: "Tous les établissements", detail: `${nombre} établissements` };
+}
+
 /** Initiales affichées quand un établissement n'a pas de logo : « The Coffee Jacobins » donne « TJ », « Zelios » donne « Z ». */
 export function initiales(nom: string): string {
   const mots = nom.trim().split(/\s+/).filter(Boolean);

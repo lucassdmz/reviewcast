@@ -39,6 +39,23 @@ test.describe("accueil", () => {
     await expect(pile.getByRole("img", { name: /Carte 2 sur|Carte 1 sur 1/ }).or(pile.getByText("Tout est fait."))).toBeVisible();
   });
 
+  test("rappelle en haut l'établissement affiché", async ({ page }) => {
+    await page.goto("/");
+    const entete = page.locator("main.entree > :first-child");
+    await expect(entete).toBeInViewport({ ratio: 1 });
+    await expect(entete.locator("span.titre-display")).not.toBeEmpty();
+    await expect(entete.locator("h1")).toHaveCount(0);
+  });
+
+  test("la carte occupe la hauteur libre, sans vide au-dessus de la barre d'onglets", async ({ page }) => {
+    await page.goto("/");
+    const carte = page.locator('.pile-carte[data-pos="0"]');
+    await expect(carte).toBeVisible();
+    const basCarte = await carte.evaluate((c) => c.getBoundingClientRect().bottom);
+    const hautBarre = await page.getByRole("navigation", { name: "Navigation principale" }).locator("> *").first().evaluate((b) => b.getBoundingClientRect().top);
+    expect(hautBarre - basCarte).toBeLessThan(100);
+  });
+
   test("la note mène à Tendances", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: /Note Google .* voir les tendances/ }).click();

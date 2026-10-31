@@ -97,7 +97,7 @@ function CarteSourireVue({ carte, suivant }: { carte: CarteSourire; suivant: (fa
         Le sourire d’abord
       </Intitule>
       <Etoiles note={5} taille="h-[18px] w-[18px]" />
-      <blockquote className="titre-display text-[22px] font-bold leading-[1.2]">« {carte.texte} »</blockquote>
+      <blockquote className="titre-display my-auto text-[26px] font-bold leading-[1.2]">« {carte.texte} »</blockquote>
       <div className="flex items-center gap-3">
         <Avatar initiales={carte.initiales} />
         <p className="min-w-0 leading-tight">
@@ -375,7 +375,7 @@ function CarteLevierVue({ carte, suivant }: { carte: CarteLevier; suivant: (fait
 
 function Recompense({ faits, recommencer }: { faits: string[]; recommencer: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-3 px-4 py-8 text-center" role="status">
+    <div className="flex flex-col items-center justify-center gap-3 px-4 py-8 text-center" role="status">
       <svg viewBox="0 0 140 140" className="h-32 w-32" aria-hidden="true">
         <g className="rayons" stroke="var(--soleil)" strokeWidth="5" strokeLinecap="round">
           <path d="M70 8v16M70 116v16M8 70h16M116 70h16M26 26l11 11M103 103l11 11M26 114l11-11M103 37l11-11" />
@@ -428,7 +428,7 @@ export function Pile({ cartes: cartesAJour }: { cartes: Carte[] }) {
   }
 
   return (
-    <section aria-label="Les gestes du matin">
+    <section aria-label="Les gestes du matin" className="flex flex-1 flex-col">
       <div className="pile">
         {cartes.map((carte, i) => {
           const decalage = i - etape;
