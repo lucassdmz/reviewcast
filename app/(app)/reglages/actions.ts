@@ -147,7 +147,7 @@ export async function actionRetirerCorrection(correctionId: string): Promise<voi
   redirect("/reglages/apprentissage?retire=1");
 }
 
-/** Lien d'avis Google, pour le QR du comptoir (carte « Pour passer au palier » de l'accueil). */
+/** Lien d'avis Google, pour le QR du comptoir (affiché sur son écran de réglage). */
 export async function actionEnregistrerLienAvis(form: FormData): Promise<void> {
   await utilisateurConnecte();
   const locationId = identifiantSchema.parse(champ(form, "locationId"));

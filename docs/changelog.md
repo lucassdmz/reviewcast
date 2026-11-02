@@ -6,6 +6,23 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+## 2 novembre 2026
+
+### Des fiches qui parlent de votre commerce, seulement quand il y a quelque chose à dire
+
+**Ce qui change pour vous.** La fin de votre pile du matin ne vous répète plus de demander des avis. Elle vous dit ce que vos avis révèlent en ce moment : un sujet qui monte, un progrès qui se voit, un mot à partager à votre équipe quand plusieurs clients saluent le même point, et, si vous avez plusieurs établissements, celui qui est le plus en forme. Rien à signaler ? Aucune fiche ne vient meubler : votre pile se termine plus tôt. Votre QR d'avis vous attend désormais dans Réglages, prêt à télécharger et à imprimer.
+
+**Ce à quoi on a pensé.**
+- Un sujet ne « monte » que s'il dépasse nettement son rythme habituel chez vous, pas au deuxième avis.
+- Un progrès se mesure en part d'avis : recevoir moins d'avis ne passe pas pour une amélioration.
+- Tous les chiffres sont calculés, jamais rédigés par une IA.
+- Deux fiches au plus, le positif d'abord. Une fiche vue ne revient pas de suite, sauf si le sujet continue de monter, et ce suivi vous suit d'un appareil à l'autre.
+- Le mot pour l'équipe ne cite aucun prénom, pour ne mettre personne en comparaison.
+
+**Pas encore couvert.** Les seuils de déclenchement sont un point de départ : ils seront ajustés sur vos vrais avis. Un commerce qui reçoit peu d'avis verra ces fiches plus rarement.
+
+---
+
 ## 31 octobre 2026
 
 ### Votre établissement en haut de l'accueil

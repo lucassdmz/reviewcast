@@ -212,6 +212,7 @@ model Location {
   themeStats       ThemeStat[]
   corrections      Correction[]
   lotsAnalyse      LotAnalyse[]
+  constatsVus      ConstatVu[]
 
   @@map("locations")
 }
@@ -341,6 +342,20 @@ model Draft {
 
   @@unique([reviewId, version])
   @@map("drafts")
+}
+
+/// Fiche de constat déjà vue sur l'accueil : elle ne revient pas avant son délai, sauf si le sujet s'aggrave.
+model ConstatVu {
+  locationId String   @map("location_id")
+  cle        String
+  /// Mesure de la fiche quand elle a été vue (nombre d'avis pour un sujet qui monte).
+  nombre     Int
+  vuAt       DateTime @map("vu_at")
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@id([locationId, cle])
+  @@map("constats_vus")
 }
 
 /// Taxonomie des thèmes (accueil, délais, qualité…), extensible par l'IA.

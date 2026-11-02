@@ -323,10 +323,10 @@ Lis docs/cdc.md avant toute tâche. C'est la référence fonctionnelle et techni
 | Retour | Lien texte souligné | Chevron rond en haut à gauche, en plus du geste du téléphone | Une PWA installée n'a pas de barre de navigateur, et le geste ne fonctionne pas à l'ouverture depuis une notification |
 | Ton des réponses | Possible renvoi à une hiérarchie | La gérante parle en son nom | L'utilisateur est la direction |
 | Choix de l'établissement | Pastilles en haut de la Home et de Tendances | Un rond avec le logo, à droite de la barre d'onglets : un tap ou un appui long ouvre la liste. Le choix vaut pour les quatre onglets et reste mémorisé sur l'appareil | Le choix ne suivait pas d'un onglet à l'autre, et la file comme les réglages l'ignoraient |
-| Accueil | Météo, compliment, carte « N avis à traiter » | Un bandeau vert (clients contents en très grand, note en pastille) puis une pile de cartes, une à la fois : un sourire, l'avis à reconquérir le plus prioritaire, les mercis prêts, le levier pour monter d'un palier. Récompense quand tout est fait | Tout était à plat : la gérante doit savoir en arrivant ce qu'elle a à faire, et finir. Recherche du 19 octobre : le frein est la peur, pas l'effort |
+| Accueil | Météo, compliment, carte « N avis à traiter » | Un bandeau vert (clients contents en très grand, note en pastille) puis une pile de cartes, une à la fois : un sourire, l'avis à reconquérir le plus prioritaire, les mercis prêts, puis les constats du moment (section 14). Récompense quand tout est fait | Tout était à plat : la gérante doit savoir en arrivant ce qu'elle a à faire, et finir. Recherche du 19 octobre : le frein est la peur, pas l'effort |
 | Avis à reconquérir | Le plus récent | Un score explicable : gravité 35 %, visibilité probable 25 %, fraîcheur 20 %, sujet qui revient ou question 20 % | Un seul avis mérite la réponse du jour ; les poids sont à ajuster à l'usage |
 | Publication depuis l'accueil | Un appui | Deux appuis : le geste, puis « Confirmer » | Aucune réponse ne part sans action explicite, même en un geste |
-| QR d'avis | Absent | Lien d'avis Google saisi dans Réglages, QR affiché depuis la carte levier ; demander à chaque client, sans tri | Levier le plus fort et autorisé par Google, qui interdit de ne solliciter que les clients contents |
+| QR d'avis | Absent | Lien d'avis Google saisi dans Réglages, QR affiché et téléchargeable sur ce même écran ; demander à chaque client, sans tri | Levier le plus fort et autorisé par Google, qui interdit de ne solliciter que les clients contents |
 | Palette | Brume, jaune, matcha discret | Crème, matcha vif, soleil, cartes autocollants | Cinq directions comparées les 19 et 25 octobre ; « ça manque d'enthousiasme » |
 | Place de la file | Onglet « À traiter » | Fondue dans l'accueil (15 octobre), puis rétablie en onglet le 27 octobre : la pile de l'accueil propose l'avis le plus prioritaire, l'onglet liste tous les avis en attente, le rattrapage à part, les réponses publiées et tous les avis | C'est la fonction principale de l'outil : on ne retrouvait plus la liste des avis en attente |
 
@@ -408,3 +408,28 @@ Critères : passer de « nous » à « je » réécrit les brouillons de l'IA au
 - La capture montre l'écran tel que le testeur le voit, barre d'onglets comprise, sans la bulle.
 - Une remarque traitée apparaît « Corrigé » dans la bulle, avec la réponse.
 - Rangée sur le côté, la bulle le reste d'un écran à l'autre et après rechargement.
+
+## 14. Les constats de l'accueil
+
+**Objectif** : la fin de la pile dit ce que seuls les avis de ce commerce peuvent révéler. Elle remplace la carte « levier » (palier, conseil de demander des avis, QR), le 2 novembre 2026 : un conseil valable pour tout le monde n'apprenait rien à un commerçant. Aucune place n'est réservée : une fiche n'existe que si ses critères sont remplis.
+
+### 14.1 Les scénarios
+
+Un constat se lit toujours sur un seul établissement. Seuils de départ, regroupés dans `lib/accueil/constats/regles.ts` et à ajuster sur de vrais avis.
+
+| Fiche | Critères |
+| --- | --- |
+| Le sujet qui monte | Au moins 3 avis négatifs sur un thème en 14 jours, au moins le double de son rythme des 8 semaines précédentes, avec au moins 5 avis lisibles sur ces 8 semaines |
+| Le progrès constaté | Au moins 4 avis négatifs sur un thème les 3 mois précédents, une part d'avis au moins divisée par 2 sur les 3 derniers mois, avec au moins 8 avis lisibles sur ces 3 mois |
+| Le mot pour l'équipe | Au moins 3 avis à 4 ou 5 étoiles positifs sur un thème en 7 jours. Se partage, sans aucun prénom |
+| L'établissement en forme | Vue d'ensemble, au moins 2 établissements actifs sur 30 jours ; le meilleur a au moins 5 avis et 4,0. Jamais de classement ni de dernier |
+
+Un avis lisible a un texte, une analyse et n'est pas hors sujet : un avis pas encore analysé ne doit pas passer pour une baisse.
+
+### 14.2 Dans la pile
+
+- Deux fiches au plus, une par type. Priorité : sujet qui monte, progrès, mot pour l'équipe, établissement en forme. À l'écran, le positif d'abord : le sujet qui monte passe en dernier.
+- Une fiche passée ou ouverte ne revient pas avant 14 jours (30 pour le progrès), sauf un sujet qui monte encore. Le suivi est en base, par établissement (`constats_vus`). Le type propose alors son thème suivant.
+- Sans fiche, la pile passe directement à la récompense.
+- Les chiffres et les phrases viennent du code, jamais de l'IA.
+- Le QR et son téléchargement sont dans Réglages, sur l'écran du lien d'avis.

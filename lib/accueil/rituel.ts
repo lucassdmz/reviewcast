@@ -1,5 +1,5 @@
 import type { Gravite } from "@/lib/db/generated/enums";
-import type { Palier } from "./palier";
+import type { Constat } from "./constats/regles";
 
 /**
  * Le rituel du matin : l'accueil est une pile de cartes, une chose à la fois.
@@ -96,14 +96,6 @@ export function choisirReconquete(candidats: CandidatReconquete[], occurrences: 
 }
 
 /** Le sujet négatif qui revient le plus ces 10 derniers jours (2 avis au moins), ou null. */
-export function sujetQuiRevient(occurrences: OccurrencesSujet): { sujet: string; nombre: number } | null {
-  let choisi: { sujet: string; nombre: number } | null = null;
-  for (const [sujet, nombre] of occurrences) {
-    if (nombre >= 2 && (choisi === null || nombre > choisi.nombre)) choisi = { sujet, nombre };
-  }
-  return choisi;
-}
-
 export interface CandidatSourire {
   id: string;
   auteur: string;
@@ -184,17 +176,12 @@ export interface CarteMercis {
   mercis: MerciPret[];
 }
 
-export interface CarteLevier {
-  type: "levier";
-  palier: Palier | null;
-  noteActuelle: string | null;
-  sujet: { libelle: string; nombre: number; themeId: string | null } | null;
-  /** QR du lien d'avis Google, en SVG, ou null tant que le lien n'est pas renseigné. */
-  qrSvg: string | null;
-  lienAvis: string | null;
+export interface CarteConstat {
+  type: "constat";
+  constat: Constat;
 }
 
-export type Carte = CarteSourire | CarteReconquete | CarteMercis | CarteLevier;
+export type Carte = CarteSourire | CarteReconquete | CarteMercis | CarteConstat;
 
 export function formaterNote(n: number, decimales: 1 | 2 = 1): string {
   return new Intl.NumberFormat("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales }).format(n);

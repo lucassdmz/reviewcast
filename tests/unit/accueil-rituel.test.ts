@@ -8,7 +8,6 @@ import {
   noteAffichee,
   raisonsPriorite,
   scorePriorite,
-  sujetQuiRevient,
   texteDeCarte,
   type CandidatReconquete,
 } from "@/lib/accueil/rituel";
@@ -54,13 +53,6 @@ describe("priorité de la cliente à reconquérir", () => {
   });
   it("ne choisit rien sans candidat", () => {
     expect(choisirReconquete([], new Map(), maintenant)).toBeNull();
-  });
-});
-
-describe("sujetQuiRevient", () => {
-  it("retient le sujet le plus fréquent, à partir de deux avis", () => {
-    expect(sujetQuiRevient(new Map([["le prix", 2], ["la tablette", 3], ["l'attente", 1]]))).toEqual({ sujet: "la tablette", nombre: 3 });
-    expect(sujetQuiRevient(new Map([["le prix", 1]]))).toBeNull();
   });
 });
 

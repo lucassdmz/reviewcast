@@ -12,7 +12,7 @@ const formatHeure = new Intl.DateTimeFormat("fr-FR", { hour: "numeric", hour12: 
 /**
  * L'accueil : l'établissement affiché, le bandeau (clients contents, note), puis la pile du matin,
  * une carte à la fois : un sourire, la cliente à reconquérir, les mercis
- * prêts, le levier pour faire monter la note.
+ * prêts, puis les constats du moment s'il y en a.
  */
 export default async function AccueilPage() {
   const maintenant = new Date();

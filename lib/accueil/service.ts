@@ -1,5 +1,4 @@
 import { filtreFiches } from "@/lib/etablissements/perimetre";
-import QRCode from "qrcode";
 import { creerRemerciement } from "@/lib/ai/service";
 import { prisma } from "@/lib/db/client";
 import { STATUTS_FILE } from "@/lib/file/statuts";
@@ -7,7 +6,7 @@ import { LIBELLES_FENETRE } from "@/lib/fenetre/adaptative";
 import { fenetreDeLaVue, fenetresParEtablissement, filtreRecents } from "@/lib/fenetre/service";
 import { lireVoix } from "@/lib/voix/service";
 import { sansSignature } from "@/lib/voix/signature";
-import { prochainPalier } from "./palier";
+import { preparerConstats } from "./constats/service";
 import { prenomDepuisSignature } from "./phrase";
 import {
   FENETRE_SUJET_JOURS,
@@ -19,7 +18,6 @@ import {
   initiales,
   noteAffichee,
   raisonsPriorite,
-  sujetQuiRevient,
   texteDeCarte,
   type Carte,
   type CandidatReconquete,
@@ -97,25 +95,17 @@ async function mercisPrets(locationId: string | null, depuis: Date): Promise<Mer
   return prets;
 }
 
-async function qrSvg(lien: string): Promise<string | null> {
-  try {
-    return await QRCode.toString(lien, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#15140F", light: "#FFFFFF" } });
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Prépare l'accueil : l'en-tête (bonjour, clients contents, note) et la pile
  * de cartes du matin, dans l'ordre sourire, cliente à reconquérir, mercis,
- * levier. Une carte sans contenu n'apparaît pas.
+ * constats. Une carte sans contenu n'apparaît pas.
  */
 export async function preparerRituel(locationId: string | null, locationPourVoix: string | null, maintenant = new Date()): Promise<Rituel> {
   // Les chiffres se lisent sur la fenêtre de la vue ; la file, sur celle de chaque établissement.
   const [fenetre, fenetres] = await Promise.all([fenetreDeLaVue(locationId, maintenant), fenetresParEtablissement(maintenant)]);
   const depuisSujet = new Date(maintenant.getTime() - FENETRE_SUJET_JOURS * 86_400_000);
 
-  const [toutes, recents, aTraiter, voix, lienAvis] = await Promise.all([
+  const [toutes, recents, aTraiter, voix] = await Promise.all([
     prisma.review.findMany({ where: { ...(await filtreFiches(locationId)), retireAt: null }, select: { note: true, dateCreation: true } }),
     prisma.review.findMany({
       where: { ...(await filtreFiches(locationId)), retireAt: null, dateCreation: { gte: fenetre.debut } },
@@ -125,7 +115,7 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
         note: true,
         texte: true,
         dateCreation: true,
-        analysis: { select: { passagesCles: true, themes: { where: { polarite: "NEGATIF" }, select: { themeId: true, theme: { select: { libelle: true } } } } } },
+        analysis: { select: { passagesCles: true, themes: { where: { polarite: "NEGATIF" }, select: { theme: { select: { libelle: true } } } } } },
       },
     }),
     prisma.review.findMany({
@@ -136,7 +126,6 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
       },
     }),
     lireVoix(locationPourVoix),
-    locationPourVoix ? lireLienAvis(locationPourVoix) : null,
   ]);
 
   const notes = toutes.map((a) => a.note);
@@ -149,15 +138,13 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
     note: note === null ? null : formaterNote(note),
   };
 
-  // Sujets négatifs des 10 derniers jours : ce qui revient pèse dans la priorité et nourrit le levier.
+  // Sujets négatifs des 10 derniers jours : ce qui revient pèse dans la priorité.
   const occurrences: OccurrencesSujet = new Map();
-  const themeDuSujet = new Map<string, string>();
   for (const a of recents) {
     if (a.dateCreation < depuisSujet) continue;
     for (const t of a.analysis?.themes ?? []) {
       const sujet = enMinuscule(t.theme.libelle);
       occurrences.set(sujet, (occurrences.get(sujet) ?? 0) + 1);
-      themeDuSujet.set(sujet, t.themeId);
     }
   }
 
@@ -219,19 +206,8 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
   const mercis = await mercisPrets(locationId, fenetre.debut);
   if (mercis.length > 0) cartes.push({ type: "mercis", mercis });
 
-  // 4. Le levier : le palier, le QR du comptoir, le sujet qui revient.
-  const palier = prochainPalier(notes);
-  const sujet = sujetQuiRevient(occurrences);
-  if (palier || sujet || note !== null) {
-    cartes.push({
-      type: "levier",
-      palier,
-      noteActuelle: entete.note,
-      sujet: sujet ? { libelle: sujet.sujet, nombre: sujet.nombre, themeId: themeDuSujet.get(sujet.sujet) ?? null } : null,
-      qrSvg: lienAvis ? await qrSvg(lienAvis) : null,
-      lienAvis,
-    });
-  }
+  // 4. Les constats : seulement ceux dont les critères sont remplis.
+  for (const constat of await preparerConstats(locationId, maintenant)) cartes.push({ type: "constat", constat });
 
   return { entete, cartes };
 }

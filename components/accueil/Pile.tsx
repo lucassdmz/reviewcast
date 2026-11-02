@@ -1,16 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useTransition, type ReactNode } from "react";
+import { useState, useTransition, type ReactNode } from "react";
+import { actionMarquerConstatVu } from "@/app/(app)/accueil-actions";
 import { actionPublierDepuisPile, actionPublierMercis } from "@/app/(app)/a-traiter/actions";
 import { useAttenteReseau } from "@/components/pwa/reseau";
-import type { Carte, CarteLevier, CarteMercis, CarteReconquete, CarteSourire } from "@/lib/accueil/rituel";
+import type { Carte, CarteConstat, CarteMercis, CarteReconquete, CarteSourire } from "@/lib/accueil/rituel";
 
 /**
  * La pile du matin : une carte à la fois. Chaque geste (partager, publier,
  * valider) passe à la carte suivante ; « Plus tard » aussi, sans rien publier.
  * Une publication demande toujours deux appuis : le geste, puis sa confirmation.
  */
+
+/** Partage du téléphone, sinon copie du texte. Vrai si le partage a abouti, « copie » si le texte est copié, faux s'il est annulé. */
+async function partagerTexte(titre: string, texte: string): Promise<true | "copie" | false> {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: titre, text: texte });
+      return true;
+    }
+    await navigator.clipboard.writeText(texte);
+    return "copie";
+  } catch {
+    return false;
+  }
+}
 
 const ETOILE = "M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5L2.5 9.5l6.6-.9z";
 
@@ -71,17 +86,11 @@ function CarteSourireVue({ carte, suivant }: { carte: CarteSourire; suivant: (fa
   const [copie, setCopie] = useState(false);
   async function partager() {
     const texte = `« ${carte.texte} »\n${carte.auteur}, 5 étoiles sur Google`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "Un avis qui fait plaisir", text: texte });
-        suivant("Le sourire est parti vers l’équipe");
-        return;
-      }
-      await navigator.clipboard.writeText(texte);
+    const resultat = await partagerTexte("Un avis qui fait plaisir", texte);
+    if (resultat === true) suivant("Le sourire est parti vers l’équipe");
+    if (resultat === "copie") {
       setCopie(true);
       setTimeout(() => suivant("Le sourire est copié pour l’équipe"), 700);
-    } catch {
-      // Partage annulé : on reste sur la carte.
     }
   }
   return (
@@ -292,83 +301,63 @@ function CarteMercisVue({ carte, suivant }: { carte: CarteMercis; suivant: (fait
   );
 }
 
-function CarteLevierVue({ carte, suivant }: { carte: CarteLevier; suivant: (fait?: string) => void }) {
-  const dialogue = useRef<HTMLDialogElement>(null);
-  const palier = carte.palier && carte.palier.avisCinqEtoiles > 0 ? carte.palier : null;
-  const cible = palier ? new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 1 }).format(palier.cible) : null;
+const ICONES_CONSTAT: Record<CarteConstat["constat"]["type"], ReactNode> = {
+  sujet_monte: (
+    <>
+      <path d="M4 18l6-6 4 4 6-8" />
+      <path d="M15 8h5v5" />
+    </>
+  ),
+  progres: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  mot_equipe: <path d="M4 5h16v11H9l-5 4z" />,
+  en_forme: <path d={ETOILE} />,
+};
+
+function CarteConstatVue({ carte, derniere, suivant }: { carte: CarteConstat; derniere: boolean; suivant: (fait?: string) => void }) {
+  const { constat } = carte;
+  const [copie, setCopie] = useState(false);
+
+  function marquerVu() {
+    // Une fiche qui n'a pas pu être notée reviendra simplement une fois de plus.
+    void actionMarquerConstatVu({ locationId: constat.locationId, cle: constat.cle, nombre: constat.nombre }).catch(() => undefined);
+  }
+  function passer(fait?: string) {
+    marquerVu();
+    suivant(fait);
+  }
+  async function partager() {
+    if (!constat.partage) return;
+    const resultat = await partagerTexte(constat.intitule, constat.partage);
+    if (resultat === true) passer("Le mot est parti vers l’équipe");
+    if (resultat === "copie") {
+      setCopie(true);
+      setTimeout(() => passer("Le mot est copié pour l’équipe"), 700);
+    }
+  }
+
   return (
     <>
-      <Intitule
-        icone={
-          <>
-            <path d="M4 18l6-6 4 4 6-8" />
-            <path d="M15 8h5v5" />
-          </>
-        }
-      >
-        {cible ? `Pour passer à ${cible}` : "Pour faire monter la note"}
-      </Intitule>
-      {palier ? (
-        <>
-          <p className="flex items-baseline gap-2.5">
-            <span className="titre-display text-[56px] font-extrabold leading-none text-matcha">{palier.avisCinqEtoiles}</span>
-            <span className="text-[16px] font-semibold leading-tight">
-              avis à 5 étoiles
-              <br />
-              et la fiche affiche {cible}
-            </span>
-          </p>
-          <div className="flex flex-wrap gap-1 text-soleil" aria-hidden="true">
-            {Array.from({ length: Math.min(palier.avisCinqEtoiles, 15) }, (_, i) => (
-              <svg key={i} viewBox="0 0 24 24" className="h-5 w-5">
-                <path d={ETOILE} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-              </svg>
-            ))}
-          </div>
-        </>
-      ) : (
-        carte.noteActuelle && (
-          <p className="titre-display text-[22px] font-bold leading-tight">Votre note est à {carte.noteActuelle}. Chaque nouvel avis la fait vivre.</p>
-        )
-      )}
-      <p className="text-[15px] leading-snug text-encre-douce">Demandez un avis à chaque client, sans choisir : c’est la règle de Google, et c’est ce qui marche.</p>
-      {carte.sujet && (
-        <p className="rounded-2xl bg-fond px-3.5 py-3 text-sm leading-snug">
-          <span className="font-semibold">Le sujet qui revient :</span> {carte.sujet.libelle}, {carte.sujet.nombre} avis en 10 jours.{" "}
-          {carte.sujet.themeId && (
-            <Link href={`/tendances/theme/${carte.sujet.themeId}`} prefetch={false} className="font-semibold text-matcha underline underline-offset-2">
-              Les lire
-            </Link>
-          )}
-        </p>
-      )}
+      <Intitule icone={ICONES_CONSTAT[constat.type]}>{constat.intitule}</Intitule>
+      <div className="my-auto flex flex-col gap-2">
+        {constat.etablissement && <p className="text-[13px] font-semibold text-encre-douce">{constat.etablissement}</p>}
+        <p className="titre-display text-[34px] font-extrabold leading-[1.1]">{constat.titre}</p>
+        <p className="text-[17px] leading-snug">{constat.phrase}</p>
+      </div>
       <Actions>
-        {carte.qrSvg ? (
-          <button type="button" onClick={() => dialogue.current?.showModal()} className={BOUTON}>
-            Afficher mon QR
+        {constat.partage && (
+          <button type="button" onClick={partager} className={BOUTON}>
+            {copie ? "Copié" : "Partager à l’équipe"}
           </button>
-        ) : (
-          <Link href="/reglages/avis" className={BOUTON}>
-            Ajouter mon lien d’avis
+        )}
+        {constat.themeId && (
+          <Link href={`/tendances/theme/${constat.themeId}`} prefetch={false} onClick={marquerVu} className={BOUTON}>
+            Lire ces avis
           </Link>
         )}
-        <button type="button" onClick={() => suivant()} className={BOUTON_TEXTE}>
-          Terminer
+        <button type="button" onClick={() => passer()} className={constat.partage || constat.themeId ? BOUTON_TEXTE : BOUTON}>
+          {derniere ? "Terminer" : "Suivant"}
         </button>
       </Actions>
-      {carte.qrSvg && (
-        <dialog ref={dialogue} aria-label="QR d’avis Google" className="feuille sticker bg-surface p-6 text-center">
-          <p className="titre-display text-xl font-bold">Votre QR d’avis</p>
-          <p className="mt-1 text-sm text-encre-douce">À poser au comptoir. Un scan ouvre votre fiche Google, prête à noter.</p>
-          {/* SVG produit côté serveur par la bibliothèque qrcode, à partir d'un lien Google validé. */}
-          <div className="mx-auto mt-4 w-56 [&_svg]:h-auto [&_svg]:w-full" dangerouslySetInnerHTML={{ __html: carte.qrSvg }} />
-          <form method="dialog" className="mt-5">
-            <button type="submit" className={`${BOUTON} w-full`}>
-              Fermer
-            </button>
-          </form>
-        </dialog>
-      )}
     </>
   );
 }
@@ -443,7 +432,7 @@ export function Pile({ cartes: cartesAJour }: { cartes: Carte[] }) {
               {carte.type === "sourire" && <CarteSourireVue carte={carte} suivant={suivant} />}
               {carte.type === "reconquete" && <CarteReconqueteVue carte={carte} suivant={suivant} />}
               {carte.type === "mercis" && <CarteMercisVue carte={carte} suivant={suivant} />}
-              {carte.type === "levier" && <CarteLevierVue carte={carte} suivant={suivant} />}
+              {carte.type === "constat" && <CarteConstatVue carte={carte} derniere={i === cartes.length - 1} suivant={suivant} />}
             </article>
           );
         })}

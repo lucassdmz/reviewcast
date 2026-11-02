@@ -266,8 +266,9 @@ export function FormulaireApprentissage({ locationId, voix, corrections }: { loc
   );
 }
 
-export function FormulaireLienAvis({ locationId, lien }: { locationId: string; lien: string | null }) {
+export function FormulaireLienAvis({ locationId, lien, qr }: { locationId: string; lien: string | null; qr: string | null }) {
   return (
+    <>
     <form action={actionEnregistrerLienAvis} className="space-y-3">
       <input type="hidden" name="locationId" value={locationId} />
       <Carte
@@ -282,5 +283,21 @@ export function FormulaireLienAvis({ locationId, lien }: { locationId: string; l
       </Carte>
       <Enregistrer />
     </form>
+    {qr && (
+      <section aria-label="Votre QR d’avis" className="mt-3">
+        <Carte titre="Votre QR d’avis" aide="À poser au comptoir. Un scan ouvre votre fiche Google, prête à noter.">
+          {/* SVG produit côté serveur par la bibliothèque qrcode, à partir d'un lien Google validé. */}
+          <div className="mx-auto w-56 [&_svg]:h-auto [&_svg]:w-full" dangerouslySetInnerHTML={{ __html: qr }} />
+          <a
+            href={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(qr)}`}
+            download="qr-avis-google.svg"
+            className="pressable bouton-principal mt-4 flex min-h-12 items-center justify-center rounded-full px-5 text-[15px]"
+          >
+            Télécharger mon QR
+          </a>
+        </Carte>
+      </section>
+    )}
+    </>
   );
 }
