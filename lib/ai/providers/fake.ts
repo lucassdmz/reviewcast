@@ -67,6 +67,18 @@ function usage(modele: string) {
 const memoire = globalThis as typeof globalThis & { __lotsSimules?: Map<string, { id: string; input: AnalyzeReviewInput }[]> };
 const lotsSimules = (memoire.__lotsSimules ??= new Map());
 
+/**
+ * Latence réglable (AI_FAKE_DELAI_MS) : reproduit le temps de réponse d'un vrai
+ * modèle sans réseau, pour mesurer et tester qu'aucun écran ne l'attend. Chaque
+ * appel simulé est alors journalisé, ce qui permet de compter ce qui aurait été payé.
+ */
+async function latence(appel: string): Promise<void> {
+  const delai = Number(process.env.AI_FAKE_DELAI_MS);
+  if (!Number.isFinite(delai) || delai <= 0) return;
+  console.info(`[ia-simulee] ${appel}`);
+  await new Promise((resolve) => setTimeout(resolve, delai));
+}
+
 export class FakeProvider implements AiProvider, FournisseurLots {
   readonly nom = "FAKE" as const;
 
@@ -85,6 +97,7 @@ export class FakeProvider implements AiProvider, FournisseurLots {
   }
 
   async analyzeReview(input: AnalyzeReviewInput): Promise<AiResult<ReviewAnalysisOutput>> {
+    await latence("analyse");
     const { note, texte } = input.review;
     const contenu = texte ?? "";
     const themes = detecterThemes(contenu, note);
@@ -104,6 +117,7 @@ export class FakeProvider implements AiProvider, FournisseurLots {
   }
 
   async draftReply(input: DraftReplyInput): Promise<AiResult<{ reponse: string }>> {
+    await latence("brouillon");
     const { auteur, etablissement } = input.review;
     const theme = input.analyse?.themes[0]?.libelle ?? "votre expérience";
     const court = /court/i.test(input.consigne ?? "") || input.ligneDeConduite.voix?.longueur === "COURTE";
@@ -139,6 +153,7 @@ export class FakeProvider implements AiProvider, FournisseurLots {
   }
 
   async thankYouNote(input: ThankYouInput): Promise<AiResult<{ message: string }>> {
+    await latence("remerciement");
     const theme = input.review.texte ? (detecterThemes(input.review.texte, input.review.note)[0]?.libelle ?? "votre visite") : "votre visite";
     const prenom = prenomPourSalutation(input.review.auteur);
     const message = `Merci${prenom ? ` ${prenom}` : ""} pour ce retour qui touche toute l'équipe, ravie que ${theme} vous ait plu. Au plaisir de vous revoir bientôt !${input.ligneDeConduite.voix?.emojis[0] ? ` ${input.ligneDeConduite.voix.emojis[0]}` : ""}`;
@@ -146,6 +161,7 @@ export class FakeProvider implements AiProvider, FournisseurLots {
   }
 
   async weatherSentence(input: WeatherSentenceInput): Promise<AiResult<{ phrase: string }>> {
+    await latence("meteo");
     const themes = input.themesPositifs.slice(0, 2).join(" et ") || "l'expérience générale";
     const pluriel = input.nbEnthousiastes > 1 ? "s" : "";
     const phrase = `${input.nbEnthousiastes} client${pluriel} content${pluriel} sur ${input.volume} avis. Ils citent surtout ${themes}.`;
@@ -153,6 +169,7 @@ export class FakeProvider implements AiProvider, FournisseurLots {
   }
 
   async summarize(input: SummarizeInput): Promise<AiResult<{ constats: string[]; vigilance: string; action: string }>> {
+    await latence("synthese");
     const data = monthlySummarySchema.parse({
       constats: [
         `${input.volume} avis reçus sur ${input.periode}, note moyenne ${input.noteMoyenne.toFixed(1)}.`,
