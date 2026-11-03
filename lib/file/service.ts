@@ -9,7 +9,7 @@ import { avecSignature, sansSignature } from "@/lib/voix/signature";
 import { phraseEcarts, reglagesDe } from "@/lib/voix/fraicheur";
 import { derniereModificationReglages, etatDuBrouillon } from "@/lib/voix/reecriture";
 import { fenetresParEtablissement } from "@/lib/fenetre/service";
-import { filtreFiches } from "@/lib/etablissements/perimetre";
+import { filtreEtablissements, filtreFiches } from "@/lib/etablissements/perimetre";
 import { contexteAvis, formaterContexte, formaterContexteFile, type ContexteAvis } from "./contexte";
 import { partagerFile } from "./recence";
 import { STATUTS_FILE, verifierTransition } from "./statuts";
@@ -57,7 +57,7 @@ export async function lireFile(
   locationId: string | null,
   maintenant = new Date(),
 ): Promise<{ recents: AvisDeLaFile[]; rattrapage: AvisDeLaFile[]; contexte: string | null }> {
-  const [tous, fenetres, contexte] = await Promise.all([listerFile(locationId), fenetresParEtablissement(maintenant), contexteDeLaFile(locationId, maintenant)]);
+  const [tous, fenetres, contexte] = await Promise.all([listerFile(locationId), fenetresParEtablissement(maintenant, await filtreEtablissements()), contexteDeLaFile(locationId, maintenant)]);
   return { ...partagerFile(tous, fenetres, maintenant), contexte };
 }
 

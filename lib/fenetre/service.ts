@@ -20,11 +20,11 @@ export async function fenetreDeLaVue(locationId: string | null, maintenant = new
   );
 }
 
-/** Fenêtre de chaque établissement, qui décide quels avis sans réponse sont dans la file. */
-export async function fenetresParEtablissement(maintenant = new Date()): Promise<Map<string, Fenetre>> {
+/** Fenêtre de chaque établissement, qui décide quels avis sans réponse sont dans la file. Un écran passe le périmètre de l'utilisateur ; une tâche planifiée lit tout. */
+export async function fenetresParEtablissement(maintenant = new Date(), perimetre: Prisma.LocationWhereInput = {}): Promise<Map<string, Fenetre>> {
   const [etablissements, avis] = await Promise.all([
-    prisma.location.findMany({ select: { id: true } }),
-    prisma.review.findMany({ where: { retireAt: null, dateCreation: { gte: debutLecture(maintenant) } }, select: { locationId: true, dateCreation: true } }),
+    prisma.location.findMany({ where: perimetre, select: { id: true } }),
+    prisma.review.findMany({ where: { location: perimetre, retireAt: null, dateCreation: { gte: debutLecture(maintenant) } }, select: { locationId: true, dateCreation: true } }),
   ]);
   const dates = new Map<string, Date[]>(etablissements.map((e) => [e.id, []]));
   for (const a of avis) dates.get(a.locationId)?.push(a.dateCreation);

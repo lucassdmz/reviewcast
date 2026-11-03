@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { preparerMercisDeToutesLesFiches } from "@/lib/accueil/mercis";
 import { notifierAvisATraiter } from "@/lib/notifications/service";
 import { tacheAutorisee } from "@/lib/taches/autorisation";
 import { reecrireTousLesBrouillonsDepasses } from "@/lib/voix/reecriture";
@@ -15,5 +16,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ erreur: "Non autorisé" }, { status: 401 });
   }
   const brouillons = await reecrireTousLesBrouillonsDepasses();
-  return NextResponse.json({ ...(await notifierAvisATraiter()), brouillonsReecrits: brouillons.reecrits });
+  const mercis = await preparerMercisDeToutesLesFiches();
+  return NextResponse.json({ ...(await notifierAvisATraiter()), brouillonsReecrits: brouillons.reecrits, mercisPrepares: mercis.prepares });
 }

@@ -198,3 +198,16 @@ export function ilYA(date: Date, maintenant: Date): string {
   return `Il y a ${jours} jours`;
 }
 
+/**
+ * Les mercis sont rédigés après l'affichage : leur carte rejoint la pile en
+ * cours, avant les constats, sans jamais remplacer la carte sous les yeux. Une
+ * pile terminée ou qui a déjà ses mercis ne bouge pas.
+ */
+export function insererMercisArrives(cartes: Carte[], etape: number, aJour: Carte[]): Carte[] {
+  const mercis = aJour.find((c) => c.type === "mercis");
+  if (!mercis || cartes.some((c) => c.type === "mercis")) return cartes;
+  if (cartes.length > 0 && etape >= cartes.length) return cartes;
+  const constat = cartes.findIndex((c) => c.type === "constat");
+  const place = Math.max(constat === -1 ? cartes.length : constat, cartes.length > 0 ? etape + 1 : 0);
+  return [...cartes.slice(0, place), mercis, ...cartes.slice(place)];
+}

@@ -39,6 +39,13 @@ test.describe("accueil", () => {
     await expect(pile.getByRole("img", { name: /Carte 2 sur|Carte 1 sur 1/ }).or(pile.getByText("Tout est fait."))).toBeVisible();
   });
 
+  test("les mercis arrivent dans la pile sans retarder l'accueil", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByText(/mercis? prêts?/i)).toBeAttached({ timeout: 20_000 });
+    // La carte visible n'a pas changé : le merci prend place plus loin dans la pile.
+    await expect(page.locator('.pile-carte[data-pos="0"]')).toBeVisible();
+  });
+
   test("rappelle en haut l'établissement affiché", async ({ page }) => {
     await page.goto("/");
     const entete = page.locator("main.entree > :first-child");

@@ -1,5 +1,4 @@
-import { filtreFiches } from "@/lib/etablissements/perimetre";
-import { creerRemerciement } from "@/lib/ai/service";
+import { filtreEtablissements, filtreFiches } from "@/lib/etablissements/perimetre";
 import { prisma } from "@/lib/db/client";
 import { STATUTS_FILE } from "@/lib/file/statuts";
 import { LIBELLES_FENETRE } from "@/lib/fenetre/adaptative";
@@ -7,6 +6,7 @@ import { fenetreDeLaVue, fenetresParEtablissement, filtreRecents } from "@/lib/f
 import { lireVoix } from "@/lib/voix/service";
 import { sansSignature } from "@/lib/voix/signature";
 import { preparerConstats } from "./constats/service";
+import { lireMercis } from "./mercis";
 import { prenomDepuisSignature } from "./phrase";
 import {
   FENETRE_SUJET_JOURS,
@@ -21,7 +21,6 @@ import {
   texteDeCarte,
   type Carte,
   type CandidatReconquete,
-  type MerciPret,
   type OccurrencesSujet,
 } from "./rituel";
 
@@ -39,9 +38,6 @@ export async function lireLienAvis(locationId: string): Promise<string | null> {
   return r?.lienAvis ?? null;
 }
 
-/** Au plus quatre mercis par matin : au delà, la validation groupée n'est plus une relecture. */
-const MERCIS_MAX = 4;
-
 export interface Entete {
   prenom: string | null;
   /** Clients contents (4 et 5 étoiles) sur la fenêtre adaptative de la vue. */
@@ -56,43 +52,13 @@ export interface Entete {
 export interface Rituel {
   entete: Entete;
   cartes: Carte[];
+  /** Avis dont le merci reste à rédiger : l'écran le demande une fois affiché. */
+  mercisAPreparer: string[];
 }
 
 
 function enMinuscule(libelle: string): string {
   return libelle.charAt(0).toLocaleLowerCase("fr") + libelle.slice(1);
-}
-
-/** Remerciements prêts pour les avis positifs récents sans réponse ; rédigés à la demande s'il n'y en a pas. */
-async function mercisPrets(locationId: string | null, depuis: Date): Promise<MerciPret[]> {
-  const avis = await prisma.review.findMany({
-    where: { ...(await filtreFiches(locationId)), note: { gte: 4 }, statut: "HORS_FILE", reponseGoogleTexte: null, retireAt: null, dateCreation: { gte: depuis }, NOT: { texte: null } },
-    orderBy: { dateCreation: "desc" },
-    take: MERCIS_MAX,
-    include: { drafts: { orderBy: { version: "desc" }, take: 1 } },
-  });
-  const prets: MerciPret[] = [];
-  for (const a of avis) {
-    let texte = a.drafts[0]?.texte;
-    if (!texte) {
-      try {
-        texte = await creerRemerciement(a.id);
-      } catch (error) {
-        console.error("Remerciement indisponible :", error instanceof Error ? error.message : error);
-        continue;
-      }
-    }
-    const { signature } = await lireVoix(a.locationId);
-    prets.push({
-      reviewId: a.id,
-      auteur: a.auteur,
-      initiales: initiales(a.auteur),
-      note: a.note,
-      extrait: a.texte ? texteDeCarte(a.texte, 60) : null,
-      texte: sansSignature(texte, signature),
-    });
-  }
-  return prets;
 }
 
 /**
@@ -102,7 +68,7 @@ async function mercisPrets(locationId: string | null, depuis: Date): Promise<Mer
  */
 export async function preparerRituel(locationId: string | null, locationPourVoix: string | null, maintenant = new Date()): Promise<Rituel> {
   // Les chiffres se lisent sur la fenêtre de la vue ; la file, sur celle de chaque établissement.
-  const [fenetre, fenetres] = await Promise.all([fenetreDeLaVue(locationId, maintenant), fenetresParEtablissement(maintenant)]);
+  const [fenetre, fenetres] = await Promise.all([fenetreDeLaVue(locationId, maintenant), fenetresParEtablissement(maintenant, await filtreEtablissements())]);
   const depuisSujet = new Date(maintenant.getTime() - FENETRE_SUJET_JOURS * 86_400_000);
 
   const [toutes, recents, aTraiter, voix] = await Promise.all([
@@ -203,11 +169,11 @@ export async function preparerRituel(locationId: string | null, locationPourVoix
   }
 
   // 3. Les mercis prêts, validés d'un geste.
-  const mercis = await mercisPrets(locationId, fenetre.debut);
+  const { prets: mercis, aPreparer: mercisAPreparer } = await lireMercis(locationId, fenetre.debut);
   if (mercis.length > 0) cartes.push({ type: "mercis", mercis });
 
   // 4. Les constats : seulement ceux dont les critères sont remplis.
   for (const constat of await preparerConstats(locationId, maintenant)) cartes.push({ type: "constat", constat });
 
-  return { entete, cartes };
+  return { entete, cartes, mercisAPreparer };
 }

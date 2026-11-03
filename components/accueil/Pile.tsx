@@ -5,7 +5,7 @@ import { useState, useTransition, type ReactNode } from "react";
 import { actionMarquerConstatVu } from "@/app/(app)/accueil-actions";
 import { actionPublierDepuisPile, actionPublierMercis } from "@/app/(app)/a-traiter/actions";
 import { useAttenteReseau } from "@/components/pwa/reseau";
-import type { Carte, CarteConstat, CarteMercis, CarteReconquete, CarteSourire } from "@/lib/accueil/rituel";
+import { insererMercisArrives, type Carte, type CarteConstat, type CarteMercis, type CarteReconquete, type CarteSourire } from "@/lib/accueil/rituel";
 
 /**
  * La pile du matin : une carte à la fois. Chaque geste (partager, publier,
@@ -393,6 +393,10 @@ export function Pile({ cartes: cartesAJour }: { cartes: Carte[] }) {
   const [etape, setEtape] = useState(0);
   const [faits, setFaits] = useState<string[]>([]);
   const fini = etape >= cartes.length;
+
+  // Seule exception : les mercis, rédigés après l'affichage, rejoignent la pile en cours.
+  const avecMercis = insererMercisArrives(cartes, etape, cartesAJour);
+  if (avecMercis !== cartes) setCartes(avecMercis);
 
   function suivant(fait?: string) {
     if (fait) setFaits((f) => [...f, fait]);

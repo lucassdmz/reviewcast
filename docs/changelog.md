@@ -8,6 +8,20 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ## 3 novembre 2026
 
+### L'accueil s'ouvre sans attendre, vos mercis arrivent dans la pile
+
+**Ce qui change pour vous.** Votre accueil s'affiche tout de suite, même le matin où de nouveaux clients vous ont laissé cinq étoiles. Les mots de remerciement se rédigent pendant que vous regardez votre première carte, et la carte « mercis prêts » rejoint votre pile quelques secondes plus tard. Le plus souvent, ils sont déjà prêts avant même que vous ouvriez l'application.
+
+**Ce à quoi on a pensé.**
+- La carte que vous avez sous les yeux ne change jamais : les mercis prennent place plus loin dans la pile, avant les constats.
+- Les mercis sont rédigés ensemble, plus en file indienne, et chacun une seule fois, même si l'accueil est ouvert sur deux appareils.
+- Le passage quotidien prépare les mercis de tous vos établissements.
+- Rien n'est publié sans votre validation : la carte demande toujours deux appuis.
+
+**Pas encore couvert.** Si vous avez déjà terminé votre pile quand les mercis arrivent, ils vous attendent à la prochaine ouverture, ou en touchant « Revoir les cartes ».
+
+---
+
 ### Tendances s'affiche à l'instant, la synthèse vous rejoint
 
 **Ce qui change pour vous.** Vos chiffres, vos sujets, votre courbe et la répartition des étoiles s'affichent tout de suite, même la première fois que vous ouvrez une période. La synthèse se rédige pendant que vous lisez, puis apparaît à sa place. Quand vous changez de période ou de dates, l'écran vous répond au moment même du geste : l'onglet choisi s'allume, « Mise à jour des chiffres… » s'affiche et les anciens chiffres s'estompent jusqu'à l'arrivée des nouveaux. Une synthèse déjà rédigée revient instantanément, sans être rédigée une deuxième fois.

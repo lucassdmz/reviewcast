@@ -240,6 +240,8 @@ model Review {
   analyseReserveeAt  DateTime?    @map("analyse_reservee_at")
   /// Avis de l'import initial : son analyse passe par la Batch API, pas par un appel unitaire.
   analyseEnLot       Boolean      @default(false) @map("analyse_en_lot")
+  /// Réservation de la rédaction du merci, pour ne jamais payer deux fois le même appel.
+  merciReserveAt     DateTime?    @map("merci_reserve_at")
   lotAnalyseId       String?      @map("lot_analyse_id")
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime     @updatedAt @map("updated_at")
