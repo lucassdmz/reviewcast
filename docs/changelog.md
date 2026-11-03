@@ -8,6 +8,16 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ## 3 novembre 2026
 
+### Vos gestes passent tout de suite, même pendant que vos avis s'importent
+
+**Ce qui change pour vous.** À l'ouverture, l'application relit vos fiches Google et fait analyser vos nouveaux avis. Jusqu'ici, un geste fait pendant ce temps (publier une réponse, valider vos mercis, régénérer une synthèse) attendait la fin de ce travail, parfois une vingtaine de secondes. Désormais, il part aussitôt. De même, quand vous connectez une fiche, vos avis s'affichent sans attendre leurs analyses, et les brouillons arrivent juste après.
+
+**Ce à quoi on a pensé.** La lecture de vos fiches suit toujours les mêmes limites côté Google. Rien ne se publie sans votre geste. Hors ligne, rien ne change : le prochain passage reprend là où il s'était arrêté.
+
+**Pas encore couvert.** Sur une très grosse fiche, les brouillons des avis récents peuvent mettre une minute à tous apparaître après la connexion.
+
+---
+
 ### L'accueil s'ouvre sans attendre, vos mercis arrivent dans la pile
 
 **Ce qui change pour vous.** Votre accueil s'affiche tout de suite, même le matin où de nouveaux clients vous ont laissé cinq étoiles. Les mots de remerciement se rédigent pendant que vous regardez votre première carte, et la carte « mercis prêts » rejoint votre pile quelques secondes plus tard. Le plus souvent, ils sont déjà prêts avant même que vous ouvriez l'application.

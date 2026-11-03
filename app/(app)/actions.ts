@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/config";
 import { COOKIE_ETABLISSEMENT, TOUS_LES_ETABLISSEMENTS } from "@/lib/etablissements/actif";
 import { lireChoixEtablissement } from "@/lib/etablissements/service";
-import { synchroniserMesFiches } from "@/lib/google/sync";
 
 /**
  * Change l'établissement affiché dans toute l'application. `id` null : vue
@@ -20,11 +19,4 @@ export async function actionChoisirEtablissement(id: string | null): Promise<voi
   const valeur = id !== null && etablissements.some((e) => e.id === id) ? id : TOUS_LES_ETABLISSEMENTS;
   (await cookies()).set(COOKIE_ETABLISSEMENT, valeur, { path: "/", maxAge: 365 * 24 * 60 * 60, sameSite: "lax" });
   revalidatePath("/", "layout");
-}
-
-/** Lancée à l'ouverture de l'application : les limites de Google sont appliquées côté serveur. */
-export async function actionSynchroOuverture(): Promise<{ changements: number; restants: number }> {
-  const session = await auth();
-  if (!session?.user?.id) return { changements: 0, restants: 0 };
-  return synchroniserMesFiches(session.user.id);
 }

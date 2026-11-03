@@ -80,9 +80,14 @@ test.describe("connexion de la fiche Google", () => {
     await expect(page.getByRole("link", { name: /Camille Lefort/ })).toBeVisible();
     await expect(page.getByRole("link", { name: /Noé Garnier.*Accueil adorable, je reviendrai\./ })).toBeVisible();
 
-    // Dès la fin de l'import, l'avis récent a son analyse et son brouillon, sans attendre le lot.
+    // Juste après l'import, l'avis récent reçoit son analyse et son brouillon, sans attendre le lot, et sans retarder l'écran des avis.
+    const brouillonPret = page.getByRole("list", { name: "Avis à traiter" }).getByRole("link").filter({ hasText: "Camille Lefort" }).filter({ hasText: "Brouillon prêt à relire" });
+    // Attente en base, sans rouvrir d'écran : chaque ouverture relancerait la synchro et ferait avancer le lot du parcours suivant.
+    await expect
+      .poll(async () => (await base((c) => c.query(`SELECT 1 FROM reviews WHERE auteur = 'Camille Lefort' AND statut = 'BROUILLON_PRET'`))).rows.length, { timeout: 30_000 })
+      .toBe(1);
     await page.goto("/a-traiter");
-    await expect(page.getByRole("list", { name: "Avis à traiter" }).getByRole("link").filter({ hasText: "Camille Lefort" }).filter({ hasText: "Brouillon prêt à relire" })).toBeVisible();
+    await expect(brouillonPret).toBeVisible();
     // Une réponse déjà donnée sur Google : l'avis n'est pas à traiter.
     await expect(page.getByText("Inès Marchand")).toHaveCount(0);
 

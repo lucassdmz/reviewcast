@@ -92,12 +92,17 @@ export class FakeProvider implements AiProvider, FournisseurLots {
     const items = lotsSimules.get(idLot);
     if (!items) throw new LotIntrouvable(idLot);
     const resultats = new Map<string, ResultatLot>();
-    for (const { id, input } of items) resultats.set(id, await this.analyzeReview(input));
+    // Un relevé de lot est un seul échange : il ne subit pas la latence d'un appel par avis.
+    for (const { id, input } of items) resultats.set(id, this.analyser(input));
     return { termine: true, resultats };
   }
 
   async analyzeReview(input: AnalyzeReviewInput): Promise<AiResult<ReviewAnalysisOutput>> {
     await latence("analyse");
+    return this.analyser(input);
+  }
+
+  private analyser(input: AnalyzeReviewInput): AiResult<ReviewAnalysisOutput> {
     const { note, texte } = input.review;
     const contenu = texte ?? "";
     const themes = detecterThemes(contenu, note);

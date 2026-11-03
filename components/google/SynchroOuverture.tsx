@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { actionSynchroOuverture } from "@/app/(app)/actions";
+import { lireReponseSynchro } from "@/lib/google/synchro-reponse";
 
 /**
  * À l'ouverture de l'application : demande au serveur de relire les fiches si
@@ -16,8 +16,9 @@ export function SynchroOuverture() {
     (async () => {
       try {
         while (actif) {
-          const r = await actionSynchroOuverture();
-          if (!actif) return;
+          const reponse = await fetch("/api/google/synchro-ouverture", { method: "POST" });
+          if (!actif || !reponse.ok) return;
+          const r = lireReponseSynchro(await reponse.json());
           if (r.changements > 0) router.refresh();
           if (r.restants === 0 || r.changements === 0) return;
         }

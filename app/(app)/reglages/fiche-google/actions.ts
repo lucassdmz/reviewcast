@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -28,7 +29,8 @@ export async function actionChoisirFiche(form: FormData): Promise<void> {
     redirect(`/reglages/fiche-google?erreur=${codeErreurConnexion(error)}`);
   }
   const { etat } = await synchroniserFiche(locationId, "connexion");
-  if (etat === "faite") await preparerAvisRecents(locationId);
+  // Les avis s'affichent tout de suite ; leur analyse et leurs brouillons se font ensuite, sans faire attendre l'écran.
+  if (etat === "faite") after(() => preparerAvisRecents(locationId));
   (await cookies()).set(COOKIE_ETABLISSEMENT, locationId, { path: "/", maxAge: 365 * 24 * 60 * 60, sameSite: "lax" });
   revalidatePath("/", "layout");
   redirect(etat === "faite" ? "/avis" : "/reglages/fiche-google?erreur=google-indisponible");
