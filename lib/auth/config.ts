@@ -1,6 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth, { type NextAuthConfig, type Session } from "next-auth";
 import Google from "next-auth/providers/google";
+import { cache } from "react";
 import { logAudit } from "@/lib/audit/log";
 import { prisma } from "@/lib/db/client";
 import { getEnv } from "@/lib/env";
@@ -65,8 +66,8 @@ const nextAuth = NextAuth(authConfig);
 
 export const { handlers, signIn, signOut } = nextAuth;
 
-/** Session courante. En mode démonstration, une session fictive : aucune connexion n'est demandée. */
-export async function auth(): Promise<Session | null> {
+/** Session courante, lue une fois par rendu (le layout et chaque filtre partagent la même réponse). En mode démonstration, une session fictive : aucune connexion n'est demandée. */
+export const auth = cache(async (): Promise<Session | null> => {
   if (estModeDemo()) return sessionDemo();
   return nextAuth.auth();
-}
+});

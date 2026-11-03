@@ -37,6 +37,9 @@ import { AiOutputError, AiProviderError, validerAvecNouvelEssai } from "../valid
 /** Ligne de conduite neutre pour les tâches qui n'en dépendent pas (analyse, météo, synthèse). */
 const LIGNE_NEUTRE: LigneDeConduite = { texte: "", exemples: [] };
 
+/** Sans limite, le SDK attend dix minutes et réessaie deux fois : un écran resterait ouvert pour rien. */
+const DELAI_APPEL_MS = 45_000;
+
 /**
  * Fournisseur Anthropic (section 4.1) : sorties structurées validées par zod,
  * prompt système mis en cache, nouvel essai unique en cas de sortie invalide.
@@ -49,7 +52,7 @@ export class AnthropicProvider implements AiProvider, FournisseurLots {
     apiKey: string,
     private readonly modeles: AiModels,
   ) {
-    this.client = new Anthropic({ apiKey });
+    this.client = new Anthropic({ apiKey, timeout: DELAI_APPEL_MS, maxRetries: 1 });
   }
 
   analyzeReview(input: AnalyzeReviewInput) {

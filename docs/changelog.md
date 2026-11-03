@@ -8,6 +8,16 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ## 3 novembre 2026
 
+### L'aperçu de votre voix s'ouvre aussitôt
+
+**Ce qui change pour vous.** Dans Réglages, « Voir un aperçu » ouvre l'écran tout de suite : la réponse d'exemple s'écrit sous vos yeux, à la place d'un écran figé.
+
+**Ce à quoi on a pensé.** L'aperçu n'est toujours pas enregistré et ne remplace aucun brouillon. Un modèle qui tarde est interrompu au bout de 45 secondes, au lieu de laisser l'écran ouvert indéfiniment.
+
+**Pas encore couvert.** L'aperçu est rédigé à chaque ouverture : il n'est pas gardé d'une fois sur l'autre.
+
+---
+
 ### Vos gestes passent tout de suite, même pendant que vos avis s'importent
 
 **Ce qui change pour vous.** À l'ouverture, l'application relit vos fiches Google et fait analyser vos nouveaux avis. Jusqu'ici, un geste fait pendant ce temps (publier une réponse, valider vos mercis, régénérer une synthèse) attendait la fin de ce travail, parfois une vingtaine de secondes. Désormais, il part aussitôt. De même, quand vous connectez une fiche, vos avis s'affichent sans attendre leurs analyses, et les brouillons arrivent juste après.

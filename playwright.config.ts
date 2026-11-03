@@ -46,6 +46,8 @@ export default defineConfig({
       DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/eclaircie",
       // Fournisseur IA simulé : aucun appel réseau pendant les parcours.
       AI_PROVIDER: "fake",
+      // Plus longue que les limites d'affichage des parcours : un écran qui attendrait l'IA échouerait.
+      AI_FAKE_DELAI_MS: "2500",
       PUBLICATION_GOOGLE: "simulee",
       // Clés VAPID réservées aux tests (aucun appareil réel n'y est abonné) et secret des tâches planifiées.
       VAPID_PUBLIC_KEY: "BFkdO-30j3-E3QVyIRoZj2qOliucCYC77Ngur1YAD3PwanTePy9PabPmMvXtf4Qzn2uUqQ7HOckrl5TrzvHaklo",

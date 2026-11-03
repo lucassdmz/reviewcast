@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { Ecran } from "@/components/Ecran";
 import { FormulaireApprentissage, FormulaireLienAvis, FormulaireSignature, FormulaireSujets, FormulaireTon } from "@/components/reglages/SectionsVoix";
@@ -62,7 +63,11 @@ export default async function SectionReglagesPage({ params, searchParams }: Page
       {cle === "ton" && <FormulaireTon locationId={etablissement.id} voix={voix} />}
       {cle === "sujets" && <FormulaireSujets locationId={etablissement.id} voix={voix} suggestions={await sujetsSansRegle(etablissement.id, voix.regles)} courants={sujetsCourantsDisponibles(voix.regles)} />}
       {cle === "apprentissage" && <FormulaireApprentissage locationId={etablissement.id} voix={voix} corrections={await listerCorrections(etablissement.id)} />}
-      {cle === "apercu" && <Apercu locationId={etablissement.id} />}
+      {cle === "apercu" && (
+        <Suspense fallback={<ApercuEnAttente />}>
+          <Apercu locationId={etablissement.id} />
+        </Suspense>
+      )}
       {cle === "avis" && <SectionLienAvis locationId={etablissement.id} />}
     </Ecran>
   );
@@ -71,6 +76,21 @@ export default async function SectionReglagesPage({ params, searchParams }: Page
 async function SectionLienAvis({ locationId }: { locationId: string }) {
   const lien = await lireLienAvis(locationId);
   return <FormulaireLienAvis locationId={locationId} lien={lien} qr={lien ? await qrSvg(lien) : null} />;
+}
+
+function ApercuEnAttente() {
+  return (
+    <div className="bloc" aria-busy="true">
+      <p role="status" className="text-[15px] text-encre-douce">
+        L&apos;aperçu se rédige avec vos réglages…
+      </p>
+      <div className="mt-3 space-y-2" aria-hidden="true">
+        <div className="h-3.5 w-full animate-pulse rounded-full bg-nuage" />
+        <div className="h-3.5 w-5/6 animate-pulse rounded-full bg-nuage" />
+        <div className="h-3.5 w-2/3 animate-pulse rounded-full bg-nuage" />
+      </div>
+    </div>
+  );
 }
 
 async function Apercu({ locationId }: { locationId: string }) {
