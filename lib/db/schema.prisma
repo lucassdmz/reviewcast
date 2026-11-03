@@ -207,6 +207,7 @@ model Location {
   googleConnection GoogleConnection @relation(fields: [googleConnectionId], references: [id], onDelete: Cascade)
   reviews          Review[]
   monthlySummaries MonthlySummary[]
+  synthesesPeriode SynthesePeriode[]
   settings         Settings?
   dailyStats       DailyStat[]
   themeStats       ThemeStat[]
@@ -421,6 +422,33 @@ model ThemeStat {
 
 /// Synthèse mensuelle précalculée pour la home et la page Tendances.
 /// `locationId` null = vue globale de tous les établissements.
+/// Synthèse de Tendances d'une période réelle (du… au…), jamais écrasée par une autre période.
+model SynthesePeriode {
+  id         String    @id @default(cuid())
+  /// `fiche:<id>`, ou `ensemble:<empreinte des fiches>` pour une vue d'ensemble : celle d'un compte n'est jamais montrée à un autre.
+  portee     String
+  locationId String?   @map("location_id")
+  debut      DateTime  @db.Date
+  /// Exclue, comme dans le calcul de la période.
+  fin        DateTime  @db.Date
+  libelle    String
+  /// Empreinte des chiffres racontés : tant qu'elle ne change pas, le texte n'est pas repayé.
+  empreinte  String?
+  texte      String?
+  /// Rédaction en cours, pour ne jamais payer deux fois le même appel.
+  reserveeAt DateTime? @map("reservee_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  location Location? @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([portee, debut, fin])
+  @@index([portee, empreinte])
+  @@index([portee, libelle])
+  @@index([locationId])
+  @@map("syntheses_periode")
+}
+
 model MonthlySummary {
   id          String   @id @default(cuid())
   locationId  String?  @map("location_id")

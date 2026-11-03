@@ -219,6 +219,14 @@ nav a {
   }
 }
 
+/* Changement de période : le sélecteur reste net, le reste s'estompe jusqu'aux nouveaux chiffres. */
+.zone-periode > :not(nav) {
+  transition: opacity 0.15s ease;
+}
+.zone-periode[data-periode-en-cours] > :not(nav) {
+  opacity: 0.5;
+}
+
 .entree > * {
   animation: monter 0.26s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }

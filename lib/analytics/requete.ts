@@ -22,6 +22,16 @@ export interface ParametresTendances {
   requete: string;
 }
 
+/** Adresse d'un raccourci de période. */
+export function hrefPeriode(selection: string): string {
+  return `/tendances?periode=${selection}`;
+}
+
+/** Adresse d'une plage choisie à la main. */
+export function hrefDates(debut: string, fin: string): string {
+  return `/tendances?${new URLSearchParams({ periode: "perso", debut, fin }).toString()}`;
+}
+
 export function lireParametres(params: Record<string, string | string[] | undefined>, maintenant = new Date()): ParametresTendances {
   const texte = (k: string) => (typeof params[k] === "string" ? (params[k] as string) : undefined);
   const selection = parserSelection(texte("periode"));

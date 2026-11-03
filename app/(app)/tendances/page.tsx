@@ -1,17 +1,15 @@
-import { BoutonAction } from "@/components/BoutonAction";
 import { Ecran } from "@/components/Ecran";
 import { NombreAnime } from "@/components/NombreAnime";
 import { CourbeMensuelle } from "@/components/tendances/CourbeMensuelle";
 import { ListeThemes } from "@/components/tendances/ListeThemes";
 import { RepartitionEtoiles } from "@/components/tendances/RepartitionEtoiles";
-import { SelecteurPeriode } from "@/components/tendances/SelecteurPeriode";
+import { SelecteurPeriode, ZonePeriode } from "@/components/tendances/SelecteurPeriode";
 import { Synthese } from "@/components/tendances/Synthese";
 import { formaterDelai } from "@/lib/analytics/agregation";
 import { lireParametres } from "@/lib/analytics/requete";
-import { syntheseTendances } from "@/lib/analytics/synthese";
+import { lireSynthese } from "@/lib/analytics/synthese";
 import { obtenirTendances } from "@/lib/analytics/tendances";
 import { idEtablissementActif } from "@/lib/etablissements/service";
-import { actionRegenererSynthese } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -25,13 +23,14 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
   const params = await searchParams;
   const { periode, requete } = lireParametres(params);
   const t = await obtenirTendances(await idEtablissementActif(), periode);
-  const synthese = await syntheseTendances(t);
+  // Seulement ce qui est stocké : la rédaction est demandée ensuite par le navigateur, sans faire attendre l'écran.
+  const { synthese, aRediger } = await lireSynthese(t);
   const titreSynthese = `Synthèse ${t.etablissement?.nom ?? "tous établissements"} · ${periode.libelle}`;
   const evolutionNote = t.repartition.noteMoyenne !== null && t.precedente.noteMoyenne !== null ? t.repartition.noteMoyenne - t.precedente.noteMoyenne : null;
 
   return (
     <Ecran titre="Tendances" large>
-      <div className="entree space-y-3">
+      <ZonePeriode className="entree space-y-3">
         <SelecteurPeriode periode={periode} />
 
         <section aria-label="Résumé de la période" className="bloc">
@@ -72,24 +71,16 @@ export default async function TendancesPage({ searchParams }: PageProps<"/tendan
         </div>
 
         <Synthese
-          synthese={synthese}
+          key={`${t.etablissement?.id ?? "ensemble"}:${requete}`}
+          initiale={synthese}
+          aRediger={aRediger}
           titre={titreSynthese}
-          regenerer={
-            <form action={actionRegenererSynthese}>
-              <input type="hidden" name="periode" value={periode.selection} />
-              {periode.selection === "perso" && (
-                <>
-                  <input type="hidden" name="debut" value={typeof params.debut === "string" ? params.debut : ""} />
-                  <input type="hidden" name="fin" value={typeof params.fin === "string" ? params.fin : ""} />
-                </>
-              )}
-              <BoutonAction enCours="Rédaction…" className="pressable rounded-full bg-nuage px-3 py-1.5 font-medium">
-                {synthese ? "Régénérer" : "Générer la synthèse"}
-              </BoutonAction>
-            </form>
-          }
+          demande={{
+            periode: periode.selection,
+            ...(periode.selection === "perso" && typeof params.debut === "string" && typeof params.fin === "string" ? { debut: params.debut, fin: params.fin } : {}),
+          }}
         />
-      </div>
+      </ZonePeriode>
     </Ecran>
   );
 }

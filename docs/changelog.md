@@ -6,6 +6,24 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+## 3 novembre 2026
+
+### Tendances s'affiche à l'instant, la synthèse vous rejoint
+
+**Ce qui change pour vous.** Vos chiffres, vos sujets, votre courbe et la répartition des étoiles s'affichent tout de suite, même la première fois que vous ouvrez une période. La synthèse se rédige pendant que vous lisez, puis apparaît à sa place. Quand vous changez de période ou de dates, l'écran vous répond au moment même du geste : l'onglet choisi s'allume, « Mise à jour des chiffres… » s'affiche et les anciens chiffres s'estompent jusqu'à l'arrivée des nouveaux. Une synthèse déjà rédigée revient instantanément, sans être rédigée une deuxième fois.
+
+**Ce à quoi on a pensé.**
+- Chaque synthèse est rangée sur ses dates exactes : deux périodes qui commencent le même mois ne s'effacent plus l'une l'autre.
+- Une synthèse n'est rédigée de nouveau que si vos chiffres ont changé. Répondre à un avis ne suffit pas à la refaire : le taux de réponse évolue à chaque réponse.
+- En attendant une version à jour, l'ancienne reste lisible, un peu estompée.
+- Deux onglets ouverts sur la même période ne déclenchent qu'une seule rédaction.
+- Hors ligne, l'écran déjà chargé reste lisible et la synthèse se rédige au retour de la connexion.
+- La vue d'ensemble de vos établissements a sa propre synthèse, jamais partagée avec un autre compte.
+
+**Pas encore couvert.** Les synthèses rédigées avant cette version ne sont pas reprises : chaque période se rédige une fois, à sa première ouverture. Pour une période glissante (« 30 derniers jours »), une nouvelle synthèse est rédigée au plus une fois par jour, quand vos chiffres ont bougé.
+
+---
+
 ## 2 novembre 2026
 
 ### Des fiches qui parlent de votre commerce, seulement quand il y a quelque chose à dire
