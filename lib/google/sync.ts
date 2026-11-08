@@ -7,7 +7,7 @@ import { estRecent } from "@/lib/fenetre/adaptative";
 import { fenetresParEtablissement } from "@/lib/fenetre/service";
 import { notifierAvisATraiter } from "@/lib/notifications/service";
 import { GoogleApiError } from "./client";
-import { cheminFiche, comparerAvis, partagerImport, versAvisDistant, type AvisDistant, type Comparaison, type MiseAJour } from "./comparaison";
+import { brouillonDOffice, cheminFiche, comparerAvis, partagerImport, versAvisDistant, type AvisDistant, type Comparaison, type MiseAJour } from "./comparaison";
 import { activerNotifications, clientDeLaConnexion } from "./connexion";
 import { avancerLots } from "./import-lots";
 import { limitePourLister, type Declencheur } from "./limites";
@@ -166,8 +166,12 @@ const ECHECS_AVANT_ARRET = 3;
 async function traiterAvis(reviewId: string, fenetres: Awaited<ReturnType<typeof fenetresParEtablissement>>, maintenant: Date): Promise<void> {
   await analyserAvis(reviewId);
   const a = await prisma.review.findUniqueOrThrow({ where: { id: reviewId }, select: { statut: true, locationId: true, dateCreation: true } });
-  // Seuls les avis récents reçoivent un brouillon d'office : l'historique attend qu'on l'ouvre, pour ne pas payer ce qu'on ne lira pas.
-  if (a.statut === "A_TRAITER" && estRecent(a, fenetres, maintenant)) await genererBrouillon(reviewId);
+  // Brouillon d'office pour les dix avis à traiter les plus récents de la fiche : l'historique attend qu'on l'ouvre, pour ne pas payer ce qu'on ne lira pas.
+  const aTraiter = a.statut === "A_TRAITER";
+  const plusRecentsATraiter = aTraiter
+    ? await prisma.review.count({ where: { locationId: a.locationId, statut: "A_TRAITER", retireAt: null, dateCreation: { gt: a.dateCreation } } })
+    : 0;
+  if (brouillonDOffice({ aTraiter, recent: estRecent(a, fenetres, maintenant), plusRecentsATraiter })) await genererBrouillon(reviewId);
   await prisma.review.update({ where: { id: reviewId }, data: { analyseAFaire: false, analyseReserveeAt: null } });
 }
 

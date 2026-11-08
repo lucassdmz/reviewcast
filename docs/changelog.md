@@ -6,6 +6,21 @@ Le journal des nouveautés, à lire ou à raconter en présentation. Pour chaque
 
 ---
 
+## 8 novembre 2026
+
+### Vos premiers brouillons, sans gaspiller vos crédits
+
+**Ce qui change pour vous.** En connectant votre fiche, vous trouvez prêtes les réponses à vos dix derniers avis à traiter. Les plus anciens restent à portée de main : un bouton dans la fiche de l'avis rédige la réponse quand vous en avez besoin.
+
+**Ce à quoi on a pensé.**
+- Une fiche avec des années d'avis ne déclenche plus des dizaines de rédactions d'un coup : vous ne payez que ce que vous lirez.
+- Un nouvel avis reçoit toujours sa réponse préparée, puisqu'il est le plus récent.
+- Tout l'historique reste analysé, à moitié prix, pour que Tendances et l'accueil soient complets dès le premier jour.
+
+**Pas encore couvert.** Le nombre de brouillons préparés d'office (dix) n'est pas réglable depuis l'application.
+
+---
+
 ## 3 novembre 2026
 
 ### L'aperçu de votre voix s'ouvre aussitôt

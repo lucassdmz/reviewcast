@@ -129,6 +129,17 @@ export function locationDepuisRessource(ressource: string): string | null {
 }
 
 /**
+ * Brouillons rédigés d'office par fiche : seulement les plus récents des avis
+ * à traiter. À l'import d'une grosse fiche, les autres gardent le bouton pour
+ * en demander un ; un nouvel avis, toujours le plus récent, en reçoit un.
+ */
+export const BROUILLONS_DOFFICE_MAX = 10;
+
+export function brouillonDOffice(avis: { aTraiter: boolean; recent: boolean; plusRecentsATraiter: number }): boolean {
+  return avis.aTraiter && avis.recent && avis.plusRecentsATraiter < BROUILLONS_DOFFICE_MAX;
+}
+
+/**
  * À l'import initial, seul l'ancien historique part en lot. « Récent » est la
  * fenêtre de la file (lib/fenetre/adaptative.ts), lue sur tous les avis de la
  * fiche : ces avis-là sont analysés tout de suite et reçoivent leur brouillon.

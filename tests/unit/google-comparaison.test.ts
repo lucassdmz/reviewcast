@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { estRecent, fenetreAdaptative } from "@/lib/fenetre/adaptative";
-import { AUTEUR_ANONYME, cheminFiche, comparerAvis, locationDepuisRessource, noteDepuisGoogle, partagerImport, versAvisDistant, type AvisDistant, type AvisLocal } from "@/lib/google/comparaison";
+import { AUTEUR_ANONYME, BROUILLONS_DOFFICE_MAX, brouillonDOffice, cheminFiche, comparerAvis, locationDepuisRessource, noteDepuisGoogle, partagerImport, versAvisDistant, type AvisDistant, type AvisLocal } from "@/lib/google/comparaison";
 
 const ID = "accounts/1/locations/2/reviews/";
 const D = new Date("2026-10-01T10:00:00Z");
@@ -128,5 +128,18 @@ describe("partage de l'import initial", () => {
     const { recents, historique } = partagerImport(avis, MAINTENANT);
     expect(recents.length + historique.length).toBe(2);
     expect(partagerImport([], MAINTENANT)).toEqual({ recents: [], historique: [] });
+  });
+});
+
+describe("brouillons rédigés d'office", () => {
+  it("rédige pour les dix avis à traiter les plus récents, pas au-delà", () => {
+    expect(brouillonDOffice({ aTraiter: true, recent: true, plusRecentsATraiter: 0 })).toBe(true);
+    expect(brouillonDOffice({ aTraiter: true, recent: true, plusRecentsATraiter: BROUILLONS_DOFFICE_MAX - 1 })).toBe(true);
+    expect(brouillonDOffice({ aTraiter: true, recent: true, plusRecentsATraiter: BROUILLONS_DOFFICE_MAX })).toBe(false);
+  });
+
+  it("ne rédige ni hors de la file ni hors de la fenêtre", () => {
+    expect(brouillonDOffice({ aTraiter: false, recent: true, plusRecentsATraiter: 0 })).toBe(false);
+    expect(brouillonDOffice({ aTraiter: true, recent: false, plusRecentsATraiter: 0 })).toBe(false);
   });
 });
